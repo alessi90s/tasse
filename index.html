@@ -14,7 +14,7 @@
         table {
             margin-top: 20px;
             border-collapse: collapse;
-            width: 50%;
+            width: 60%;
         }
         table, td {
             border: 1px solid #ddd;
@@ -22,6 +22,9 @@
         }
         td {
             text-align: left;
+        }
+        strong {
+            color: #000;
         }
     </style>
 </head>
@@ -55,6 +58,10 @@
             <td id="impostaSostitutivaOutput"></td>
         </tr>
         <tr>
+            <td>Acconto Imposta Sostitutiva (100%):</td>
+            <td id="accontoImpostaSostitutivaOutput"></td>
+        </tr>
+        <tr>
             <td>Contributi INPS (26,07%):</td>
             <td id="contributiInpsOutput"></td>
         </tr>
@@ -82,6 +89,7 @@
             // Esegui i calcoli
             var redditoNetto = redditoLordo * coefficiente;
             var impostaSostitutiva = redditoNetto * 0.05; // 5%
+            var accontoImpostaSostitutiva = impostaSostitutiva * 1.0; // 100%
             var contributiInps = redditoNetto * 0.2607; // 26,07%
             var accontoInps = contributiInps * 0.80; // 80%
 
@@ -89,19 +97,30 @@
             document.getElementById("redditoLordoOutput").innerText = "€ " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("redditoNettoOutput").innerText = "€ " + redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("impostaSostitutivaOutput").innerText = "€ " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById("accontoImpostaSostitutivaOutput").innerText = "€ " + accontoImpostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("contributiInpsOutput").innerText = "€ " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("accontoInpsOutput").innerText = "€ " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-            // Calcola il totale delle tasse e dei contributi
-            var totaleTasseContributi = impostaSostitutiva + contributiInps + accontoInps;
+            // Calcola il totale delle tasse e dei contributi effettivi
+            var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
 
-            // Crea il messaggio per il cliente
-            var messaggio = "Con un incasso totale di € " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) +
-                ", nel regime forfettario pagherai:<br>" +
-                "- Imposta sostitutiva (5%): € " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
-                "- Contributi INPS (26,07%): € " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
-                "- Acconto contributi INPS (80%): € " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
-                "Per un totale di tasse e contributi pari a € " + totaleTasseContributi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ".";
+            // Calcola il totale degli acconti
+            var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
+
+            // Calcola il totale complessivo da versare
+            var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
+
+            // Crea il messaggio per il cliente in modo semplice
+            var messaggio = "Hai guadagnato € " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ".<br><br>" +
+                "Le vere tasse che devi pagare sono:<br>" +
+                "- Imposta sostitutiva: € " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "- Contributi INPS: € " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "<strong>In totale, pagherai € " + totaleTasseContributiEffettivi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " di tasse e contributi.</strong><br><br>" +
+                "Inoltre, dovrai anticipare per l'anno prossimo:<br>" +
+                "- Acconto imposta sostitutiva: € " + accontoImpostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "- Acconto contributi INPS: € " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "Questi acconti sono solo un anticipo sulle tasse future.<br><br>" +
+                "<strong>In totale, quest'anno dovrai versare € " + totaleDaVersare.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ", includendo tasse, contributi e acconti.</strong>";
 
             // Visualizza il messaggio nell'elemento HTML
             document.getElementById("messaggioCliente").innerHTML = messaggio;
