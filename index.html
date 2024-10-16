@@ -2,7 +2,6 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    
     <title>Calcolo Regime Forfettario</title>
     <style>
         /* Il tuo CSS qui */
@@ -15,7 +14,7 @@
         table {
             margin-top: 20px;
             border-collapse: collapse;
-            width: 60%;
+            width: 70%;
         }
         table, td {
             border: 1px solid #ddd;
@@ -40,6 +39,13 @@
         <label for="coefficienteRedditivita">Coefficiente di Redditività (%):</label>
         <input type="number" id="coefficienteRedditivita" placeholder="Inserisci il coefficiente"><br><br>
 
+        <label for="cassaInps">Seleziona la cassa di riferimento INPS:</label>
+        <select id="cassaInps">
+            <option value="gs_inps">Gestione Separata INPS</option>
+            <option value="inps_commercianti">INPS Commercianti</option>
+            <option value="inps_artigiani">INPS Artigiani</option>
+        </select><br><br>
+
         <button type="button" onclick="calcola()">Calcola</button>
     </form>
 
@@ -63,11 +69,19 @@
             <td id="accontoImpostaSostitutivaOutput"></td>
         </tr>
         <tr>
-            <td>Contributi INPS (26,07%):</td>
+            <td>Contributi INPS:</td>
             <td id="contributiInpsOutput"></td>
         </tr>
+        <tr id="rowContributiFissi" style="display: none;">
+            <td>Contributi Fissi:</td>
+            <td id="contributiFissiOutput"></td>
+        </tr>
+        <tr id="rowContributiVariabili" style="display: none;">
+            <td>Contributi Variabili:</td>
+            <td id="contributiVariabiliOutput"></td>
+        </tr>
         <tr>
-            <td>Acconto Contributi INPS (80%):</td>
+            <td>Acconto Contributi INPS:</td>
             <td id="accontoInpsOutput"></td>
         </tr>
     </table>
@@ -80,6 +94,7 @@
             // Ottieni i valori di input
             var redditoLordo = parseFloat(document.getElementById("redditoLordo").value);
             var coefficiente = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
+            var cassaInps = document.getElementById("cassaInps").value;
 
             // Verifica che i valori siano numeri validi
             if (isNaN(redditoLordo) || isNaN(coefficiente)) {
@@ -87,12 +102,53 @@
                 return;
             }
 
-            // Esegui i calcoli
+            // Esegui i calcoli comuni
             var redditoNetto = redditoLordo * coefficiente;
             var impostaSostitutiva = redditoNetto * 0.05; // 5%
             var accontoImpostaSostitutiva = impostaSostitutiva * 1.0; // 100%
-            var contributiInps = redditoNetto * 0.2607; // 26,07%
-            var accontoInps = contributiInps * 0.80; // 80%
+
+            // Inizializza le variabili per i contributi INPS
+            var contributiInps = 0;
+            var accontoInps = 0;
+            var contributiFissi = 0;
+            var contributiVariabili = 0;
+            var messaggioContributi = "";
+
+            // Calcoli specifici per la cassa INPS selezionata
+            if (cassaInps === "gs_inps") {
+                // Gestione Separata INPS
+                contributiInps = redditoNetto * 0.2607; // 26,07%
+                accontoInps = contributiInps * 0.80; // 80%
+                messaggioContributi = "- Contributi INPS (26,07% del reddito netto): € " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>";
+            } else if (cassaInps === "inps_commercianti") {
+                // INPS Commercianti
+                contributiFissi = 4515.43; // Contributi fissi minimali
+                var sogliaReddito = 18415.00;
+                if (redditoNetto > sogliaReddito) {
+                    var eccedenza = redditoNetto - sogliaReddito;
+                    contributiVariabili = eccedenza * 0.2448; // 24,48% sull'eccedenza
+                }
+                contributiInps = contributiFissi + contributiVariabili;
+                accontoInps = contributiVariabili * 0.80; // 80% dell'eccedenza
+                messaggioContributi = "- Contributi fissi INPS Commercianti: € " + contributiFissi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>";
+                if (contributiVariabili > 0) {
+                    messaggioContributi += "- Contributi variabili INPS Commercianti (24,48% sull'eccedenza): € " + contributiVariabili.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>";
+                }
+            } else if (cassaInps === "inps_artigiani") {
+                // INPS Artigiani
+                contributiFissi = 4427.04; // Contributi fissi minimali
+                var sogliaReddito = 18415.00;
+                if (redditoNetto > sogliaReddito) {
+                    var eccedenza = redditoNetto - sogliaReddito;
+                    contributiVariabili = eccedenza * 0.24; // 24% sull'eccedenza
+                }
+                contributiInps = contributiFissi + contributiVariabili;
+                accontoInps = contributiVariabili * 0.80; // 80% dell'eccedenza
+                messaggioContributi = "- Contributi fissi INPS Artigiani: € " + contributiFissi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>";
+                if (contributiVariabili > 0) {
+                    messaggioContributi += "- Contributi variabili INPS Artigiani (24% sull'eccedenza): € " + contributiVariabili.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>";
+                }
+            }
 
             // Aggiorna i valori nella tabella
             document.getElementById("redditoLordoOutput").innerText = "€ " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -101,6 +157,17 @@
             document.getElementById("accontoImpostaSostitutivaOutput").innerText = "€ " + accontoImpostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("contributiInpsOutput").innerText = "€ " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("accontoInpsOutput").innerText = "€ " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Gestisci la visualizzazione dei contributi fissi e variabili
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                document.getElementById("rowContributiFissi").style.display = "";
+                document.getElementById("rowContributiVariabili").style.display = "";
+                document.getElementById("contributiFissiOutput").innerText = "€ " + contributiFissi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById("contributiVariabiliOutput").innerText = "€ " + contributiVariabili.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            } else {
+                document.getElementById("rowContributiFissi").style.display = "none";
+                document.getElementById("rowContributiVariabili").style.display = "none";
+            }
 
             // Calcola il totale delle tasse e dei contributi effettivi
             var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
@@ -115,7 +182,7 @@
             var messaggio = "Hai guadagnato € " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ".<br><br>" +
                 "Le vere tasse che devi pagare sono:<br>" +
                 "- Imposta sostitutiva: € " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
-                "- Contributi INPS: € " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                messaggioContributi +
                 "<strong>In totale, pagherai € " + totaleTasseContributiEffettivi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " di tasse e contributi.</strong><br><br>" +
                 "Inoltre, dovrai anticipare per l'anno prossimo:<br>" +
                 "- Acconto imposta sostitutiva: € " + accontoImpostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
