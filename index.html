@@ -27,9 +27,29 @@
         <button type="button" onclick="calcola()">Calcola</button>
     </form>
 
-    <!-- Tabella dei risultati -->
+    <!-- Sezione per i risultati -->
+    <h2>Risultati</h2>
     <table>
-        <!-- Il tuo codice per la tabella -->
+        <tr>
+            <td>Reddito Lordo:</td>
+            <td id="redditoLordoOutput"></td>
+        </tr>
+        <tr>
+            <td>Reddito Netto:</td>
+            <td id="redditoNettoOutput"></td>
+        </tr>
+        <tr>
+            <td>Imposta Sostitutiva (5%):</td>
+            <td id="impostaSostitutivaOutput"></td>
+        </tr>
+        <tr>
+            <td>Contributi INPS (26.07%):</td>
+            <td id="contributiInpsOutput"></td>
+        </tr>
+        <tr>
+            <td>Acconto Contributi INPS (80%):</td>
+            <td id="accontoInpsOutput"></td>
+        </tr>
     </table>
 
     <!-- Messaggio per il cliente -->
@@ -39,7 +59,7 @@
         function calcola() {
             // Ottieni i valori di input
             var redditoLordo = parseFloat(document.getElementById("redditoLordo").value);
-            var coefficiente = parseFloat(document.getElementById("coefficienteRedditivita").value);
+            var coefficiente = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
 
             // Verifica che i valori siano numeri validi
             if (isNaN(redditoLordo) || isNaN(coefficiente)) {
@@ -48,26 +68,12 @@
             }
 
             // Esegui i calcoli
-            var redditoNetto = redditoLordo * (coefficiente / 100);
+            var redditoNetto = redditoLordo * coefficiente;
             var impostaSostitutiva = redditoNetto * 0.05; // 5%
-            var contributiINPS = redditoNetto * 0.2607; // 26.07%
-            var accontoINPS = contributiINPS * 0.80; // 80%
+            var contributiInps = redditoNetto * 0.2607; // 26.07%
+            var accontoInps = contributiInps * 0.80; // 80%
 
-            // Aggiorna la tabella dei risultati
-            // ...
-
-            // Crea il messaggio per il cliente
-            var totaleTasseContributi = impostaSostitutiva + contributiINPS;
-            var messaggio = "Con un incasso totale di €" + redditoLordo.toFixed(2) +
-                            ", nel regime forfettario pagherai:<br>" +
-                            "- Imposta sostitutiva (5%): €" + impostaSostitutiva.toFixed(2) + "<br>" +
-                            "- Contributi INPS (26.07%): €" + contributiINPS.toFixed(2) + "<br>" +
-                            "Per un totale di tasse e contributi pari a €" + totaleTasseContributi.toFixed(2) + ".";
-
-            // Visualizza il messaggio nell'elemento HTML
-            document.getElementById("messaggioCliente").innerHTML = messaggio;
-        }
-    </script>
-
-</body>
-</html>
+            // Aggiorna i valori nella tabella
+            document.getElementById("redditoLordoOutput").innerText = "€ " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById("redditoNettoOutput").innerText = "€ " + redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById("impostaSostitutivaOutput").innerText = "€ " + impos
