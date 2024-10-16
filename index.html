@@ -105,7 +105,80 @@
             var accontoInps = contributiInps * 0.8; // 80% di acconto
 
             // Aggiorna i risultati nella tabella
-            document.getElementById("redditoLordo").innerText = "€" + redditoLordo.toLocaleString();
+            document.getElementById("reddi<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolo Regime Forfettario</title>
+    <style>
+        /* Il tuo CSS qui */
+        #messaggioCliente {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calcolatore Regime Forfettario</h1>
+
+    <form>
+        <label for="redditoLordo">Reddito Lordo:</label>
+        <input type="number" id="redditoLordo" placeholder="Inserisci il reddito lordo"><br><br>
+
+        <label for="coefficienteRedditivita">Coefficiente di Redditività (%):</label>
+        <input type="number" id="coefficienteRedditivita" placeholder="Inserisci il coefficiente"><br><br>
+
+        <button type="button" onclick="calcola()">Calcola</button>
+    </form>
+
+    <!-- Tabella dei risultati -->
+    <table>
+        <!-- Il tuo codice per la tabella -->
+    </table>
+
+    <!-- Messaggio per il cliente -->
+    <div id="messaggioCliente"></div>
+
+    <script>
+        function calcola() {
+            // Ottieni i valori di input
+            var redditoLordo = parseFloat(document.getElementById("redditoLordo").value);
+            var coefficiente = parseFloat(document.getElementById("coefficienteRedditivita").value);
+
+            // Verifica che i valori siano numeri validi
+            if (isNaN(redditoLordo) || isNaN(coefficiente)) {
+                alert("Per favore, inserisci valori numerici validi.");
+                return;
+            }
+
+            // Esegui i calcoli
+            var redditoNetto = redditoLordo * (coefficiente / 100);
+            var impostaSostitutiva = redditoNetto * 0.05; // 5%
+            var contributiINPS = redditoNetto * 0.2607; // 26.07%
+            var accontoINPS = contributiINPS * 0.80; // 80%
+
+            // Aggiorna la tabella dei risultati
+            // ...
+
+            // Crea il messaggio per il cliente
+            var totaleTasseContributi = impostaSostitutiva + contributiINPS;
+            var messaggio = "Con un incasso totale di €" + redditoLordo.toFixed(2) +
+                            ", nel regime forfettario pagherai:<br>" +
+                            "- Imposta sostitutiva (5%): €" + impostaSostitutiva.toFixed(2) + "<br>" +
+                            "- Contributi INPS (26.07%): €" + contributiINPS.toFixed(2) + "<br>" +
+                            "Per un totale di tasse e contributi pari a €" + totaleTasseContributi.toFixed(2) + ".";
+
+            // Visualizza il messaggio nell'elemento HTML
+            document.getElementById("messaggioCliente").innerHTML = messaggio;
+        }
+    </script>
+
+</body>
+</html>
+toLordo").innerText = "€" + redditoLordo.toLocaleString();
             document.getElementById("redditoNetto").innerText = "€" + redditoNetto.toLocaleString();
             document.getElementById("impostaSostitutiva").innerText = "€" + impostaSostitutiva.toLocaleString();
             document.getElementById("contributiInps").innerText = "€" + contributiInps.toLocaleString();
