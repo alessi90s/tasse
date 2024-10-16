@@ -11,6 +11,18 @@
             color: #333;
             line-height: 1.5;
         }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 50%;
+        }
+        table, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        td {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -43,7 +55,7 @@
             <td id="impostaSostitutivaOutput"></td>
         </tr>
         <tr>
-            <td>Contributi INPS (26.07%):</td>
+            <td>Contributi INPS (26,07%):</td>
             <td id="contributiInpsOutput"></td>
         </tr>
         <tr>
@@ -70,10 +82,31 @@
             // Esegui i calcoli
             var redditoNetto = redditoLordo * coefficiente;
             var impostaSostitutiva = redditoNetto * 0.05; // 5%
-            var contributiInps = redditoNetto * 0.2607; // 26.07%
+            var contributiInps = redditoNetto * 0.2607; // 26,07%
             var accontoInps = contributiInps * 0.80; // 80%
 
             // Aggiorna i valori nella tabella
             document.getElementById("redditoLordoOutput").innerText = "€ " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("redditoNettoOutput").innerText = "€ " + redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("impostaSostitutivaOutput").innerText = "€ " + impos
+            document.getElementById("impostaSostitutivaOutput").innerText = "€ " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById("contributiInpsOutput").innerText = "€ " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById("accontoInpsOutput").innerText = "€ " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Calcola il totale delle tasse e dei contributi
+            var totaleTasseContributi = impostaSostitutiva + contributiInps + accontoInps;
+
+            // Crea il messaggio per il cliente
+            var messaggio = "Con un incasso totale di € " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) +
+                ", nel regime forfettario pagherai:<br>" +
+                "- Imposta sostitutiva (5%): € " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "- Contributi INPS (26,07%): € " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "- Acconto contributi INPS (80%): € " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "<br>" +
+                "Per un totale di tasse e contributi pari a € " + totaleTasseContributi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ".";
+
+            // Visualizza il messaggio nell'elemento HTML
+            document.getElementById("messaggioCliente").innerHTML = messaggio;
+        }
+    </script>
+
+</body>
+</html>
