@@ -104,11 +104,34 @@
             <option value="2024">2024</option>
         </select>
 
+        <label for="aliquotaImposta">Seleziona l'aliquota dell'imposta sostitutiva:</label>
+        <select id="aliquotaImposta">
+            <option value="0.05">5%</option>
+            <option value="0.15">15%</option>
+        </select>
+
+        <label for="codiceAteco">Seleziona il Codice ATECO:</label>
+        <select id="codiceAteco" onchange="aggiornaCoefficiente()">
+            <option value="" data-coefficiente="">-- Seleziona un codice ATECO --</option>
+            <option value="62.01.00" data-coefficiente="0.67">62.01.00 - Produzione di software non connesso all'edizione (67%)</option>
+            <option value="74.10.21" data-coefficiente="0.78">74.10.21 - Attività dei disegnatori grafici (78%)</option>
+            <option value="47.19.02" data-coefficiente="0.40">47.19.02 - Commercio al dettaglio ambulante (40%)</option>
+            <!-- Aggiungi altri codici ATECO secondo necessità -->
+        </select>
+
+        <label for="coefficienteRedditivita">Oppure seleziona il Coefficiente di Redditività (%):</label>
+        <select id="coefficienteRedditivita">
+            <option value="">-- Seleziona il coefficiente --</option>
+            <option value="86">86%</option>
+            <option value="78">78%</option>
+            <option value="67">67%</option>
+            <option value="40">40%</option>
+            <option value="33">33%</option>
+            <!-- Aggiungi altri coefficienti secondo necessità -->
+        </select>
+
         <label for="redditoLordo">Reddito Lordo:</label>
         <input type="number" id="redditoLordo" placeholder="Inserisci il reddito lordo">
-
-        <label for="coefficienteRedditivita">Coefficiente di Redditività (%):</label>
-        <input type="number" id="coefficienteRedditivita" placeholder="Inserisci il coefficiente">
 
         <label for="cassaInps">Seleziona la cassa di riferimento INPS:</label>
         <select id="cassaInps">
@@ -136,7 +159,7 @@
             <td id="redditoNettoOutput"></td>
         </tr>
         <tr class="evidenziato-giallo">
-            <td>Imposta Sostitutiva (5%) sul 2024:</td>
+            <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul 2024:</td>
             <td id="impostaSostitutivaOutput"></td>
         </tr>
         <tr class="evidenziato-azzurro">
@@ -165,22 +188,40 @@
     <div id="messaggioCliente"></div>
 
     <script>
+        function aggiornaCoefficiente() {
+            var selectAteco = document.getElementById("codiceAteco");
+            var coefficiente = selectAteco.options[selectAteco.selectedIndex].getAttribute('data-coefficiente');
+            
+            if (coefficiente) {
+                document.getElementById("coefficienteRedditivita").value = coefficiente * 100;
+            } else {
+                document.getElementById("coefficienteRedditivita").value = "";
+            }
+        }
+
         function calcola() {
             // Ottieni i valori di input
             var annoReddito = document.getElementById("annoReddito").value;
             var redditoLordo = parseFloat(document.getElementById("redditoLordo").value);
-            var coefficiente = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
+            var coefficienteInput = document.getElementById("coefficienteRedditivita").value;
+            var coefficiente = parseFloat(coefficienteInput) / 100;
             var cassaInps = document.getElementById("cassaInps").value;
+            var aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
 
             // Verifica che i valori siano numeri validi
-            if (isNaN(redditoLordo) || isNaN(coefficiente) || redditoLordo <= 0 || coefficiente <= 0) {
-                alert("Per favore, inserisci valori numerici validi e maggiori di zero.");
+            if (isNaN(redditoLordo) || redditoLordo <= 0) {
+                alert("Per favore, inserisci un reddito lordo valido e maggiore di zero.");
+                return;
+            }
+
+            if (isNaN(coefficiente) || coefficiente <= 0) {
+                alert("Per favore, seleziona o inserisci un coefficiente di redditività valido.");
                 return;
             }
 
             // Esegui i calcoli comuni
             var redditoNetto = redditoLordo * coefficiente;
-            var impostaSostitutiva = redditoNetto * 0.05; // 5%
+            var impostaSostitutiva = redditoNetto * aliquotaImposta;
             var accontoImpostaSostitutiva = impostaSostitutiva * 1.0; // 100%
 
             // Inizializza le variabili per i contributi INPS
@@ -228,112 +269,4 @@
 
             // Aggiorna i valori nella tabella
             document.getElementById("redditoLordoOutput").innerText = "€ " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("redditoNettoOutput").innerText = "€ " + redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("impostaSostitutivaOutput").innerText = "€ " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("accontoImpostaSostitutivaOutput").innerText = "€ " + accontoImpostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("contributiInpsOutput").innerText = "€ " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("accontoInpsOutput").innerText = "€ " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-            // Gestisci la visualizzazione dei contributi fissi e variabili
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                document.getElementById("rowContributiFissi").style.display = "";
-                document.getElementById("rowContributiVariabili").style.display = "";
-                document.getElementById("contributiFissiOutput").innerText = "€ " + contributiFissi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById("contributiVariabiliOutput").innerText = "€ " + contributiVariabili.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            } else {
-                document.getElementById("rowContributiFissi").style.display = "none";
-                document.getElementById("rowContributiVariabili").style.display = "none";
-            }
-
-            // Calcola il totale delle tasse e dei contributi effettivi
-            var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
-
-            // Calcola il totale degli acconti
-            var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
-
-            // Calcola il totale complessivo da versare
-            var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
-
-            // Calcola le scadenze dei pagamenti
-            var annoDichiarazione = parseInt(annoReddito) + 1;
-
-            // Date di scadenza per imposta sostitutiva
-            var scadenzaSaldoImposta = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta2 = "30 novembre " + annoDichiarazione;
-
-            // Date di scadenza per contributi INPS
-            var scadenzaSaldoContributi = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi2 = "30 novembre " + annoDichiarazione;
-
-            // Date di scadenza per contributi fissi (se applicabili)
-            var scadenzeContributiFissi = [
-                "16 maggio " + annoReddito,
-                "20 agosto " + annoReddito,
-                "16 novembre " + annoReddito,
-                "16 febbraio " + (parseInt(annoReddito) + 1)
-            ];
-
-            // Crea il messaggio per il cliente in modo semplice e dettagliato
-            var messaggio = "<h3>Dettaglio dei pagamenti per l'anno " + annoReddito + "</h3>";
-
-            messaggio += "<p>Hai guadagnato <strong>€ " + redditoLordo.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong> nel " + annoReddito + ".</p>";
-
-            messaggio += "<h4>Tasse da pagare:</h4>";
-            messaggio += "<ul>";
-            messaggio += "<li><span class='evidenziato-giallo'>Saldo imposta sostitutiva sul 2024 (<strong>€ " + impostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare entro il <strong>" + scadenzaSaldoImposta + "</strong>.</li>";
-            messaggio += "<li><span class='evidenziato-azzurro'>Acconto imposta sostitutiva per il 2025 (<strong>€ " + accontoImpostaSostitutiva.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare in due rate:</li>";
-            messaggio += "<ul>";
-            messaggio += "<li>Prima rata (<strong>€ " + (accontoImpostaSostitutiva / 2).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzaAccontoImposta1 + "</strong>.</li>";
-            messaggio += "<li>Seconda rata (<strong>€ " + (accontoImpostaSostitutiva / 2).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzaAccontoImposta2 + "</strong>.</li>";
-            messaggio += "</ul>";
-            messaggio += "</ul>";
-
-            messaggio += "<h4>Contributi previdenziali:</h4>";
-            messaggio += "<ul>";
-
-            if (cassaInps === "gs_inps") {
-                // Gestione Separata INPS
-                messaggio += "<li><span class='evidenziato-giallo'>Saldo contributi INPS Gestione Separata sul 2024 (<strong>€ " + contributiInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare entro il <strong>" + scadenzaSaldoContributi + "</strong>.</li>";
-                messaggio += "<li><span class='evidenziato-azzurro'>Acconto contributi INPS per il 2025 (<strong>€ " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare in due rate:</li>";
-                messaggio += "<ul>";
-                messaggio += "<li>Prima rata (<strong>€ " + (accontoInps / 2).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzaAccontoContributi1 + "</strong>.</li>";
-                messaggio += "<li>Seconda rata (<strong>€ " + (accontoInps / 2).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzaAccontoContributi2 + "</strong>.</li>";
-                messaggio += "</ul>";
-            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                // Contributi fissi
-                messaggio += "<li><span class='evidenziato-giallo'>Contributi fissi INPS sul 2024 (<strong>€ " + contributiFissi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare in quattro rate:</li>";
-                messaggio += "<ul>";
-                for (var i = 0; i < scadenzeContributiFissi.length; i++) {
-                    messaggio += "<li>Rata " + (i + 1) + " (<strong>€ " + (contributiFissi / 4).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzeContributiFissi[i] + "</strong>.</li>";
-                }
-                messaggio += "</ul>";
-                // Contributi variabili
-                if (contributiVariabili > 0) {
-                    messaggio += "<li><span class='evidenziato-giallo'>Saldo contributi variabili sul 2024 (<strong>€ " + contributiVariabili.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare entro il <strong>" + scadenzaSaldoContributi + "</strong>.</li>";
-                    messaggio += "<li><span class='evidenziato-azzurro'>Acconto contributi variabili per il 2025 (<strong>€ " + accontoInps.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>)</span> da pagare in due rate:</li>";
-                    messaggio += "<ul>";
-                    messaggio += "<li>Prima rata (<strong>€ " + (accontoInps / 2).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzaAccontoContributi1 + "</strong>.</li>";
-                    messaggio += "<li>Seconda rata (<strong>€ " + (accontoInps / 2).toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong>) entro il <strong>" + scadenzaAccontoContributi2 + "</strong>.</li>";
-                    messaggio += "</ul>";
-                }
-            }
-
-            messaggio += "</ul>";
-
-            // Riepilogo finale
-            messaggio += "<h4>Riepilogo:</h4>";
-            messaggio += "<p><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: <strong>€ " + totaleTasseContributiEffettivi.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong></span></p>";
-            messaggio += "<p><span class='evidenziato-azzurro'>Totale acconti per il 2025: <strong>€ " + totaleAcconti.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong></span></p>";
-            messaggio += "<p><strong>Totale da versare complessivamente: € " + totaleDaVersare.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + "</strong></p>";
-
-            messaggio += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025) e non rappresentano un costo aggiuntivo.</p>";
-
-            // Visualizza il messaggio nell'elemento HTML
-            document.getElementById("messaggioCliente").innerHTML = messaggio;
-        }
-    </script>
-
-</body>
-</html>
+            document.getElementById("redditoNettoOutput").innerText = "€ " + redditoNetto.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFra
