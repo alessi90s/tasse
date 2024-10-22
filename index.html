@@ -326,7 +326,7 @@
             messaggio += "<li>Coefficiente di Redditività: " + (coefficiente * 100) + "%</li>";
             messaggio += "<li>Reddito Netto: € " + redditoNetto.toLocaleString('it-IT') + " (calcolato come € " + redditoLordo.toLocaleString('it-IT') + " x " + (coefficiente * 100) + "%)</li>";
             messaggio += "<li>Aliquota Imposta Sostitutiva: " + (aliquotaImposta * 100) + "%</li>";
-            messaggio += "<li><span class='evidenziato-giallo'>Imposta Sostitutiva da versare: € " + impostaSostitutiva.toLocaleString('it-IT') + " (calcolata come € " + redditoNetto.toLocaleString('it-IT') + " x " + (aliquotaImposta * 100) + "%)</span></li>";
+            messaggio += "<li><span class='evidenziato-giallo'>Imposta Sostitutiva da versare: € " + impostaSostitutiva.toLocaleString('it-IT') + " (si calcola prendendo il reddito netto (reddito lordo * coefficiente di redditivtà -> quindi" + redditoNetto.toLocaleString('it-IT') + "€ moltiplicato per la tua aliquota " + (aliquotaImposta * 100) + "%)</span></li>";
             messaggio += "</ul>";
 
             // Calcolo dei Contributi INPS
