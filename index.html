@@ -186,6 +186,26 @@
         </tr>
     </table>
 
+    <!-- Nuova tabella con le scadenze -->
+    <h2>Scadenze dei Pagamenti</h2>
+    <table>
+        <tr>
+            <th>Data Scadenza</th>
+            <th>Importo Totale</th>
+            <th>Dettaglio</th>
+        </tr>
+        <tr>
+            <td>30 giugno 2025</td>
+            <td id="totale30Giugno"></td>
+            <td id="dettaglio30Giugno"></td>
+        </tr>
+        <tr>
+            <td>30 novembre 2025</td>
+            <td id="totale30Novembre"></td>
+            <td id="dettaglio30Novembre"></td>
+        </tr>
+    </table>
+
     <!-- Messaggio per il cliente -->
     <div id="messaggioCliente"></div>
 
@@ -300,10 +320,10 @@
             totaleAcconti = Math.round(totaleAcconti);
             totaleDaVersare = Math.round(totaleDaVersare);
 
-            // Calcola le percentuali rispetto al reddito lordo
-            var percentualeTasseContributi = ((totaleTasseContributiEffettivi / redditoLordo) * 100).toFixed(2);
-            var percentualeAcconti = ((totaleAcconti / redditoLordo) * 100).toFixed(2);
-            var percentualeTotale = ((totaleDaVersare / redditoLordo) * 100).toFixed(2);
+            // Calcola le percentuali rispetto al reddito lordo (arrotondate)
+            var percentualeTasseContributi = Math.round((totaleTasseContributiEffettivi / redditoLordo) * 100);
+            var percentualeAcconti = Math.round((totaleAcconti / redditoLordo) * 100);
+            var percentualeTotale = Math.round((totaleDaVersare / redditoLordo) * 100);
 
             // Calcola le scadenze dei pagamenti
             var annoDichiarazione = parseInt(annoReddito) + 1;
@@ -325,6 +345,37 @@
                 "16 novembre " + annoReddito,
                 "16 febbraio " + (parseInt(annoReddito) + 1)
             ];
+
+            // Calcolo dei pagamenti per le scadenze specifiche
+            var totale30Giugno = impostaSostitutiva + Math.round(accontoImpostaSostitutiva / 2);
+            var totale30Novembre = Math.round(accontoImpostaSostitutiva / 2);
+
+            var dettaglio30Giugno = "Saldo imposta sostitutiva (€ " + impostaSostitutiva.toLocaleString('it-IT') + ") + Prima rata acconto imposta (€ " + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + ")";
+            var dettaglio30Novembre = "Seconda rata acconto imposta (€ " + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + ")";
+
+            // Aggiungi i contributi INPS alle scadenze
+            if (cassaInps === "gs_inps") {
+                totale30Giugno += contributiInps + Math.round(accontoInps / 2);
+                totale30Novembre += Math.round(accontoInps / 2);
+
+                dettaglio30Giugno += " + Saldo contributi INPS (€ " + contributiInps.toLocaleString('it-IT') + ") + Prima rata acconto contributi INPS (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
+                dettaglio30Novembre += " + Seconda rata acconto contributi INPS (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
+            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                // Aggiungi eventuali contributi variabili
+                if (contributiVariabili > 0) {
+                    totale30Giugno += contributiVariabili + Math.round(accontoInps / 2);
+                    totale30Novembre += Math.round(accontoInps / 2);
+
+                    dettaglio30Giugno += " + Saldo contributi variabili (€ " + contributiVariabili.toLocaleString('it-IT') + ") + Prima rata acconto contributi variabili (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
+                    dettaglio30Novembre += " + Seconda rata acconto contributi variabili (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
+                }
+            }
+
+            // Aggiorna la tabella delle scadenze
+            document.getElementById("totale30Giugno").innerText = "€ " + totale30Giugno.toLocaleString('it-IT');
+            document.getElementById("dettaglio30Giugno").innerText = dettaglio30Giugno;
+            document.getElementById("totale30Novembre").innerText = "€ " + totale30Novembre.toLocaleString('it-IT');
+            document.getElementById("dettaglio30Novembre").innerText = dettaglio30Novembre;
 
             // Crea il messaggio per il cliente
             var messaggio = "<h3>Dettaglio dei pagamenti per l'anno " + annoReddito + "</h3>";
@@ -405,12 +456,11 @@
             messaggio += "</ul>";
 
             // Riepilogo finale
-            // Rimosso il rettangolo verde e aggiunte le percentuali
             messaggio += "<h4>Riepilogo dei Pagamenti:</h4>";
             messaggio += "<ul>";
-            messaggio += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: € " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + " (" + percentualeTasseContributi + "% del reddito lordo)</span></li>";
-            messaggio += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: € " + totaleAcconti.toLocaleString('it-IT') + " (" + percentualeAcconti + "% del reddito lordo)</span></li>";
-            messaggio += "<li><strong>Totale da versare complessivamente: € " + totaleDaVersare.toLocaleString('it-IT') + " (" + percentualeTotale + "% del reddito lordo)</strong></li>";
+            messaggio += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: € " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + " (circa il " + percentualeTasseContributi + "% del reddito lordo (€ " + redditoLordo.toLocaleString('it-IT') + "))</span></li>";
+            messaggio += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: € " + totaleAcconti.toLocaleString('it-IT') + " (circa il " + percentualeAcconti + "% del reddito lordo (€ " + redditoLordo.toLocaleString('it-IT') + "))</span></li>";
+            messaggio += "<li><strong>Totale da versare complessivamente: € " + totaleDaVersare.toLocaleString('it-IT') + " (circa il " + percentualeTotale + "% del reddito lordo (€ " + redditoLordo.toLocaleString('it-IT') + "))</strong></li>";
             messaggio += "</ul>";
             messaggio += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025) e non rappresentano un costo aggiuntivo.</p>";
 
