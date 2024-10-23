@@ -89,15 +89,7 @@
         .calcoli-dettagliati h4 {
             margin-top: 0;
         }
-        .risultato-finali {
-            background-color: #e2f0d9;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 5px;
-        }
-        .risultato-finali h4 {
-            margin-top: 0;
-        }
+        /* Rimosso lo stile del rettangolo verde */
         @media (max-width: 600px) {
             body {
                 margin: 10px;
@@ -308,6 +300,11 @@
             totaleAcconti = Math.round(totaleAcconti);
             totaleDaVersare = Math.round(totaleDaVersare);
 
+            // Calcola le percentuali rispetto al reddito lordo
+            var percentualeTasseContributi = ((totaleTasseContributiEffettivi / redditoLordo) * 100).toFixed(2);
+            var percentualeAcconti = ((totaleAcconti / redditoLordo) * 100).toFixed(2);
+            var percentualeTotale = ((totaleDaVersare / redditoLordo) * 100).toFixed(2);
+
             // Calcola le scadenze dei pagamenti
             var annoDichiarazione = parseInt(annoReddito) + 1;
 
@@ -408,15 +405,14 @@
             messaggio += "</ul>";
 
             // Riepilogo finale
-            messaggio += "<div class='risultato-finali'>";
+            // Rimosso il rettangolo verde e aggiunte le percentuali
             messaggio += "<h4>Riepilogo dei Pagamenti:</h4>";
             messaggio += "<ul>";
-            messaggio += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: € " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + "</span></li>";
-            messaggio += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: € " + totaleAcconti.toLocaleString('it-IT') + "</span></li>";
-            messaggio += "<li><strong>Totale da versare complessivamente: € " + totaleDaVersare.toLocaleString('it-IT') + "</strong></li>";
+            messaggio += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: € " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + " (" + percentualeTasseContributi + "% del reddito lordo)</span></li>";
+            messaggio += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: € " + totaleAcconti.toLocaleString('it-IT') + " (" + percentualeAcconti + "% del reddito lordo)</span></li>";
+            messaggio += "<li><strong>Totale da versare complessivamente: € " + totaleDaVersare.toLocaleString('it-IT') + " (" + percentualeTotale + "% del reddito lordo)</strong></li>";
             messaggio += "</ul>";
             messaggio += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025) e non rappresentano un costo aggiuntivo.</p>";
-            messaggio += "</div>";
 
             // Visualizza il messaggio nell'elemento HTML
             document.getElementById("messaggioCliente").innerHTML = messaggio;
