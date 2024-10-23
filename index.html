@@ -89,7 +89,6 @@
         .calcoli-dettagliati h4 {
             margin-top: 0;
         }
-        /* Rimosso lo stile del rettangolo verde */
         @media (max-width: 600px) {
             body {
                 margin: 10px;
@@ -194,6 +193,28 @@
             <th>Importo Totale</th>
             <th>Dettaglio</th>
         </tr>
+        <!-- Righe per contributi fissi -->
+        <tr id="rowScadenzaFissa1" style="display: none;">
+            <td id="scadenzaFissa1"></td>
+            <td id="importoFissa1"></td>
+            <td id="dettaglioFissa1"></td>
+        </tr>
+        <tr id="rowScadenzaFissa2" style="display: none;">
+            <td id="scadenzaFissa2"></td>
+            <td id="importoFissa2"></td>
+            <td id="dettaglioFissa2"></td>
+        </tr>
+        <tr id="rowScadenzaFissa3" style="display: none;">
+            <td id="scadenzaFissa3"></td>
+            <td id="importoFissa3"></td>
+            <td id="dettaglioFissa3"></td>
+        </tr>
+        <tr id="rowScadenzaFissa4" style="display: none;">
+            <td id="scadenzaFissa4"></td>
+            <td id="importoFissa4"></td>
+            <td id="dettaglioFissa4"></td>
+        </tr>
+        <!-- Righe per le altre scadenze -->
         <tr>
             <td>30 giugno 2025</td>
             <td id="totale30Giugno"></td>
@@ -346,26 +367,38 @@
                 "16 febbraio " + (parseInt(annoReddito) + 1)
             ];
 
-            // Calcolo dei pagamenti per le scadenze specifiche
+            // Aggiorna la tabella delle scadenze
+            // Nascondi tutte le righe delle scadenze fisse
+            for (var i = 1; i <= 4; i++) {
+                document.getElementById("rowScadenzaFissa" + i).style.display = "none";
+            }
+
+            // Variabili per totali e dettagli
             var totale30Giugno = impostaSostitutiva + Math.round(accontoImpostaSostitutiva / 2);
             var totale30Novembre = Math.round(accontoImpostaSostitutiva / 2);
-
             var dettaglio30Giugno = "Saldo imposta sostitutiva (€ " + impostaSostitutiva.toLocaleString('it-IT') + ") + Prima rata acconto imposta (€ " + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + ")";
             var dettaglio30Novembre = "Seconda rata acconto imposta (€ " + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + ")";
 
-            // Aggiungi i contributi INPS alle scadenze
             if (cassaInps === "gs_inps") {
+                // Aggiorna i totali per Gestione Separata
                 totale30Giugno += contributiInps + Math.round(accontoInps / 2);
                 totale30Novembre += Math.round(accontoInps / 2);
-
                 dettaglio30Giugno += " + Saldo contributi INPS (€ " + contributiInps.toLocaleString('it-IT') + ") + Prima rata acconto contributi INPS (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
                 dettaglio30Novembre += " + Seconda rata acconto contributi INPS (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                // Aggiungi eventuali contributi variabili
+                // Mostra le scadenze dei contributi fissi
+                var contributiFissiPerRata = Math.round(contributiFissi / 4);
+                for (var i = 0; i < scadenzeContributiFissi.length; i++) {
+                    document.getElementById("rowScadenzaFissa" + (i + 1)).style.display = "";
+                    document.getElementById("scadenzaFissa" + (i + 1)).innerText = scadenzeContributiFissi[i];
+                    document.getElementById("importoFissa" + (i + 1)).innerText = "€ " + contributiFissiPerRata.toLocaleString('it-IT');
+                    document.getElementById("dettaglioFissa" + (i + 1)).innerText = "Rata " + (i + 1) + " contributi fissi INPS";
+                }
+
+                // Aggiorna i totali per contributi variabili
                 if (contributiVariabili > 0) {
                     totale30Giugno += contributiVariabili + Math.round(accontoInps / 2);
                     totale30Novembre += Math.round(accontoInps / 2);
-
                     dettaglio30Giugno += " + Saldo contributi variabili (€ " + contributiVariabili.toLocaleString('it-IT') + ") + Prima rata acconto contributi variabili (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
                     dettaglio30Novembre += " + Seconda rata acconto contributi variabili (€ " + Math.round(accontoInps / 2).toLocaleString('it-IT') + ")";
                 }
