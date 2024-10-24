@@ -8,15 +8,16 @@
         /* Stili CSS */
         body {
             font-family: Arial, sans-serif;
-            margin: 0; /* Rimosso il margine per centrare */
+            margin: 0;
             line-height: 1.6;
         }
         h1, h2, h3, h4 {
             color: #333;
+            text-align: center;
         }
         #container {
-            max-width: 800px; /* Larghezza massima per il contenitore */
-            margin: 0 auto; /* Centra il contenitore */
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
         }
         #disclaimer {
@@ -26,28 +27,46 @@
             border: 1px solid #f5c6cb;
             margin-bottom: 20px;
             font-size: 16px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         form label {
             display: block;
             margin-top: 10px;
+            width: 100%;
+            max-width: 400px;
         }
         form input, form select {
             padding: 8px;
             margin-top: 5px;
             width: 100%;
-            max-width: 300px;
+            max-width: 400px;
             box-sizing: border-box;
         }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+        }
         form button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background-color: #007bff;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #28a745;
             color: #fff;
             border: none;
             cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            width: 100%;
         }
         form button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
         #messaggioCliente {
             margin-top: 30px;
@@ -55,13 +74,16 @@
             color: #333;
             line-height: 1.6;
         }
+        .table-container {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
         table {
             margin-top: 20px;
             border-collapse: collapse;
             width: 100%;
-            max-width: 100%;
-            overflow-x: auto;
-            display: block;
+            max-width: 800px;
         }
         table, td, th {
             border: 1px solid #ddd;
@@ -100,6 +122,7 @@
             border-bottom: 1px solid #ccc;
             background-color: #f1f1f1;
             margin-top: 30px;
+            text-align: center;
         }
         .tab button {
             background-color: inherit;
@@ -109,6 +132,7 @@
             padding: 14px 16px;
             transition: background-color 0.3s;
             font-size: 17px;
+            display: inline-block;
         }
         .tab button:hover {
             background-color: #ddd;
@@ -120,14 +144,13 @@
             display: none;
         }
         @media (max-width: 600px) {
-            body {
-                margin: 0; /* Rimosso il margine per centrare */
-            }
             #container {
                 padding: 10px;
             }
             form label, form input, form select, form button {
-                width: 100%;
+                max-width: 100%;
+            }
+            .button-container {
                 max-width: 100%;
             }
         }
@@ -175,59 +198,65 @@
                 <option value="inps_artigiani">INPS Artigiani</option>
             </select>
 
-            <button type="button" onclick="calcola()">Calcola</button>
+            <!-- Pulsante "Calcola" centrato -->
+            <div class="button-container">
+                <button type="button" onclick="calcola()">Calcola</button>
+            </div>
         </form>
 
         <!-- Sezione per i risultati -->
         <div id="risultati" style="display:none;">
             <h2>Risultati</h2>
-            <table>
-                <tr>
-                    <th>Descrizione</th>
-                    <th>Importo</th>
-                </tr>
-                <tr>
-                    <td>Reddito Lordo:</td>
-                    <td id="redditoLordoOutput"></td>
-                </tr>
-                <tr>
-                    <td>Reddito Netto (anno 2024):</td>
-                    <td id="redditoNettoOutput"></td>
-                </tr>
-                <tr class="evidenziato-giallo">
-                    <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul 2024:</td>
-                    <td id="impostaSostitutivaOutput"></td>
-                </tr>
-                <tr class="evidenziato-azzurro">
-                    <td>Acconto Imposta Sostitutiva (100%) sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
-                    <td id="accontoImpostaSostitutivaOutput"></td>
-                </tr>
-                <tr class="evidenziato-giallo">
-                    <td>Contributi INPS sul 2024:</td>
-                    <td id="contributiInpsOutput"></td>
-                </tr>
-                <tr id="rowContributiFissi" class="evidenziato-giallo" style="display: none;">
-                    <td>Contributi Fissi sul 2024:</td>
-                    <td id="contributiFissiOutput"></td>
-                </tr>
-                <tr id="rowContributiVariabili" class="evidenziato-giallo" style="display: none;">
-                    <td>Contributi Variabili sul 2024:</td>
-                    <td id="contributiVariabiliOutput"></td>
-                </tr>
-                <tr class="evidenziato-azzurro">
-                    <td>Acconto Contributi INPS sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
-                    <td id="accontoInpsOutput"></td>
-                </tr>
-            </table>
+            <!-- Tabella centrata -->
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Descrizione</th>
+                        <th>Importo</th>
+                    </tr>
+                    <tr>
+                        <td>Reddito Lordo:</td>
+                        <td id="redditoLordoOutput"></td>
+                    </tr>
+                    <tr>
+                        <td>Reddito Netto (anno 2024):</td>
+                        <td id="redditoNettoOutput"></td>
+                    </tr>
+                    <tr class="evidenziato-giallo">
+                        <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul 2024:</td>
+                        <td id="impostaSostitutivaOutput"></td>
+                    </tr>
+                    <tr class="evidenziato-azzurro">
+                        <td>Acconto Imposta Sostitutiva (100%) sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
+                        <td id="accontoImpostaSostitutivaOutput"></td>
+                    </tr>
+                    <tr class="evidenziato-giallo">
+                        <td>Contributi INPS sul 2024:</td>
+                        <td id="contributiInpsOutput"></td>
+                    </tr>
+                    <tr id="rowContributiFissi" class="evidenziato-giallo" style="display: none;">
+                        <td>Contributi Fissi sul 2024:</td>
+                        <td id="contributiFissiOutput"></td>
+                    </tr>
+                    <tr id="rowContributiVariabili" class="evidenziato-giallo" style="display: none;">
+                        <td>Contributi Variabili sul 2024:</td>
+                        <td id="contributiVariabiliOutput"></td>
+                    </tr>
+                    <tr class="evidenziato-azzurro">
+                        <td>Acconto Contributi INPS sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
+                        <td id="accontoInpsOutput"></td>
+                    </tr>
+                </table>
+            </div>
 
             <!-- Menù a schede -->
             <div class="tab">
-                <button class="tablinks" onclick="openTab(event, 'testoConsulenza')" id="defaultOpen">Testo Consulenza con Calcolo</button>
+                <button class="tablinks" onclick="openTab(event, 'testoConsulenza')" id="defaultOpen">Come si calcolano?</button>
                 <button class="tablinks" onclick="openTab(event, 'scadenzaPagamenti')">Scadenza Pagamenti</button>
                 <button class="tablinks" onclick="openTab(event, 'dettaglioPagamenti')">Dettaglio Pagamenti</button>
             </div>
 
-            <!-- Sezione 1: Testo Consulenza con Calcolo -->
+            <!-- Sezione 1: Come si calcolano? -->
             <div id="testoConsulenza" class="tabcontent">
                 <!-- Nuova sezione di testo personalizzato -->
                 <div id="testoPersonalizzato"></div>
@@ -237,45 +266,47 @@
             <div id="scadenzaPagamenti" class="tabcontent">
                 <!-- Tabella con le scadenze -->
                 <h2>Scadenze dei Pagamenti</h2>
-                <table>
-                    <tr>
-                        <th>Data Scadenza</th>
-                        <th>Importo Totale</th>
-                        <th>Dettaglio</th>
-                    </tr>
-                    <!-- Righe per contributi fissi -->
-                    <tr id="rowScadenzaFissa1" style="display: none;">
-                        <td id="scadenzaFissa1"></td>
-                        <td id="importoFissa1"></td>
-                        <td id="dettaglioFissa1"></td>
-                    </tr>
-                    <tr id="rowScadenzaFissa2" style="display: none;">
-                        <td id="scadenzaFissa2"></td>
-                        <td id="importoFissa2"></td>
-                        <td id="dettaglioFissa2"></td>
-                    </tr>
-                    <tr id="rowScadenzaFissa3" style="display: none;">
-                        <td id="scadenzaFissa3"></td>
-                        <td id="importoFissa3"></td>
-                        <td id="dettaglioFissa3"></td>
-                    </tr>
-                    <tr id="rowScadenzaFissa4" style="display: none;">
-                        <td id="scadenzaFissa4"></td>
-                        <td id="importoFissa4"></td>
-                        <td id="dettaglioFissa4"></td>
-                    </tr>
-                    <!-- Righe per le altre scadenze -->
-                    <tr>
-                        <td>30 giugno 2025</td>
-                        <td id="totale30Giugno"></td>
-                        <td id="dettaglio30Giugno"></td>
-                    </tr>
-                    <tr>
-                        <td>30 novembre 2025</td>
-                        <td id="totale30Novembre"></td>
-                        <td id="dettaglio30Novembre"></td>
-                    </tr>
-                </table>
+                <div class="table-container">
+                    <table>
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo Totale</th>
+                            <th>Dettaglio</th>
+                        </tr>
+                        <!-- Righe per contributi fissi -->
+                        <tr id="rowScadenzaFissa1" style="display: none;">
+                            <td id="scadenzaFissa1"></td>
+                            <td id="importoFissa1"></td>
+                            <td id="dettaglioFissa1"></td>
+                        </tr>
+                        <tr id="rowScadenzaFissa2" style="display: none;">
+                            <td id="scadenzaFissa2"></td>
+                            <td id="importoFissa2"></td>
+                            <td id="dettaglioFissa2"></td>
+                        </tr>
+                        <tr id="rowScadenzaFissa3" style="display: none;">
+                            <td id="scadenzaFissa3"></td>
+                            <td id="importoFissa3"></td>
+                            <td id="dettaglioFissa3"></td>
+                        </tr>
+                        <tr id="rowScadenzaFissa4" style="display: none;">
+                            <td id="scadenzaFissa4"></td>
+                            <td id="importoFissa4"></td>
+                            <td id="dettaglioFissa4"></td>
+                        </tr>
+                        <!-- Righe per le altre scadenze -->
+                        <tr>
+                            <td>30 giugno 2025</td>
+                            <td id="totale30Giugno"></td>
+                            <td id="dettaglio30Giugno"></td>
+                        </tr>
+                        <tr>
+                            <td>30 novembre 2025</td>
+                            <td id="totale30Novembre"></td>
+                            <td id="dettaglio30Novembre"></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <!-- Sezione 3: Dettaglio Pagamenti -->
@@ -286,6 +317,7 @@
         </div>
     </div>
 
+    
     <script>
         function calcola() {
             // Ottieni i valori di input
