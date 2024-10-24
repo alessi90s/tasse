@@ -441,43 +441,32 @@
             testoPersonalizzato += "<p><strong>Nota bene:</strong> Se nell'anno di riferimento hai versato dei contributi, questi vengono sottratti dal tuo reddito imponibile.</p>";
             testoPersonalizzato += "<p>Se avevi già versato degli acconti, questi vengono usati come credito per pagare il saldo di imposte e contributi.</p>";
 
-            // Esempio di calcolo
+            // Esempio di calcolo basato sul reddito lordo inserito
             testoPersonalizzato += "<h4>Esempio di calcolo:</h4>";
 
-            // Utilizziamo un reddito lordo di esempio
-            var redditoEsempio = 10000;
-            var redditoNettoEsempio = redditoEsempio * coefficiente;
-            var impostaEsempio = Math.round(redditoNettoEsempio * aliquotaImposta);
-            var contributiInpsEsempio = 0;
-            var accontoImpostaEsempio = impostaEsempio; // 100%
-            var accontoInpsEsempio = 0;
+            var redditoEsempio = redditoLordo;
+            var redditoNettoEsempio = redditoNetto;
+            var impostaEsempio = impostaSostitutiva;
+            var contributiInpsEsempio = contributiInps;
+            var accontoImpostaEsempio = accontoImpostaSostitutiva;
+            var accontoInpsEsempio = accontoInps;
 
-            if (cassaInps === "gs_inps") {
-                contributiInpsEsempio = Math.round(redditoNettoEsempio * (aliquotaContributivaPercentuale / 100));
-                accontoInpsEsempio = Math.round(contributiInpsEsempio * 0.80);
-            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                contributiFissiEsempio = contributiFissi;
-                if (redditoNettoEsempio > sogliaReddito) {
-                    var eccedenzaEsempio = redditoNettoEsempio - sogliaReddito;
-                    var contributiVariabiliEsempio = Math.round(eccedenzaEsempio * (aliquotaContributivaPercentuale / 100));
-                } else {
-                    var contributiVariabiliEsempio = 0;
-                }
-                contributiInpsEsempio = contributiFissiEsempio + contributiVariabiliEsempio;
-                accontoInpsEsempio = Math.round(contributiVariabiliEsempio * 0.80);
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                var contributiFissiEsempio = contributiFissi;
+                var contributiVariabiliEsempio = contributiVariabili;
             }
 
             var saldoTotaleEsempio = impostaEsempio + contributiInpsEsempio;
             var accontiTotaliEsempio = accontoImpostaEsempio + accontoInpsEsempio;
             var importoComplessivoEsempio = saldoTotaleEsempio + accontiTotaliEsempio;
 
-            testoPersonalizzato += "<p>Per un incasso di <strong>€ " + redditoEsempio.toLocaleString('it-IT') + "</strong>, il " + coefficientePercentuale + "% corrisponde a <strong>€ " + Math.round(redditoNettoEsempio).toLocaleString('it-IT') + "</strong>. Su questo importo, dovrai pagare:</p>";
+            testoPersonalizzato += "<p>Per un incasso di <strong>€ " + redditoEsempio.toLocaleString('it-IT') + "</strong>, il " + coefficientePercentuale + "% corrisponde a <strong>€ " + redditoNettoEsempio.toLocaleString('it-IT') + "</strong>. Su questo importo, dovrai pagare:</p>";
 
             testoPersonalizzato += "<ul>";
-            testoPersonalizzato += "<li><strong>Imposta sostitutiva:</strong> " + aliquotaImpostaPercentuale + "% su € " + Math.round(redditoNettoEsempio).toLocaleString('it-IT') + ", che equivale a <strong>€ " + impostaEsempio.toLocaleString('it-IT') + "</strong>.</li>";
+            testoPersonalizzato += "<li><strong>Imposta sostitutiva:</strong> " + aliquotaImpostaPercentuale + "% su € " + redditoNettoEsempio.toLocaleString('it-IT') + ", che equivale a <span class='evidenziato-giallo'><strong>€ " + impostaEsempio.toLocaleString('it-IT') + "</strong></span>.</li>";
 
             if (cassaInps === "gs_inps") {
-                testoPersonalizzato += "<li><strong>Contributi INPS:</strong> " + aliquotaContributivaPercentuale + "% su € " + Math.round(redditoNettoEsempio).toLocaleString('it-IT') + ", che equivale a <strong>€ " + contributiInpsEsempio.toLocaleString('it-IT') + "</strong>.</li>";
+                testoPersonalizzato += "<li><strong>Contributi INPS:</strong> " + aliquotaContributivaPercentuale + "% su € " + redditoNettoEsempio.toLocaleString('it-IT') + ", che equivale a <span class='evidenziato-giallo'><strong>€ " + contributiInpsEsempio.toLocaleString('it-IT') + "</strong></span>.</li>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 testoPersonalizzato += "<li><strong>Contributi INPS:</strong> Contributi fissi di € " + contributiFissiEsempio.toLocaleString('it-IT');
                 if (contributiVariabiliEsempio > 0) {
@@ -485,22 +474,22 @@
                 } else {
                     testoPersonalizzato += ".";
                 }
-                testoPersonalizzato += " Totale contributi: <strong>€ " + contributiInpsEsempio.toLocaleString('it-IT') + "</strong>.</li>";
+                testoPersonalizzato += " Totale contributi: <span class='evidenziato-giallo'><strong>€ " + contributiInpsEsempio.toLocaleString('it-IT') + "</strong></span>.</li>";
             }
             testoPersonalizzato += "</ul>";
 
-            testoPersonalizzato += "<p>Quindi, a livello di saldo, pagherai <strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong> (€ " + impostaEsempio.toLocaleString('it-IT') + " di imposta + € " + contributiInpsEsempio.toLocaleString('it-IT') + " di contributi).</p>";
+            testoPersonalizzato += "<p>Quindi, a livello di saldo, pagherai <span class='evidenziato-giallo'><strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong></span> (€ " + impostaEsempio.toLocaleString('it-IT') + " di imposta + € " + contributiInpsEsempio.toLocaleString('it-IT') + " di contributi).</p>";
 
             testoPersonalizzato += "<h4>Acconti:</h4>";
             testoPersonalizzato += "<p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>";
             testoPersonalizzato += "<ul>";
-            testoPersonalizzato += "<li><strong>Imposta sostitutiva:</strong> pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <strong>€ " + accontoImpostaEsempio.toLocaleString('it-IT') + "</strong>.</li>";
+            testoPersonalizzato += "<li><strong>Imposta sostitutiva:</strong> pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class='evidenziato-azzurro'><strong>€ " + accontoImpostaEsempio.toLocaleString('it-IT') + "</strong></span>.</li>";
 
             if (cassaInps === "gs_inps") {
-                testoPersonalizzato += "<li><strong>Contributi INPS:</strong> pagherai l’80% dell'importo del saldo come acconto, quindi <strong>€ " + accontoInpsEsempio.toLocaleString('it-IT') + "</strong>.</li>";
+                testoPersonalizzato += "<li><strong>Contributi INPS:</strong> pagherai l’80% dell'importo del saldo come acconto, quindi <span class='evidenziato-azzurro'><strong>€ " + accontoInpsEsempio.toLocaleString('it-IT') + "</strong></span>.</li>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 if (contributiVariabiliEsempio > 0) {
-                    testoPersonalizzato += "<li><strong>Contributi INPS Variabili:</strong> pagherai l’80% dell'importo dei contributi variabili come acconto, quindi <strong>€ " + accontoInpsEsempio.toLocaleString('it-IT') + "</strong>.</li>";
+                    testoPersonalizzato += "<li><strong>Contributi INPS Variabili:</strong> pagherai l’80% dell'importo dei contributi variabili come acconto, quindi <span class='evidenziato-azzurro'><strong>€ " + accontoInpsEsempio.toLocaleString('it-IT') + "</strong></span>.</li>";
                 } else {
                     testoPersonalizzato += "<li><strong>Contributi INPS Variabili:</strong> Nessun acconto dovuto poiché non ci sono contributi variabili.</li>";
                 }
@@ -508,8 +497,8 @@
             testoPersonalizzato += "</ul>";
 
             testoPersonalizzato += "<h4>Totale complessivo:</h4>";
-            testoPersonalizzato += "<p><strong>Saldo totale:</strong> € " + saldoTotaleEsempio.toLocaleString('it-IT') + " (importo imposta + importo contributi)</p>";
-            testoPersonalizzato += "<p><strong>Acconti totali:</strong> € " + accontiTotaliEsempio.toLocaleString('it-IT') + " (€ " + accontoImpostaEsempio.toLocaleString('it-IT') + " di imposta + € " + accontoInpsEsempio.toLocaleString('it-IT') + " di contributi INPS)</p>";
+            testoPersonalizzato += "<p><strong>Saldo totale:</strong> <span class='evidenziato-giallo'><strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong></span> (importo imposta + importo contributi)</p>";
+            testoPersonalizzato += "<p><strong>Acconti totali:</strong> <span class='evidenziato-azzurro'><strong>€ " + accontiTotaliEsempio.toLocaleString('it-IT') + "</strong></span> (€ " + accontoImpostaEsempio.toLocaleString('it-IT') + " di imposta + € " + accontoInpsEsempio.toLocaleString('it-IT') + " di contributi INPS)</p>";
             testoPersonalizzato += "<p><strong>Importo complessivo (saldo + acconti):</strong> € " + importoComplessivoEsempio.toLocaleString('it-IT') + "</p>";
             testoPersonalizzato += "<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>";
 
