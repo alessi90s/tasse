@@ -89,6 +89,31 @@
         .calcoli-dettagliati h4 {
             margin-top: 0;
         }
+        /* Stili per il menù a schede */
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+            background-color: #f1f1f1;
+            margin-top: 30px;
+        }
+        .tab button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: background-color 0.3s;
+            font-size: 17px;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+        }
         @media (max-width: 600px) {
             body {
                 margin: 10px;
@@ -145,93 +170,111 @@
     </form>
 
     <!-- Sezione per i risultati -->
-    <h2>Risultati</h2>
-    <table>
-        <tr>
-            <th>Descrizione</th>
-            <th>Importo</th>
-        </tr>
-        <tr>
-            <td>Reddito Lordo:</td>
-            <td id="redditoLordoOutput"></td>
-        </tr>
-        <tr>
-            <td>Reddito Netto (anno 2024):</td>
-            <td id="redditoNettoOutput"></td>
-        </tr>
-        <tr class="evidenziato-giallo">
-            <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul 2024:</td>
-            <td id="impostaSostitutivaOutput"></td>
-        </tr>
-        <tr class="evidenziato-azzurro">
-            <td>Acconto Imposta Sostitutiva (100%) sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
-            <td id="accontoImpostaSostitutivaOutput"></td>
-        </tr>
-        <tr class="evidenziato-giallo">
-            <td>Contributi INPS sul 2024:</td>
-            <td id="contributiInpsOutput"></td>
-        </tr>
-        <tr id="rowContributiFissi" class="evidenziato-giallo" style="display: none;">
-            <td>Contributi Fissi sul 2024:</td>
-            <td id="contributiFissiOutput"></td>
-        </tr>
-        <tr id="rowContributiVariabili" class="evidenziato-giallo" style="display: none;">
-            <td>Contributi Variabili sul 2024:</td>
-            <td id="contributiVariabiliOutput"></td>
-        </tr>
-        <tr class="evidenziato-azzurro">
-            <td>Acconto Contributi INPS sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
-            <td id="accontoInpsOutput"></td>
-        </tr>
-    </table>
+    <div id="risultati" style="display:none;">
+        <h2>Risultati</h2>
+        <table>
+            <tr>
+                <th>Descrizione</th>
+                <th>Importo</th>
+            </tr>
+            <tr>
+                <td>Reddito Lordo:</td>
+                <td id="redditoLordoOutput"></td>
+            </tr>
+            <tr>
+                <td>Reddito Netto (anno 2024):</td>
+                <td id="redditoNettoOutput"></td>
+            </tr>
+            <tr class="evidenziato-giallo">
+                <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul 2024:</td>
+                <td id="impostaSostitutivaOutput"></td>
+            </tr>
+            <tr class="evidenziato-azzurro">
+                <td>Acconto Imposta Sostitutiva (100%) sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
+                <td id="accontoImpostaSostitutivaOutput"></td>
+            </tr>
+            <tr class="evidenziato-giallo">
+                <td>Contributi INPS sul 2024:</td>
+                <td id="contributiInpsOutput"></td>
+            </tr>
+            <tr id="rowContributiFissi" class="evidenziato-giallo" style="display: none;">
+                <td>Contributi Fissi sul 2024:</td>
+                <td id="contributiFissiOutput"></td>
+            </tr>
+            <tr id="rowContributiVariabili" class="evidenziato-giallo" style="display: none;">
+                <td>Contributi Variabili sul 2024:</td>
+                <td id="contributiVariabiliOutput"></td>
+            </tr>
+            <tr class="evidenziato-azzurro">
+                <td>Acconto Contributi INPS sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
+                <td id="accontoInpsOutput"></td>
+            </tr>
+        </table>
 
-    <!-- Nuova sezione di testo personalizzato -->
-    <div id="testoPersonalizzato"></div>
+        <!-- Menù a schede -->
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'testoConsulenza')" id="defaultOpen">Testo Consulenza con Calcolo</button>
+            <button class="tablinks" onclick="openTab(event, 'scadenzaPagamenti')">Scadenza Pagamenti</button>
+            <button class="tablinks" onclick="openTab(event, 'dettaglioPagamenti')">Dettaglio Pagamenti</button>
+        </div>
 
-    <!-- Nuova tabella con le scadenze -->
-    <h2>Scadenze dei Pagamenti</h2>
-    <table>
-        <tr>
-            <th>Data Scadenza</th>
-            <th>Importo Totale</th>
-            <th>Dettaglio</th>
-        </tr>
-        <!-- Righe per contributi fissi -->
-        <tr id="rowScadenzaFissa1" style="display: none;">
-            <td id="scadenzaFissa1"></td>
-            <td id="importoFissa1"></td>
-            <td id="dettaglioFissa1"></td>
-        </tr>
-        <tr id="rowScadenzaFissa2" style="display: none;">
-            <td id="scadenzaFissa2"></td>
-            <td id="importoFissa2"></td>
-            <td id="dettaglioFissa2"></td>
-        </tr>
-        <tr id="rowScadenzaFissa3" style="display: none;">
-            <td id="scadenzaFissa3"></td>
-            <td id="importoFissa3"></td>
-            <td id="dettaglioFissa3"></td>
-        </tr>
-        <tr id="rowScadenzaFissa4" style="display: none;">
-            <td id="scadenzaFissa4"></td>
-            <td id="importoFissa4"></td>
-            <td id="dettaglioFissa4"></td>
-        </tr>
-        <!-- Righe per le altre scadenze -->
-        <tr>
-            <td>30 giugno 2025</td>
-            <td id="totale30Giugno"></td>
-            <td id="dettaglio30Giugno"></td>
-        </tr>
-        <tr>
-            <td>30 novembre 2025</td>
-            <td id="totale30Novembre"></td>
-            <td id="dettaglio30Novembre"></td>
-        </tr>
-    </table>
+        <!-- Sezione 1: Testo Consulenza con Calcolo -->
+        <div id="testoConsulenza" class="tabcontent">
+            <!-- Nuova sezione di testo personalizzato -->
+            <div id="testoPersonalizzato"></div>
+        </div>
 
-    <!-- Messaggio per il cliente -->
-    <div id="messaggioCliente"></div>
+        <!-- Sezione 2: Scadenza Pagamenti -->
+        <div id="scadenzaPagamenti" class="tabcontent">
+            <!-- Tabella con le scadenze -->
+            <h2>Scadenze dei Pagamenti</h2>
+            <table>
+                <tr>
+                    <th>Data Scadenza</th>
+                    <th>Importo Totale</th>
+                    <th>Dettaglio</th>
+                </tr>
+                <!-- Righe per contributi fissi -->
+                <tr id="rowScadenzaFissa1" style="display: none;">
+                    <td id="scadenzaFissa1"></td>
+                    <td id="importoFissa1"></td>
+                    <td id="dettaglioFissa1"></td>
+                </tr>
+                <tr id="rowScadenzaFissa2" style="display: none;">
+                    <td id="scadenzaFissa2"></td>
+                    <td id="importoFissa2"></td>
+                    <td id="dettaglioFissa2"></td>
+                </tr>
+                <tr id="rowScadenzaFissa3" style="display: none;">
+                    <td id="scadenzaFissa3"></td>
+                    <td id="importoFissa3"></td>
+                    <td id="dettaglioFissa3"></td>
+                </tr>
+                <tr id="rowScadenzaFissa4" style="display: none;">
+                    <td id="scadenzaFissa4"></td>
+                    <td id="importoFissa4"></td>
+                    <td id="dettaglioFissa4"></td>
+                </tr>
+                <!-- Righe per le altre scadenze -->
+                <tr>
+                    <td>30 giugno 2025</td>
+                    <td id="totale30Giugno"></td>
+                    <td id="dettaglio30Giugno"></td>
+                </tr>
+                <tr>
+                    <td>30 novembre 2025</td>
+                    <td id="totale30Novembre"></td>
+                    <td id="dettaglio30Novembre"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Sezione 3: Dettaglio Pagamenti -->
+        <div id="dettaglioPagamenti" class="tabcontent">
+            <!-- Messaggio per il cliente -->
+            <div id="messaggioCliente"></div>
+        </div>
+    </div>
 
     <script>
         function calcola() {
@@ -478,7 +521,7 @@
             }
             testoPersonalizzato += "</ul>";
 
-            testoPersonalizzato += "<p>Quindi, a livello di saldo, pagherai <span class='evidenziato-giallo'><strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong></span> (€ " + impostaEsempio.toLocaleString('it-IT') + " di imposta + € " + contributiInpsEsempio.toLocaleString('it-IT') + " di contributi).</p>";
+            testoPersonalizzato += "<p>Quindi, a livello di saldo, pagherai <span class='evidenziato-giallo'><strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong></span> (di cui € " + impostaEsempio.toLocaleString('it-IT') + " di imposta e € " + contributiInpsEsempio.toLocaleString('it-IT') + " di contributi).</p>";
 
             testoPersonalizzato += "<h4>Acconti:</h4>";
             testoPersonalizzato += "<p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>";
@@ -497,13 +540,19 @@
             testoPersonalizzato += "</ul>";
 
             testoPersonalizzato += "<h4>Totale complessivo:</h4>";
-            testoPersonalizzato += "<p><strong>Saldo totale:</strong> <span class='evidenziato-giallo'><strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong></span> (importo imposta + importo contributi)</p>";
-            testoPersonalizzato += "<p><strong>Acconti totali:</strong> <span class='evidenziato-azzurro'><strong>€ " + accontiTotaliEsempio.toLocaleString('it-IT') + "</strong></span> (€ " + accontoImpostaEsempio.toLocaleString('it-IT') + " di imposta + € " + accontoInpsEsempio.toLocaleString('it-IT') + " di contributi INPS)</p>";
+            testoPersonalizzato += "<p><strong>Saldo totale:</strong> <span class='evidenziato-giallo'><strong>€ " + saldoTotaleEsempio.toLocaleString('it-IT') + "</strong></span> (di cui € " + impostaEsempio.toLocaleString('it-IT') + " di imposta e € " + contributiInpsEsempio.toLocaleString('it-IT') + " di contributi)</p>";
+            testoPersonalizzato += "<p><strong>Acconti totali:</strong> <span class='evidenziato-azzurro'><strong>€ " + accontiTotaliEsempio.toLocaleString('it-IT') + "</strong></span> (di cui € " + accontoImpostaEsempio.toLocaleString('it-IT') + " di imposta e € " + accontoInpsEsempio.toLocaleString('it-IT') + " di contributi)</p>";
             testoPersonalizzato += "<p><strong>Importo complessivo (saldo + acconti):</strong> € " + importoComplessivoEsempio.toLocaleString('it-IT') + "</p>";
             testoPersonalizzato += "<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>";
 
             // Inserisci il testo personalizzato nell'elemento HTML
             document.getElementById("testoPersonalizzato").innerHTML = testoPersonalizzato;
+
+            // Visualizza la sezione dei risultati
+            document.getElementById("risultati").style.display = "block";
+
+            // Apri la prima scheda di default
+            document.getElementById("defaultOpen").click();
 
             // Crea il messaggio per il cliente
             var messaggio = "<h3>Dettaglio dei pagamenti per l'anno " + annoReddito + "</h3>";
@@ -594,6 +643,22 @@
             // Visualizza il messaggio nell'elemento HTML
             document.getElementById("messaggioCliente").innerHTML = messaggio;
         }
+
+        // Funzione per gestire le schede
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
     </script>
 
 </body>
