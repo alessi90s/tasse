@@ -329,6 +329,36 @@
     </div>
 
     <script>
+
+    
+        document.addEventListener('DOMContentLoaded', function() {
+        // Tutto il tuo codice JavaScript va qui dentro
+
+        // Event listener per mostrare/nascondere il checkbox in base alla cassa INPS selezionata
+        document.getElementById("cassaInps").addEventListener("change", function() {
+            var cassaInps = document.getElementById("cassaInps").value;
+            var riduzioneContainer = document.getElementById("riduzioneContainer");
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                riduzioneContainer.style.display = "block";
+            } else {
+                riduzioneContainer.style.display = "none";
+                document.getElementById("riduzioneContributi").checked = false;
+            }
+        });
+
+        // Imposta lo stato iniziale del checkbox in base al valore iniziale del selettore
+        (function() {
+            var cassaInps = document.getElementById("cassaInps").value;
+            var riduzioneContainer = document.getElementById("riduzioneContainer");
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                riduzioneContainer.style.display = "block";
+            } else {
+                riduzioneContainer.style.display = "none";
+                document.getElementById("riduzioneContributi").checked = false;
+            }
+        })();
+
+        
         function calcola() {
             // Ottieni i valori di input
             var annoReddito = document.getElementById("annoReddito").value;
@@ -336,16 +366,6 @@
             var coefficienteInput = document.getElementById("coefficienteRedditivita").value;
             var coefficiente = parseFloat(coefficienteInput) / 100;
             var cassaInps = document.getElementById("cassaInps").value;
-            document.getElementById("cassaInps").addEventListener("change", function() {
-    var cassaInps = document.getElementById("cassaInps").value;
-    var riduzioneContainer = document.getElementById("riduzioneContainer");
-    if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-        riduzioneContainer.style.display = "block";
-    } else {
-        riduzioneContainer.style.display = "none";
-        document.getElementById("riduzioneContributi").checked = false;
-    }
-});
             var riduzioneContributiApplicata = document.getElementById("riduzioneContributi").checked;
             var aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
             
