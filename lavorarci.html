@@ -423,7 +423,7 @@
             document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
 
             // Gestisci la visualizzazione dei contributi fissi e variabili
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") || cassaInps === "inps_commercianti-35") {
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") || cassaInps === "inps_commercianti_35") {
                 document.getElementById("rowContributiFissi").style.display = "";
                 document.getElementById("rowContributiVariabili").style.display = "";
                 document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT') + "€";
@@ -491,7 +491,7 @@
                 totale30Novembre += Math.round(accontoInps / 2);
                 dettaglio30Giugno += " + Saldo contributi INPS (" + contributiInps.toLocaleString('it-IT') + "€) + Prima rata acconto contributi INPS (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€)";
                 dettaglio30Novembre += " + Seconda rata acconto contributi INPS (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€)";
-            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani" || cassaInps === "inps_commercianti_35") {
                 // Mostra le scadenze dei contributi fissi
                 var contributiFissiPerRata = Math.round(contributiFissi / 4);
                 for (var i = 0; i < scadenzeContributiFissi.length; i++) {
