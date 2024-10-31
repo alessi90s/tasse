@@ -196,6 +196,7 @@
                 <option value="gs_inps">Gestione Separata INPS</option>
                 <option value="inps_commercianti">INPS Commercianti</option>
                 <option value="inps_artigiani">INPS Artigiani</option>
+                <option value="inps_commercianti_35">INPS Artigiani</option>
             </select>
 
             <!-- Pulsante "Calcola" centrato -->
@@ -383,6 +384,21 @@
             } else if (cassaInps === "inps_artigiani") {
                 // INPS Artigiani
                 contributiFissi = 4427; // Contributi fissi minimali arrotondati
+                aliquotaContributivaPercentuale = 24;
+                if (redditoNetto > sogliaReddito) {
+                    var eccedenza = redditoNetto - sogliaReddito;
+                    contributiVariabili = eccedenza * (aliquotaContributivaPercentuale / 100); // 24% sull'eccedenza
+                }
+                contributiInps = contributiFissi + contributiVariabili;
+                accontoInps = contributiVariabili * 0.80; // 80% dell'eccedenza
+                // Arrotonda gli importi
+                contributiFissi = Math.round(contributiFissi);
+                contributiVariabili = Math.round(contributiVariabili);
+                contributiInps = Math.round(contributiInps);
+                accontoInps = Math.round(accontoInps);
+            } else if (cassaInps === "inps_commercianti_35") {
+                // INPS Artigiani
+                contributiFissi = 2800; // Contributi fissi minimali arrotondati
                 aliquotaContributivaPercentuale = 24;
                 if (redditoNetto > sogliaReddito) {
                     var eccedenza = redditoNetto - sogliaReddito;
