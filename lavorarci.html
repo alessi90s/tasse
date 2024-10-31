@@ -196,8 +196,6 @@
                 <option value="gs_inps">Gestione Separata INPS</option>
                 <option value="inps_commercianti">INPS Commercianti</option>
                 <option value="inps_artigiani">INPS Artigiani</option>
-                <option value="inps_commercianti-35">INPS Commercianti con riduzione 35%</option>
-                <option value="inps_artigiani-35">INPS Artigiani con riduzione 35%</option>
             </select>
 
             <!-- Pulsante "Calcola" centrato -->
@@ -397,21 +395,7 @@
                 contributiVariabili = Math.round(contributiVariabili);
                 contributiInps = Math.round(contributiInps);
                 accontoInps = Math.round(accontoInps);
-            } else if (cassaInps === "inps_commercianti-35") {
-                // INPS Commercianti
-                contributiFissi = 2800; // Contributi fissi minimali arrotondati
-                aliquotaContributivaPercentuale = 24.48;
-                if (redditoNetto > sogliaReddito) {
-                    var eccedenza = redditoNetto - sogliaReddito;
-                    contributiVariabili = eccedenza * (aliquotaContributivaPercentuale / 100); // 24,48% sull'eccedenza
-                }
-                contributiInps = contributiFissi + contributiVariabili;
-                accontoInps = contributiVariabili * 0.80; // 80% dell'eccedenza
-                // Arrotonda gli importi
-                contributiFissi = Math.round(contributiFissi);
-                contributiVariabili = Math.round(contributiVariabili);
-                contributiInps = Math.round(contributiInps);
-                accontoInps = Math.round(accontoInps);
+            }
 
             // Aggiorna i valori nella tabella
             document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
@@ -423,7 +407,7 @@
             document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
 
             // Gestisci la visualizzazione dei contributi fissi e variabili
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani"|| cassaInps === "inps_commercianti-35") {
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 document.getElementById("rowContributiFissi").style.display = "";
                 document.getElementById("rowContributiVariabili").style.display = "";
                 document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT') + "€";
