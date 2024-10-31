@@ -528,7 +528,7 @@
                 testoPersonalizzato += "<p>L'imposta come i contributi li paghi non sul totale incassato ma sul <strong>" + coefficientePercentuale + "%</strong> (che è il coefficiente di redditività del tuo codice ATECO).</p>";
                 testoPersonalizzato += "<p>Quindi <span class='evidenziato-giallo'>paghi il <strong>" + aliquotaImpostaPercentuale + "%</strong> di imposta e il <strong>" + aliquotaContributivaPercentuale + "%</strong> di contributi INPS</span> non sul totale incassato (<strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong>) ma sul tuo incassato per il coefficiente di redditività.</p>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani" || cassaInps === "inps_commercianti_35") {
-                var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
+                var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani" : "Commercianti con riduzione 35%;
                 testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
                 testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
                 if (redditoNetto > sogliaReddito) {
