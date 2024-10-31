@@ -143,6 +143,9 @@
         .tabcontent {
             display: none;
         }
+        #riduzioneContainer {
+            margin-top: 10px;
+        }
         @media (max-width: 600px) {
             #container {
                 padding: 10px;
@@ -333,7 +336,18 @@
             var coefficienteInput = document.getElementById("coefficienteRedditivita").value;
             var coefficiente = parseFloat(coefficienteInput) / 100;
             var cassaInps = document.getElementById("cassaInps").value;
+            document.getElementById("cassaInps").addEventListener("change", function() {
+    var cassaInps = document.getElementById("cassaInps").value;
+    var riduzioneContainer = document.getElementById("riduzioneContainer");
+    if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+        riduzioneContainer.style.display = "block";
+    } else {
+        riduzioneContainer.style.display = "none";
+        document.getElementById("riduzioneContributi").checked = false;
+    }
+});
             var aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
+            
 
             // Verifica che i valori siano numeri validi
             if (isNaN(redditoLordo) || redditoLordo <= 0) {
