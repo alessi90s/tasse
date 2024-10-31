@@ -423,7 +423,7 @@
             document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
 
             // Gestisci la visualizzazione dei contributi fissi e variabili
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani"|| cassaInps === "inps_commercianti-35") {
                 document.getElementById("rowContributiFissi").style.display = "";
                 document.getElementById("rowContributiVariabili").style.display = "";
                 document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT') + "€";
