@@ -346,6 +346,7 @@
         document.getElementById("riduzioneContributi").checked = false;
     }
 });
+            var riduzioneContributiApplicata = document.getElementById("riduzioneContributi").checked;
             var aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
             
 
@@ -391,6 +392,10 @@
                 // INPS Commercianti
                 contributiFissi = 4515; // Contributi fissi minimali arrotondati
                 aliquotaContributivaPercentuale = 24.48;
+                if (riduzioneContributiApplicata) {
+                    contributiFissiAnnui *= 0.65; // Apply 35% reduction
+                    aliquotaContributivaPercentuale *= 0.65; // Apply 35% reduction
+                }
                 if (redditoNetto > sogliaReddito) {
                     var eccedenza = redditoNetto - sogliaReddito;
                     contributiVariabili = eccedenza * (aliquotaContributivaPercentuale / 100); // 24,48% sull'eccedenza
@@ -406,6 +411,10 @@
                 // INPS Artigiani
                 contributiFissi = 4427; // Contributi fissi minimali arrotondati
                 aliquotaContributivaPercentuale = 24;
+                if (riduzioneContributiApplicata) {
+                    contributiFissiAnnui *= 0.65; // Apply 35% reduction
+                    aliquotaContributivaPercentuale *= 0.65; // Apply 35% reduction
+                }
                 if (redditoNetto > sogliaReddito) {
                     var eccedenza = redditoNetto - sogliaReddito;
                     contributiVariabili = eccedenza * (aliquotaContributivaPercentuale / 100); // 24% sull'eccedenza
