@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolatore Regime Forfettario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* CSS per il calcolatore */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+}
+
+input[type="number"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+#calcola-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#calcola-btn:hover {
+    background-color: #0056b3;
+}
+
+#risultati {
+    margin-top: 20px;
+}
+
+#risultati table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#risultati th,
+#risultati td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#risultati th {
+    background-color: #f2f2f2;
+}
+
+.highlight-yellow {
+    background-color: #fff9c4;
+}
+
+.highlight-blue {
+    background-color: #bbdefb;
+}
+
+.tabs {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    background-color: #f2f2f2;
+    margin-right: 5px;
+}
+
+.tab-link.current {
+    background-color: #fff;
+    border-bottom: 2px solid #007bff;
+}
+
+.tab-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab-content.current {
+    display: block;
+}
+
+@media screen and (max-width: 600px) {
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab-link {
+        margin-bottom: 5px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calcolatore Regime Forfettario</h1>
+        <form id="calculator-form">
+            <div class="form-group">
+                <label for="reddito-lordo">Reddito Lordo (€):</label>
+                <input type="number" id="reddito-lordo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="aliquota-imposta">Aliquota dell'Imposta Sostitutiva:</label>
+                <select id="aliquota-imposta">
+                    <option value="5">5%</option>
+                    <option value="15">15%</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="coefficiente-redditivita">Coefficiente di Redditività:</label>
+                <select id="coefficiente-redditivita">
+                    <option value="86">86%</option>
+                    <option value="78">78%</option>
+                    <option value="67">67%</option>
+                    <option value="40">40%</option>
+                    <!-- Aggiungi altri coefficienti se necessario -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cassa-inps">Cassa di Riferimento INPS:</label>
+                <select id="cassa-inps">
+                    <option value="gestione-separata">Gestione Separata INPS</option>
+                    <option value="commercianti">INPS Commercianti</option>
+                    <option value="artigiani">INPS Artigiani</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="riduzione-35-group" style="display: none;">
+                <input type="checkbox" id="riduzione-35">
+                <label for="riduzione-35">Applica riduzione del 35% sui contributi INPS</label>
+            </div>
+
+            <div class="form-group">
+                <label for="data-apertura">Data di Apertura della Partita IVA:</label>
+                <input type="date" id="data-apertura" required>
+            </div>
+
+            <button type="button" id="calcola-btn">Calcola</button>
+        </form>
+
+        <div id="risultati" style="display: none;">
+            <!-- I risultati verranno mostrati qui -->
+        </div>
+
+        <div id="menu-schede" style="display: none;">
+            <ul class="tabs">
+                <li class="tab-link current" data-tab="tab-1">Come si Calcolano?</li>
+                <li class="tab-link" data-tab="tab-2">Scadenza Pagamenti</li>
+                <li class="tab-link" data-tab="tab-3">Dettaglio Pagamenti</li>
+            </ul>
+
+            <div id="tab-1" class="tab-content current">
+                <!-- Spiegazione dettagliata dei calcoli -->
+            </div>
+            <div id="tab-2" class="tab-content">
+                <!-- Dettaglio delle scadenze con tabelle -->
+            </div>
+            <div id="tab-3" class="tab-content">
+                <!-- Riepilogo dettagliato dei pagamenti -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript per il calcolatore
+
+document.addEventListener('DOMContentLoaded', function() {
+    const cassaInpsSelect = document.getElementById('cassa-inps');
+    const riduzione35Group = document.getElementById('riduzione-35-group');
+    const calcolaBtn = document.getElementById('calcola-btn');
+    const risultatiDiv = document.getElementById('risultati');
+    const menuSchede = document.getElementById('menu-schede');
+
+    cassaInpsSelect.addEventListener('change', function() {
+        if (this.value === 'commercianti' || this.value === 'artigiani') {
+            riduzione35Group.style.display = 'block';
+        } else {
+            riduzione35Group.style.display = 'none';
+        }
+    });
+
+    calcolaBtn.addEventListener('click', function() {
+        calcola();
+    });
+
+    function calcola() {
+        // Ottenere i valori di input
+        const redditoLordo = parseFloat(document.getElementById('reddito-lordo').value);
+        const aliquotaImposta = parseFloat(document.getElementById('aliquota-imposta').value);
+        const coefficienteRedditivita = parseFloat(document.getElementById('coefficiente-redditivita').value);
+        const cassaInps = document.getElementById('cassa-inps').value;
+        const riduzione35 = document.getElementById('riduzione-35').checked;
+        const dataApertura = new Date(document.getElementById('data-apertura').value);
+
+        // Calcolo dei mesi di attività
+        const dataFineAnno = new Date(dataApertura.getFullYear(), 11, 31);
+        const mesiAttivi = ((dataFineAnno.getFullYear() - dataApertura.getFullYear()) * 12) + (dataFineAnno.getMonth() - dataApertura.getMonth()) + 1;
+
+        // Calcolo del reddito netto
+        const redditoNetto = Math.round(redditoLordo * (coefficienteRedditivita / 100));
+
+        // Calcolo dell'imposta sostitutiva
+        const impostaSostitutiva = Math.round(redditoNetto * (aliquotaImposta / 100));
+
+        // Calcolo dei contributi INPS
+        let contributiInps = 0;
+        let contributiFissi = 0;
+        let contributiVariabili = 0;
+
+        if (cassaInps === 'gestione-separata') {
+            contributiInps = Math.round(redditoNetto * 0.2607);
+        } else if (cassaInps === 'commercianti' || cassaInps === 'artigiani') {
+            const sogliaReddito = 18415;
+            let aliquotaVariabile = cassaInps === 'commercianti' ? 0.2448 : 0.24;
+            let contributiFissiAnnui = cassaInps === 'commercianti' ? 4515.43 : 4427.04;
+
+            // Riduzione del 35% se applicabile
+            if (riduzione35) {
+                contributiFissiAnnui *= 0.65;
+                aliquotaVariabile *= 0.65;
+            }
+
+            // Calcolo contributi fissi proporzionati
+            contributiFissi = Math.round((contributiFissiAnnui / 12) * mesiAttivi);
+
+            // Calcolo contributi variabili
+            if (redditoNetto > sogliaReddito) {
+                contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile);
+            }
+
+            contributiInps = contributiFissi + contributiVariabili;
+        }
+
+        // Calcolo degli acconti (imposta sostitutiva e contributi INPS)
+        const accontoImposta = Math.round(impostaSostitutiva * 0.8);
+        const accontoInps = Math.round(contributiInps * 0.8);
+
+        // Mostrare i risultati
+        risultatiDiv.style.display = 'block';
+        menuSchede.style.display = 'block';
+
+        risultatiDiv.innerHTML = `
+            <h2>Risultati</h2>
+            <table>
+                <tr>
+                    <th>Descrizione</th>
+                    <th>Importo (€)</th>
+                </tr>
+                <tr>
+                    <td>Reddito Netto</td>
+                    <td>${redditoNetto}</td>
+                </tr>
+                <tr class="highlight-yellow">
+                    <td>Imposta Sostitutiva (${aliquotaImposta}%)</td>
+                    <td>${impostaSostitutiva}</td>
+                </tr>
+                <tr class="highlight-yellow">
+                    <td>Contributi INPS</td>
+                    <td>${contributiInps}</td>
+                </tr>
+                <tr class="highlight-blue">
+                    <td>Acconto Imposta Sostitutiva (80%)</td>
+                    <td>${accontoImposta}</td>
+                </tr>
+                <tr class="highlight-blue">
+                    <td>Acconto Contributi INPS (80%)</td>
+                    <td>${accontoInps}</td>
+                </tr>
+            </table>
+        `;
+
+        // Popolare le schede
+        popolaSchede({
+            redditoLordo,
+            redditoNetto,
+            impostaSostitutiva,
+            contributiInps,
+            accontoImposta,
+            accontoInps,
+            contributiFissi,
+            contributiVariabili,
+            mesiAttivi,
+            dataApertura,
+            cassaInps,
+            riduzione35,
+            aliquotaImposta,
+            coefficienteRedditivita
+        });
+    }
+
+    function popolaSchede(dati) {
+        // Scheda "Come si Calcolano?"
+        const tab1 = document.getElementById('tab-1');
+        tab1.innerHTML = `
+            <h3>Calcolo del Reddito Netto</h3>
+            <p>Il reddito netto si ottiene moltiplicando il reddito lordo per il coefficiente di redditività:</p>
+            <p><strong>Reddito Netto = ${dati.redditoLordo} € x (${dati.coefficienteRedditivita}%) = ${dati.redditoNetto} €</strong></p>
+
+            <h3>Calcolo dell'Imposta Sostitutiva</h3>
+            <p>L'imposta sostitutiva si calcola sul reddito netto:</p>
+            <p><strong>Imposta Sostitutiva = ${dati.redditoNetto} € x (${dati.aliquotaImposta}%) = ${dati.impostaSostitutiva} €</strong></p>
+
+            <h3>Calcolo dei Contributi INPS</h3>
+            <p>I contributi INPS vengono calcolati in base alla cassa selezionata.</p>
+            <!-- Aggiungi ulteriori dettagli in base alla cassa INPS -->
+        `;
+
+        // Scheda "Scadenza Pagamenti"
+        const tab2 = document.getElementById('tab-2');
+        tab2.innerHTML = `
+            <h3>Scadenze dei Pagamenti</h3>
+            <table>
+                <tr>
+                    <th>Data</th>
+                    <th>Importo (€)</th>
+                    <th>Descrizione</th>
+                </tr>
+                <tr>
+                    <td>30 Giugno</td>
+                    <td>${dati.impostaSostitutiva + dati.contributiInps + Math.round(dati.accontoImposta / 2) + Math.round(dati.accontoInps / 2)}</td>
+                    <td>Saldo Imposta Sostitutiva, Saldo Contributi INPS, Primo Acconto Imposta, Primo Acconto INPS</td>
+                </tr>
+                <tr>
+                    <td>30 Novembre</td>
+                    <td>${Math.round(dati.accontoImposta / 2) + Math.round(dati.accontoInps / 2)}</td>
+                    <td>Secondo Acconto Imposta, Secondo Acconto INPS</td>
+                </tr>
+            </table>
+            <!-- Aggiungi le scadenze dei contributi fissi se commercianti o artigiani -->
+        `;
+
+        // Scheda "Dettaglio Pagamenti"
+        const totaleTasseContributi = dati.impostaSostitutiva + dati.contributiInps;
+        const totaleAcconti = dati.accontoImposta + dati.accontoInps;
+        const totaleDaVersare = totaleTasseContributi + totaleAcconti;
+
+        const tab3 = document.getElementById('tab-3');
+        tab3.innerHTML = `
+            <h3>Dettaglio Pagamenti</h3>
+            <p><strong>Totale Tasse e Contributi Effettivi:</strong> ${totaleTasseContributi} € (${((totaleTasseContributi / dati.redditoLordo) * 100).toFixed(2)}% del reddito lordo)</p>
+            <p><strong>Totale Acconti:</strong> ${totaleAcconti} € (${((totaleAcconti / dati.redditoLordo) * 100).toFixed(2)}% del reddito lordo)</p>
+            <p><strong>Totale da Versare Complessivamente:</strong> ${totaleDaVersare} € (${((totaleDaVersare / dati.redditoLordo) * 100).toFixed(2)}% del reddito lordo)</p>
+        `;
+    }
+
+    // Gestione delle schede
+    const tabs = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+
+            tabs.forEach(function(node) {
+                node.classList.remove('current');
+            });
+
+            tabContents.forEach(function(node) {
+                node.classList.remove('current');
+            });
+
+            this.classList.add('current');
+            document.getElementById(tabId).classList.add('current');
+        });
+    });
+});
+
+    </script>
+</body>
+</html>
