@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Verifica se html2pdf è caricato correttamente
+    console.log(typeof html2pdf);  // Questo dovrebbe restituire "function"
+
     // Aggiunta del pulsante per il download del PDF
     const downloadButton = document.createElement("button");
     downloadButton.textContent = "Scarica Risultati in PDF";
