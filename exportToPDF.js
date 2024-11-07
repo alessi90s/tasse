@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Aggiunta del pulsante per il download del PDF tramite stampa del browser
-    const printButton = document.createElement("button");
-    printButton.textContent = "Stampa/Salva come PDF";
-    printButton.style.cssText = `
+    // Aggiunta del pulsante per il download del PDF
+    const downloadButton = document.createElement("button");
+    downloadButton.textContent = "Scarica Risultati in PDF";
+    downloadButton.style.cssText = `
         background-color: #007BFF;
         color: #fff;
         padding: 10px 20px;
@@ -13,39 +13,24 @@ document.addEventListener("DOMContentLoaded", function () {
         display: block;
         margin: 20px auto;
     `;
-    document.querySelector(".calculator-container").appendChild(printButton);
+    document.querySelector(".calculator-container").appendChild(downloadButton);
 
-    // Listener per il click del pulsante di stampa
-    printButton.addEventListener("click", function () {
-        // Mostra solo la sezione dei risultati per la stampa
+    // Listener per il click del pulsante
+    downloadButton.addEventListener("click", function () {
         const risultatiDiv = document.getElementById("risultati");
-
+        
         if (risultatiDiv && risultatiDiv.innerHTML.trim() !== "") {
-            // Clona l'elemento risultati per la stampa
-            const printContents = risultatiDiv.cloneNode(true);
+            // Opzioni per migliorare la qualità del PDF
+            const options = {
+                margin: [10, 10, 10, 10],
+                filename: 'calcolo_regime_forfettario.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
 
-            // Crea un nuovo documento per la stampa
-            const printWindow = window.open("", "", "width=800,height=600");
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Risultati del Calcolo</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; padding: 20px; }
-                            .result-content h2, .result-content h3 { margin-top: 0; }
-                            .result-table { width: 100%; border-collapse: collapse; }
-                            .result-table th, .result-table td {
-                                border: 1px solid #ddd; padding: 8px; text-align: left;
-                            }
-                            .result-table th { background-color: #f2f2f2; }
-                            .highlight { font-weight: bold; color: #007BFF; }
-                        </style>
-                    </head>
-                    <body>${printContents.outerHTML}</body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
+            // Usa html2pdf per generare il PDF dal contenuto HTML
+            html2pdf().set(options).from(risultatiDiv).save();
         } else {
             alert("Nessun risultato disponibile per il download.");
         }
