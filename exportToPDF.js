@@ -23,25 +23,17 @@ document.addEventListener("DOMContentLoaded", function () {
         // Trova il contenuto dei risultati
         const risultatiDiv = document.getElementById("risultati");
         if (risultatiDiv && risultatiDiv.innerHTML.trim() !== "") {
-            // Estrai il testo dai risultati
-            let textContent = "";
-            const resultElements = risultatiDiv.querySelectorAll("*");
-
-            resultElements.forEach(element => {
-                if (element.tagName === "H2" || element.tagName === "H3") {
-                    textContent += element.textContent.toUpperCase() + "\n\n";
-                } else if (element.tagName === "P" || element.tagName === "LI" || element.tagName === "TD") {
-                    textContent += element.textContent + "\n";
-                }
+            // Usa il metodo html() di jsPDF per includere l'HTML con la formattazione
+            doc.html(risultatiDiv, {
+                callback: function (doc) {
+                    // Salva il PDF con nome specifico
+                    doc.save("calcolo_regime_forfettario.pdf");
+                },
+                x: 10,
+                y: 10,
+                width: 180, // Imposta la larghezza del contenuto per adattarsi meglio al PDF
+                windowWidth: risultatiDiv.scrollWidth // Dimensione della finestra per migliorare il layout
             });
-
-            // Aggiungi il testo estratto al PDF
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(12);
-            doc.text(textContent, 10, 10);
-
-            // Salva il PDF con nome specifico
-            doc.save("calcolo_regime_forfettario.pdf");
         } else {
             alert("Nessun risultato disponibile per il download.");
         }
