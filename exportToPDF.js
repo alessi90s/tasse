@@ -18,14 +18,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Listener per il click del pulsante
     downloadButton.addEventListener("click", function () {
         const risultatiDiv = document.getElementById("risultati");
-        
+
         if (risultatiDiv && risultatiDiv.innerHTML.trim() !== "") {
             // Opzioni per migliorare la qualità del PDF
             const options = {
                 margin: [10, 10, 10, 10],
                 filename: 'calcolo_regime_forfettario.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { scale: 4, useCORS: true, logging: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
