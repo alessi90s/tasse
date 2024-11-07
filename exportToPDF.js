@@ -18,11 +18,30 @@ document.addEventListener("DOMContentLoaded", function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        // Prendi il contenuto dei risultati
+        // Trova il contenuto dei risultati
         const risultatiDiv = document.getElementById("risultati");
+
         if (risultatiDiv && risultatiDiv.innerHTML.trim() !== "") {
-            doc.text("Risultati del Calcolo", 10, 10);
-            doc.fromHTML(risultatiDiv.innerHTML, 10, 20);
+            // Estrarre il testo dai risultati
+            let textContent = "";
+            const resultElements = risultatiDiv.querySelectorAll("*");
+
+            resultElements.forEach(element => {
+                if (element.tagName === "H2" || element.tagName === "H3") {
+                    textContent += element.textContent.toUpperCase() + "\n\n";
+                } else if (element.tagName === "P" || element.tagName === "LI" || element.tagName === "TD") {
+                    textContent += element.textContent + "\n";
+                } else if (element.tagName === "TABLE") {
+                    textContent += "\n[TABELLA]\n"; // Placeholder per gestire le tabelle
+                }
+            });
+
+            // Aggiungere il testo estratto nel PDF
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.text(textContent, 10, 10);
+
+            // Salvare il PDF con nome specifico
             doc.save("calcolo_regime_forfettario.pdf");
         } else {
             alert("Nessun risultato disponibile per il download.");
