@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Aggiunta del pulsante per il download del PDF
     const downloadButton = document.createElement("button");
     downloadButton.textContent = "Scarica Risultati in PDF";
     downloadButton.style.cssText = `
@@ -14,15 +15,15 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     document.querySelector(".calculator-container").appendChild(downloadButton);
 
+    // Listener per il click del pulsante
     downloadButton.addEventListener("click", function () {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
         // Trova il contenuto dei risultati
         const risultatiDiv = document.getElementById("risultati");
-
         if (risultatiDiv && risultatiDiv.innerHTML.trim() !== "") {
-            // Estrarre il testo dai risultati
+            // Estrai il testo dai risultati
             let textContent = "";
             const resultElements = risultatiDiv.querySelectorAll("*");
 
@@ -31,17 +32,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     textContent += element.textContent.toUpperCase() + "\n\n";
                 } else if (element.tagName === "P" || element.tagName === "LI" || element.tagName === "TD") {
                     textContent += element.textContent + "\n";
-                } else if (element.tagName === "TABLE") {
-                    textContent += "\n[TABELLA]\n"; // Placeholder per gestire le tabelle
                 }
             });
 
-            // Aggiungere il testo estratto nel PDF
+            // Aggiungi il testo estratto al PDF
             doc.setFont("helvetica", "normal");
             doc.setFontSize(12);
             doc.text(textContent, 10, 10);
 
-            // Salvare il PDF con nome specifico
+            // Salva il PDF con nome specifico
             doc.save("calcolo_regime_forfettario.pdf");
         } else {
             alert("Nessun risultato disponibile per il download.");
