@@ -122,12 +122,12 @@
 
         /* Stili per evidenziare saldi e acconti */
         .saldo {
-            color: #d9534f; /* Rosso per i saldi */
+            color: #28a745; /* Verde per i saldi */
             font-weight: bold;
         }
 
         .acconto {
-            color: #f0ad4e; /* Arancione per gli acconti */
+            color: #17a2b8; /* Celeste per gli acconti */
             font-weight: bold;
         }
 
@@ -336,22 +336,35 @@
             const contributoTrimestre = Math.round(contributoFisso / 4);
             let totale = 0;
 
+            let trimestreApertura = -1;
+
             for (let i = 0; i < trimestri.length; i++) {
                 const trimestre = trimestri[i];
-                if (dataApertura <= trimestre.end) {
-                    if (dataApertura >= trimestre.start) {
-                        // Calcola proporzionalmente il contributo per questo trimestre
-                        const daysInQuarter = (trimestre.end - trimestre.start) / (1000 * 60 * 60 * 24) + 1;
-                        const daysActive = (trimestre.end - dataApertura) / (1000 * 60 * 60 * 24) + 1;
-                        const proporzione = daysActive / daysInQuarter;
-                        const importo = Math.round(contributoTrimestre * proporzione);
-                        rate.push({ data: trimestre.scadenza, importo });
-                        totale += importo;
-                    } else {
-                        // Paga l'intero contributo trimestrale
-                        rate.push({ data: trimestre.scadenza, importo: contributoTrimestre });
-                        totale += contributoTrimestre;
-                    }
+                if (dataApertura >= trimestre.start && dataApertura <= trimestre.end) {
+                    trimestreApertura = i;
+                    break;
+                }
+            }
+
+            if (trimestreApertura === -1) {
+                // Se la data di apertura è fuori dai trimestri (non dovrebbe accadere), considera tutti i trimestri
+                trimestreApertura = 0;
+            }
+
+            for (let i = trimestreApertura; i < 4; i++) {
+                const trimestre = trimestri[i];
+                if (i === trimestreApertura) {
+                    // Calcolo proporzionale della prima rata
+                    const daysInQuarter = (trimestre.end - trimestre.start) / (1000 * 60 * 60 * 24) + 1;
+                    const daysActive = (trimestre.end - dataApertura) / (1000 * 60 * 60 * 24) + 1;
+                    const proporzione = daysActive / daysInQuarter;
+                    const importo = Math.round(contributoTrimestre * proporzione);
+                    rate.push({ data: trimestre.scadenza, importo });
+                    totale += importo;
+                } else {
+                    // Paga l'intero contributo trimestrale
+                    rate.push({ data: trimestre.scadenza, importo: contributoTrimestre });
+                    totale += contributoTrimestre;
                 }
             }
 
@@ -542,9 +555,9 @@
             const totaleComplessivo = totaleSaldo + totaleAcconti + data.totaleContributiFissi;
 
             // Calcolo delle percentuali relative al reddito lordo
-            const percSaldo = ((totaleSaldo + data.totaleContributiFissi) / data.redditoIncassato * 100).toFixed(0);
-            const percAcconti = (totaleAcconti / data.redditoIncassato * 100).toFixed(0);
-            const percTotale = (totaleComplessivo / data.redditoIncassato * 100).toFixed(0);
+            const percSaldo = (((totaleSaldo + data.totaleContributiFissi) / data.redditoIncassato) * 100).toFixed(0);
+            const percAcconti = ((totaleAcconti / data.redditoIncassato) * 100).toFixed(0);
+            const percTotale = ((totaleComplessivo / data.redditoIncassato) * 100).toFixed(0);
 
             dettagli += `
                     <h3>Riepilogo dei Pagamenti:</h3>
