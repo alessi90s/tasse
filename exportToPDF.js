@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         display: block;
         margin: 20px auto;
     `;
+    // Aggiungi il pulsante alla sezione del contenitore principale
     document.querySelector(".calculator-container").appendChild(downloadButton);
 
     // Listener per il click del pulsante
@@ -20,12 +21,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const risultatiDiv = document.getElementById("risultati");
 
         if (risultatiDiv && risultatiDiv.innerHTML.trim() !== "") {
-            // Opzioni per migliorare la qualità del PDF
+            // Genera il PDF utilizzando il contenuto HTML esistente
             const options = {
-                margin: [10, 10, 10, 10],
                 filename: 'calcolo_regime_forfettario.pdf',
                 image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 4, useCORS: true, logging: true },
+                html2canvas: {
+                    scale: 2, // Ridimensionamento per migliorare la qualità del PDF
+                    useCORS: true // Consente di gestire le risorse esterne con CORS
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
