@@ -14,15 +14,15 @@
 
         .calculator-container {
             background-color: #fff;
-            max-width: 600px;
+            max-width: 700px;
             margin: 50px auto;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
 
         .calculator-container h1 {
+            text-align: center;
             margin-bottom: 20px;
             color: #333;
         }
@@ -62,16 +62,62 @@
 
         #risultati {
             margin-top: 30px;
-            text-align: left;
         }
 
-        #risultati h2 {
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background-color: #ddd;
+            cursor: pointer;
+        }
+
+        .tabs button.active {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .result-content {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .result-content h2 {
             color: #333;
         }
 
-        #risultati p {
-            color: #555;
-            line-height: 1.6;
+        .result-content p {
+            margin: 5px 0;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .result-table th,
+        .result-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .result-table th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
@@ -112,11 +158,7 @@
                     <option value="gestioneSeparata">Gestione Separata INPS</option>
                     <option value="inpsCommercianti">INPS Commercianti</option>
                     <option value="inpsArtigiani">INPS Artigiani</option>
-                    <option value="enpap">Enpap</option>
-                    <option value="enpapi">Enpapi</option>
-                    <option value="inarcassa">Inarcassa</option>
-                    <option value="enpam">Enpam</option>
-                    <option value="cassaForense">Cassa Forense</option>
+                    <!-- Altre casse previdenziali -->
                 </select>
             </div>
             <div class="form-group" id="riduzioneContainer" style="display: none;">
@@ -139,14 +181,14 @@
         // Dati per gli anni di riferimento
         const anniRiferimento = {
             "2024": {
-                "gestioneSeparata": 26.07,
+                "gestioneSeparata": 26,
                 "inpsCommercianti": {
-                    "contributoFisso": 4515.43,
-                    "aliquotaVariabile": 24.48,
+                    "contributoFisso": 4515,
+                    "aliquotaVariabile": 24,
                     "sogliaReddito": 18415
                 },
                 "inpsArtigiani": {
-                    "contributoFisso": 4427.04,
+                    "contributoFisso": 4427,
                     "aliquotaVariabile": 24,
                     "sogliaReddito": 18415
                 }
@@ -172,38 +214,40 @@
 
         function calcola() {
             const anno = document.getElementById('annoRiferimento').value;
-            const redditoIncassato = parseFloat(document.getElementById('redditoIncassato').value);
-            const impostaSostitutiva = parseFloat(document.getElementById('impostaSostitutiva').value);
-            const coefficienteRedditività = parseFloat(document.getElementById('coefficienteRedditività').value);
+            const redditoIncassato = parseInt(document.getElementById('redditoIncassato').value);
+            const impostaSostitutiva = parseInt(document.getElementById('impostaSostitutiva').value);
+            const coefficienteRedditività = parseInt(document.getElementById('coefficienteRedditività').value);
             const cassaPrevidenziale = document.getElementById('cassaPrevidenziale').value;
             const riduzione35 = document.getElementById('riduzione35').checked;
             const dataApertura = document.getElementById('dataApertura').value ? new Date(document.getElementById('dataApertura').value) : null;
 
-            const redditoNetto = redditoIncassato * (coefficienteRedditività / 100);
+            const redditoNetto = Math.round(redditoIncassato * (coefficienteRedditività / 100));
             let contributi = 0;
-            let imposta = (redditoNetto * impostaSostitutiva) / 100;
+            let imposta = Math.round((redditoNetto * impostaSostitutiva) / 100);
+
+            let contributiFissi = 0;
+            let contributiVariabili = 0;
 
             if (cassaPrevidenziale === 'gestioneSeparata') {
                 const aliquotaContributi = anniRiferimento[anno]["gestioneSeparata"];
-                contributi = (redditoNetto * aliquotaContributi) / 100;
+                contributi = Math.round((redditoNetto * aliquotaContributi) / 100);
             } else if (cassaPrevidenziale === 'inpsCommercianti' || cassaPrevidenziale === 'inpsArtigiani') {
                 const datiCassa = anniRiferimento[anno][cassaPrevidenziale];
                 // Calcolo del contributo fisso
-                let contributoFisso = datiCassa.contributoFisso;
+                contributiFissi = datiCassa.contributoFisso;
                 if (riduzione35) {
-                    contributoFisso *= 0.65;
+                    contributiFissi = Math.round(contributiFissi * 0.65);
                 }
                 // Adegua il contributo fisso in base alla data di apertura
                 if (dataApertura) {
-                    contributoFisso = calcolaContributoFissoProporzionale(contributoFisso, dataApertura, anno);
+                    contributiFissi = Math.round(calcolaContributoFissoProporzionale(contributiFissi, dataApertura, anno));
                 }
                 // Calcolo del contributo variabile se supera la soglia
-                let contributiVariabili = 0;
                 if (redditoNetto > datiCassa.sogliaReddito) {
                     const eccedenza = redditoNetto - datiCassa.sogliaReddito;
-                    contributiVariabili = (eccedenza * datiCassa.aliquotaVariabile) / 100;
+                    contributiVariabili = Math.round((eccedenza * datiCassa.aliquotaVariabile) / 100);
                 }
-                contributi = contributoFisso + contributiVariabili;
+                contributi = contributiFissi + contributiVariabili;
             } else {
                 // Placeholder per altre casse previdenziali
                 contributi = 0;
@@ -213,25 +257,32 @@
             const saldoImposte = imposta;
             const accontoImposte = imposta; // 100% del saldo
             const saldoContributi = contributi;
-            const accontoContributi = contributi * 0.8; // 80% del saldo
+            let accontoContributi = 0;
+            if (cassaPrevidenziale === 'gestioneSeparata') {
+                accontoContributi = Math.round(contributi * 0.8); // 80% del saldo
+            } else if (cassaPrevidenziale === 'inpsCommercianti' || cassaPrevidenziale === 'inpsArtigiani') {
+                accontoContributi = Math.round(contributiVariabili * 0.8); // Solo sui contributi variabili
+            }
 
             mostraRisultati({
+                anno,
+                redditoIncassato,
+                coefficienteRedditività,
                 redditoNetto,
+                impostaSostitutiva,
                 imposta,
+                contributiFissi,
+                contributiVariabili,
                 contributi,
                 saldoImposte,
                 accontoImposte,
                 saldoContributi,
-                accontoContributi
+                accontoContributi,
+                cassaPrevidenziale
             });
         }
 
         function calcolaContributoFissoProporzionale(contributoFisso, dataApertura, anno) {
-            const date1 = new Date(`${anno}-05-16`);
-            const date2 = new Date(`${anno}-08-20`);
-            const date3 = new Date(`${anno}-11-16`);
-            const date4 = new Date(`${parseInt(anno) +1}-02-16`);
-
             const trimestri = [
                 { start: new Date(`${anno}-01-01`), end: new Date(`${anno}-03-31`), rata: 1 },
                 { start: new Date(`${anno}-04-01`), end: new Date(`${anno}-06-30`), rata: 2 },
@@ -264,16 +315,302 @@
         function mostraRisultati(data) {
             const risultatiDiv = document.getElementById('risultati');
             risultatiDiv.innerHTML = `
-                <h2>Risultati:</h2>
-                <p><strong>Reddito Netto:</strong> €${data.redditoNetto.toFixed(2)}</p>
-                <p><strong>Imposta da pagare:</strong> €${data.imposta.toFixed(2)}</p>
-                <p><strong>Contributi da pagare:</strong> €${data.contributi.toFixed(2)}</p>
-                <h3>Saldi e Acconti:</h3>
-                <p><strong>Saldo Imposte:</strong> €${data.saldoImposte.toFixed(2)}</p>
-                <p><strong>Acconto Imposte:</strong> €${data.accontoImposte.toFixed(2)}</p>
-                <p><strong>Saldo Contributi:</strong> €${data.saldoContributi.toFixed(2)}</p>
-                <p><strong>Acconto Contributi:</strong> €${data.accontoContributi.toFixed(2)}</p>
+                <div class="tabs">
+                    <button class="tablink active" onclick="openTab(event, 'calcoli')">Come si calcolano</button>
+                    <button class="tablink" onclick="openTab(event, 'dettagli')">Dettagli pagamenti</button>
+                    <button class="tablink" onclick="openTab(event, 'scadenze')">Scadenze pagamenti</button>
+                </div>
+                <div id="calcoli" class="tab active">
+                    ${generaTestoCalcoli(data)}
+                </div>
+                <div id="dettagli" class="tab">
+                    ${generaDettagliPagamenti(data)}
+                </div>
+                <div id="scadenze" class="tab">
+                    ${generaScadenzePagamenti(data)}
+                </div>
             `;
+        }
+
+        function generaTestoCalcoli(data) {
+            let testo = '';
+            if (data.cassaPrevidenziale === 'gestioneSeparata') {
+                testo = `
+                    <div class="result-content">
+                        <h2>Dettaglio dei Calcoli</h2>
+                        <p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${data.impostaSostitutiva}%.</p>
+                        <p>Paghi inoltre i contributi alla Gestione Separata INPS con un'aliquota del ${anniRiferimento[data.anno]["gestioneSeparata"]}%.</p>
+                        <p>L'imposta e i contributi si calcolano sul ${data.coefficienteRedditività}% del tuo incassato.</p>
+                        <p>${data.redditoIncassato}€ x ${data.coefficienteRedditività}% = ${data.redditoNetto}€ (reddito netto imponibile)</p>
+                        <h3>Nota bene:</h3>
+                        <ul>
+                            <li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>
+                            <li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li>
+                        </ul>
+                        <h3>Esempio di calcolo:</h3>
+                        <p>Per un incasso di ${data.redditoIncassato}€, il ${data.coefficienteRedditività}% corrisponde a ${data.redditoNetto}€. Su questo importo, dovrai pagare:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a ${data.imposta}€.</li>
+                            <li>Contributi INPS: Aliquota del ${anniRiferimento[data.anno]["gestioneSeparata"]}% su ${data.redditoNetto}€, che equivale a ${data.contributi}€.</li>
+                        </ul>
+                        <p>Quindi, a livello di saldo, pagherai ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
+                        <h3>Acconti:</h3>
+                        <p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori ${data.accontoImposte}€.</li>
+                            <li>Contributi INPS: pagherai l'80% dell'importo del saldo come acconto, quindi ulteriori ${data.accontoContributi}€.</li>
+                        </ul>
+                        <h3>Totale complessivo:</h3>
+                        <p>Saldo totale: ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi)</p>
+                        <p>Acconti totali: ${data.accontoImposte + data.accontoContributi}€ (di cui ${data.accontoImposte}€ di imposta e ${data.accontoContributi}€ di contributi)</p>
+                        <p>Importo complessivo (saldo + acconti): ${data.imposta + data.contributi + data.accontoImposte + data.accontoContributi}€</p>
+                        <p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>
+                    </div>
+                `;
+            } else if (data.cassaPrevidenziale === 'inpsCommercianti' || data.cassaPrevidenziale === 'inpsArtigiani') {
+                testo = `
+                    <div class="result-content">
+                        <h2>Dettaglio dei Calcoli</h2>
+                        <p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${data.impostaSostitutiva}%.</p>
+                        <p>Paghi inoltre i contributi fissi INPS ${data.cassaPrevidenziale === 'inpsCommercianti' ? 'Commercianti' : 'Artigiani'} di ${data.contributiFissi}€ all'anno.</p>
+                        <p>L'imposta e i contributi variabili si calcolano sul ${data.coefficienteRedditività}% del tuo incassato.</p>
+                        <p>${data.redditoIncassato}€ x ${data.coefficienteRedditività}% = ${data.redditoNetto}€ (reddito netto imponibile)</p>
+                        <h3>Nota bene:</h3>
+                        <ul>
+                            <li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>
+                            <li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li>
+                        </ul>
+                        <h3>Esempio di calcolo:</h3>
+                        <p>Per un incasso di ${data.redditoIncassato}€, il ${data.coefficienteRedditività}% corrisponde a ${data.redditoNetto}€. Su questo importo, dovrai pagare:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a ${data.imposta}€.</li>
+                            <li>Contributi INPS: Contributi fissi di ${data.contributiFissi}€ ${data.contributiVariabili > 0 ? `+ Contributi variabili di ${data.contributiVariabili}€` : ''}. Totale contributi: ${data.contributi}€.</li>
+                        </ul>
+                        <p>Quindi, a livello di saldo, pagherai ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
+                        <h3>Acconti:</h3>
+                        <p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori ${data.accontoImposte}€.</li>
+                            ${data.accontoContributi > 0 ? `<li>Contributi INPS Variabili: pagherai l'80% dei contributi variabili come acconto, quindi ulteriori ${data.accontoContributi}€.</li>` : `<li>Contributi INPS Variabili: Nessun acconto dovuto poiché non ci sono contributi variabili.</li>`}
+                        </ul>
+                        <h3>Totale complessivo:</h3>
+                        <p>Saldo totale: ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi)</p>
+                        <p>Acconti totali: ${data.accontoImposte + data.accontoContributi}€ (di cui ${data.accontoImposte}€ di imposta e ${data.accontoContributi}€ di contributi)</p>
+                        <p>Importo complessivo (saldo + acconti): ${data.imposta + data.contributi + data.accontoImposte + data.accontoContributi}€</p>
+                        <p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>
+                    </div>
+                `;
+            }
+            return testo;
+        }
+
+        function generaDettagliPagamenti(data) {
+            let dettagli = `
+                <div class="result-content">
+                    <h2>Dettaglio dei pagamenti per l'anno ${data.anno}</h2>
+                    <p>Hai guadagnato ${data.redditoIncassato}€ nel ${data.anno}.</p>
+                    <h3>Calcolo del Reddito Netto:</h3>
+                    <p>Reddito Lordo (${data.redditoIncassato}€) x Coefficiente di Redditività (${data.coefficienteRedditività}%) = ${data.redditoNetto}€</p>
+                    <h3>Calcolo dell'Imposta Sostitutiva:</h3>
+                    <p>Reddito Netto (${data.redditoNetto}€) x Aliquota Imposta Sostitutiva (${data.impostaSostitutiva}%) = ${data.imposta}€</p>
+            `;
+
+            if (data.cassaPrevidenziale === 'gestioneSeparata') {
+                dettagli += `
+                    <h3>Calcolo dei Contributi INPS (Gestione Separata):</h3>
+                    <p>Reddito Netto (${data.redditoNetto}€) x Aliquota Contributiva (${anniRiferimento[data.anno]["gestioneSeparata"]}%) = ${data.contributi}€</p>
+                `;
+            } else if (data.cassaPrevidenziale === 'inpsCommercianti' || data.cassaPrevidenziale === 'inpsArtigiani') {
+                dettagli += `
+                    <h3>Calcolo dei Contributi INPS (${data.cassaPrevidenziale === 'inpsCommercianti' ? 'Commercianti' : 'Artigiani'}):</h3>
+                    <p>Contributi Fissi: ${data.contributiFissi}€</p>
+                    ${data.contributiVariabili > 0 ? `<p>Contributi Variabili: ${data.contributiVariabili}€</p>` : ''}
+                    <p><strong>Totale Contributi INPS: ${data.contributi}€</strong></p>
+                `;
+            }
+
+            dettagli += `
+                    <h3>Tasse da pagare:</h3>
+                    <ul>
+                        <li>Saldo imposta sostitutiva sul ${data.anno} (${data.imposta}€) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                        <li>Acconto imposta sostitutiva per il ${parseInt(data.anno) + 1} (${data.accontoImposte}€) da pagare in due rate:
+                            <ul>
+                                <li>Prima rata (${Math.round(data.accontoImposte / 2)}€) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                                <li>Seconda rata (${Math.round(data.accontoImposte / 2)}€) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
+                            </ul>
+                        </li>
+                    </ul>
+            `;
+
+            if (data.cassaPrevidenziale === 'gestioneSeparata') {
+                dettagli += `
+                    <h3>Contributi previdenziali:</h3>
+                    <ul>
+                        <li>Saldo contributi INPS sul ${data.anno} (${data.contributi}€) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                        <li>Acconto contributi INPS per il ${parseInt(data.anno) + 1} (${data.accontoContributi}€) da pagare in due rate:
+                            <ul>
+                                <li>Prima rata (${Math.round(data.accontoContributi / 2)}€) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                                <li>Seconda rata (${Math.round(data.accontoContributi / 2)}€) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                `;
+            } else if (data.cassaPrevidenziale === 'inpsCommercianti' || data.cassaPrevidenziale === 'inpsArtigiani') {
+                dettagli += `
+                    <h3>Contributi previdenziali:</h3>
+                    <ul>
+                        <li>Contributi fissi INPS sul ${data.anno} (${data.contributiFissi}€) da pagare in quattro rate:
+                            <ul>
+                                <li>Rata 1 (${Math.round(data.contributiFissi / 4)}€) entro il 16 maggio ${data.anno}.</li>
+                                <li>Rata 2 (${Math.round(data.contributiFissi / 4)}€) entro il 20 agosto ${data.anno}.</li>
+                                <li>Rata 3 (${Math.round(data.contributiFissi / 4)}€) entro il 16 novembre ${data.anno}.</li>
+                                <li>Rata 4 (${Math.round(data.contributiFissi / 4)}€) entro il 16 febbraio ${parseInt(data.anno) + 1}.</li>
+                            </ul>
+                        </li>
+                `;
+
+                if (data.contributiVariabili > 0) {
+                    dettagli += `
+                        <li>Saldo contributi variabili INPS sul ${data.anno} (${data.contributiVariabili}€) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                        <li>Acconto contributi variabili per il ${parseInt(data.anno) + 1} (${data.accontoContributi}€) da pagare in due rate:
+                            <ul>
+                                <li>Prima rata (${Math.round(data.accontoContributi / 2)}€) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                                <li>Seconda rata (${Math.round(data.accontoContributi / 2)}€) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
+                            </ul>
+                        </li>
+                    `;
+                } else {
+                    dettagli += `
+                        <li>Contributi variabili INPS: Nessun contributo variabile dovuto poiché non hai superato la soglia di reddito.</li>
+                    `;
+                }
+
+                dettagli += `</ul>`;
+            }
+
+            const totaleSaldo = data.saldoImposte + data.saldoContributi;
+            const totaleAcconti = data.accontoImposte + data.accontoContributi;
+            const totaleComplessivo = totaleSaldo + totaleAcconti;
+
+            dettagli += `
+                    <h3>Riepilogo dei Pagamenti:</h3>
+                    <p>Totale tasse e contributi effettivi sul ${data.anno}: ${totaleSaldo}€</p>
+                    <p>Totale acconti per il ${parseInt(data.anno) + 1}: ${totaleAcconti}€</p>
+                    <p><strong>Totale da versare complessivamente: ${totaleComplessivo}€</strong></p>
+                    <p>Nota: Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (${parseInt(data.anno) + 1}) e non rappresentano un costo aggiuntivo.</p>
+                </div>
+            `;
+
+            return dettagli;
+        }
+
+        function generaScadenzePagamenti(data) {
+            let scadenze = `
+                <div class="result-content">
+                    <h2>Scadenze dei Pagamenti</h2>
+            `;
+
+            if (data.cassaPrevidenziale === 'gestioneSeparata') {
+                const totalePrimaRata = data.saldoImposte + Math.round(data.accontoImposte / 2) + data.saldoContributi + Math.round(data.accontoContributi / 2);
+                const totaleSecondaRata = Math.round(data.accontoImposte / 2) + Math.round(data.accontoContributi / 2);
+
+                scadenze += `
+                    <table class="result-table">
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo Totale</th>
+                            <th>Dettaglio</th>
+                        </tr>
+                        <tr>
+                            <td>30 giugno ${parseInt(data.anno) + 1}</td>
+                            <td>${totalePrimaRata}€</td>
+                            <td>
+                                Saldo imposta sostitutiva (${data.saldoImposte}€) + Prima rata acconto imposta (${Math.round(data.accontoImposte / 2)}€) + Saldo contributi INPS (${data.saldoContributi}€) + Prima rata acconto contributi INPS (${Math.round(data.accontoContributi / 2)}€)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>30 novembre ${parseInt(data.anno) + 1}</td>
+                            <td>${totaleSecondaRata}€</td>
+                            <td>
+                                Seconda rata acconto imposta (${Math.round(data.accontoImposte / 2)}€) + Seconda rata acconto contributi INPS (${Math.round(data.accontoContributi / 2)}€)
+                            </td>
+                        </tr>
+                    </table>
+                `;
+            } else if (data.cassaPrevidenziale === 'inpsCommercianti' || data.cassaPrevidenziale === 'inpsArtigiani') {
+                const contributiFissiRata = Math.round(data.contributiFissi / 4);
+                scadenze += `
+                    <h3>Contributi Fissi INPS:</h3>
+                    <table class="result-table">
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo</th>
+                        </tr>
+                        <tr>
+                            <td>16 maggio ${data.anno}</td>
+                            <td>${contributiFissiRata}€</td>
+                        </tr>
+                        <tr>
+                            <td>20 agosto ${data.anno}</td>
+                            <td>${contributiFissiRata}€</td>
+                        </tr>
+                        <tr>
+                            <td>16 novembre ${data.anno}</td>
+                            <td>${contributiFissiRata}€</td>
+                        </tr>
+                        <tr>
+                            <td>16 febbraio ${parseInt(data.anno) + 1}</td>
+                            <td>${contributiFissiRata}€</td>
+                        </tr>
+                    </table>
+                `;
+
+                const totalePrimaRata = data.saldoImposte + Math.round(data.accontoImposte / 2) + data.contributiVariabili + Math.round(data.accontoContributi / 2);
+                const totaleSecondaRata = Math.round(data.accontoImposte / 2) + Math.round(data.accontoContributi / 2);
+
+                scadenze += `
+                    <h3>Imposte e Contributi Variabili:</h3>
+                    <table class="result-table">
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo Totale</th>
+                            <th>Dettaglio</th>
+                        </tr>
+                        <tr>
+                            <td>30 giugno ${parseInt(data.anno) + 1}</td>
+                            <td>${totalePrimaRata}€</td>
+                            <td>
+                                Saldo imposta sostitutiva (${data.saldoImposte}€) + Prima rata acconto imposta (${Math.round(data.accontoImposte / 2)}€) ${data.contributiVariabili > 0 ? `+ Saldo contributi INPS variabili (${data.contributiVariabili}€) + Prima rata acconto contributi INPS variabili (${Math.round(data.accontoContributi / 2)}€)` : ''}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>30 novembre ${parseInt(data.anno) + 1}</td>
+                            <td>${totaleSecondaRata}€</td>
+                            <td>
+                                Seconda rata acconto imposta (${Math.round(data.accontoImposte / 2)}€) ${data.contributiVariabili > 0 ? `+ Seconda rata acconto contributi INPS variabili (${Math.round(data.accontoContributi / 2)}€)` : ''}
+                            </td>
+                        </tr>
+                    </table>
+                `;
+            }
+
+            scadenze += `</div>`;
+            return scadenze;
+        }
+
+        function openTab(evt, tabName) {
+            const tablinks = document.getElementsByClassName('tablink');
+            const tabs = document.getElementsByClassName('tab');
+
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
     </script>
 </body>
