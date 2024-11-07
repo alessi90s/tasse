@@ -122,12 +122,12 @@
 
         /* Stili per evidenziare saldi e acconti */
         .saldo {
-            color: #28a745; /* Verde per i saldi */
+            background-color: #d4edda; /* Verde pastello per i saldi */
             font-weight: bold;
         }
 
         .acconto {
-            color: #17a2b8; /* Celeste per gli acconti */
+            background-color: #d1ecf1; /* Celeste per gli acconti */
             font-weight: bold;
         }
 
@@ -260,6 +260,7 @@
             if (cassaPrevidenziale === 'gestioneSeparata') {
                 const aliquotaContributi = anniRiferimento[anno]["gestioneSeparata"];
                 contributi = Math.round((redditoNetto * aliquotaContributi) / 100);
+                totaleContributiFissi = 0;
             } else if (cassaPrevidenziale === 'inpsCommercianti' || cassaPrevidenziale === 'inpsArtigiani') {
                 const datiCassa = anniRiferimento[anno][cassaPrevidenziale];
                 // Calcolo del contributo fisso
@@ -291,6 +292,7 @@
             } else {
                 // Placeholder per altre casse previdenziali
                 contributi = 0;
+                totaleContributiFissi = 0;
             }
 
             // Calcolo di saldi e acconti
@@ -409,15 +411,15 @@
                         <h3>Esempio di calcolo:</h3>
                         <p>Per un incasso di <strong>${data.redditoIncassato}€</strong>, il <strong>${data.coefficienteRedditività}%</strong> corrisponde a <strong>${data.redditoNetto}€</strong>. Su questo importo, dovrai pagare:</p>
                         <ul>
-                            <li class="saldo">Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a ${data.imposta}€.</li>
-                            <li class="saldo">Contributi INPS: Aliquota del ${anniRiferimento[data.anno]["gestioneSeparata"]}% su ${data.redditoNetto}€, che equivale a ${data.contributi}€.</li>
+                            <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.imposta}€</span>.</li>
+                            <li>Contributi INPS: Aliquota del ${anniRiferimento[data.anno]["gestioneSeparata"]}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.contributi}€</span>.</li>
                         </ul>
                         <p>Quindi, a livello di <strong>saldo</strong>, pagherai <strong>${data.imposta + data.contributi}€</strong> (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
                         <h3>Acconti:</h3>
-                        <p>Oltre al saldo, dovrai versare anche gli <strong class="acconto">acconti</strong> per l’anno successivo:</p>
+                        <p>Oltre al saldo, dovrai versare anche gli <strong>acconti</strong> per l’anno successivo:</p>
                         <ul>
-                            <li class="acconto">Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori ${data.accontoImposte}€.</li>
-                            <li class="acconto">Contributi INPS: pagherai l'80% dell'importo del saldo come acconto, quindi ulteriori ${data.accontoContributi}€.</li>
+                            <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="acconto">${data.accontoImposte}€</span>.</li>
+                            <li>Contributi INPS: pagherai l'80% dell'importo del saldo come acconto, quindi ulteriori <span class="acconto">${data.accontoContributi}€</span>.</li>
                         </ul>
                         <h3>Totale complessivo:</h3>
                         <p><strong>Saldo totale:</strong> ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi)</p>
@@ -442,15 +444,15 @@
                         <h3>Esempio di calcolo:</h3>
                         <p>Per un incasso di <strong>${data.redditoIncassato}€</strong>, il <strong>${data.coefficienteRedditività}%</strong> corrisponde a <strong>${data.redditoNetto}€</strong>. Su questo importo, dovrai pagare:</p>
                         <ul>
-                            <li class="saldo">Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a ${data.imposta}€.</li>
-                            <li class="saldo">Contributi INPS: Contributi fissi di ${data.totaleContributiFissi}€ ${data.contributiVariabili > 0 ? `+ Contributi variabili di ${data.contributiVariabili}€` : ''}. Totale contributi: ${data.contributi}€.</li>
+                            <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.imposta}€</span>.</li>
+                            <li>Contributi INPS: Contributi fissi di ${data.totaleContributiFissi}€ ${data.contributiVariabili > 0 ? `+ Contributi variabili di <span class="saldo">${data.contributiVariabili}€</span>` : ''}. Totale contributi: <span class="saldo">${data.contributi}€</span>.</li>
                         </ul>
                         <p>Quindi, a livello di <strong>saldo</strong>, pagherai <strong>${data.imposta + data.contributi}€</strong> (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
                         <h3>Acconti:</h3>
-                        <p>Oltre al saldo, dovrai versare anche gli <strong class="acconto">acconti</strong> per l’anno successivo:</p>
+                        <p>Oltre al saldo, dovrai versare anche gli <strong>acconti</strong> per l’anno successivo:</p>
                         <ul>
-                            <li class="acconto">Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori ${data.accontoImposte}€.</li>
-                            ${data.accontoContributi > 0 ? `<li class="acconto">Contributi INPS Variabili: pagherai l'80% dei contributi variabili come acconto, quindi ulteriori ${data.accontoContributi}€.</li>` : `<li>Contributi INPS Variabili: Nessun acconto dovuto poiché non ci sono contributi variabili.</li>`}
+                            <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="acconto">${data.accontoImposte}€</span>.</li>
+                            ${data.accontoContributi > 0 ? `<li>Contributi INPS Variabili: pagherai l'80% dei contributi variabili come acconto, quindi ulteriori <span class="acconto">${data.accontoContributi}€</span>.</li>` : `<li>Contributi INPS Variabili: Nessun acconto dovuto poiché non ci sono contributi variabili.</li>`}
                         </ul>
                         <h3>Totale complessivo:</h3>
                         <p><strong>Saldo totale:</strong> ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi)</p>
@@ -491,11 +493,11 @@
             dettagli += `
                     <h3>Tasse da pagare:</h3>
                     <ul>
-                        <li class="saldo">Saldo imposta sostitutiva sul ${data.anno} (<strong>${data.imposta}€</strong>) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
-                        <li class="acconto">Acconto imposta sostitutiva per il ${parseInt(data.anno) + 1} (<strong>${data.accontoImposte}€</strong>) da pagare in due rate:
+                        <li>Saldo imposta sostitutiva sul ${data.anno} (<span class="saldo">${data.imposta}€</span>) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                        <li>Acconto imposta sostitutiva per il ${parseInt(data.anno) + 1} (<span class="acconto">${data.accontoImposte}€</span>) da pagare in due rate:
                             <ul>
-                                <li>Prima rata (<strong>${Math.round(data.accontoImposte / 2)}€</strong>) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
-                                <li>Seconda rata (<strong>${Math.round(data.accontoImposte / 2)}€</strong>) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
+                                <li>Prima rata (<span class="acconto">${Math.round(data.accontoImposte / 2)}€</span>) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                                <li>Seconda rata (<span class="acconto">${Math.round(data.accontoImposte / 2)}€</span>) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
                             </ul>
                         </li>
                     </ul>
@@ -505,11 +507,11 @@
                 dettagli += `
                     <h3>Contributi previdenziali:</h3>
                     <ul>
-                        <li class="saldo">Saldo contributi INPS sul ${data.anno} (<strong>${data.contributi}€</strong>) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
-                        <li class="acconto">Acconto contributi INPS per il ${parseInt(data.anno) + 1} (<strong>${data.accontoContributi}€</strong>) da pagare in due rate:
+                        <li>Saldo contributi INPS sul ${data.anno} (<span class="saldo">${data.contributi}€</span>) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                        <li>Acconto contributi INPS per il ${parseInt(data.anno) + 1} (<span class="acconto">${data.accontoContributi}€</span>) da pagare in due rate:
                             <ul>
-                                <li>Prima rata (<strong>${Math.round(data.accontoContributi / 2)}€</strong>) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
-                                <li>Seconda rata (<strong>${Math.round(data.accontoContributi / 2)}€</strong>) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
+                                <li>Prima rata (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                                <li>Seconda rata (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
                             </ul>
                         </li>
                     </ul>
@@ -533,11 +535,11 @@
 
                 if (data.contributiVariabili > 0) {
                     dettagli += `
-                        <li class="saldo">Saldo contributi variabili INPS sul ${data.anno} (<strong>${data.contributiVariabili}€</strong>) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
-                        <li class="acconto">Acconto contributi variabili per il ${parseInt(data.anno) + 1} (<strong>${data.accontoContributi}€</strong>) da pagare in due rate:
+                        <li>Saldo contributi variabili INPS sul ${data.anno} (<span class="saldo">${data.contributiVariabili}€</span>) da pagare entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                        <li>Acconto contributi variabili per il ${parseInt(data.anno) + 1} (<span class="acconto">${data.accontoContributi}€</span>) da pagare in due rate:
                             <ul>
-                                <li>Prima rata (<strong>${Math.round(data.accontoContributi / 2)}€</strong>) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
-                                <li>Seconda rata (<strong>${Math.round(data.accontoContributi / 2)}€</strong>) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
+                                <li>Prima rata (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>) entro il 30 giugno ${parseInt(data.anno) + 1}.</li>
+                                <li>Seconda rata (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>) entro il 30 novembre ${parseInt(data.anno) + 1}.</li>
                             </ul>
                         </li>
                     `;
@@ -550,18 +552,21 @@
                 dettagli += `</ul>`;
             }
 
-            const totaleSaldo = data.saldoImposte + data.contributiVariabili;
+            // Calcolo del totale dei contributi fissi (solo se non è gestione separata)
+            const contributiFissiTotale = data.cassaPrevidenziale === 'gestioneSeparata' ? 0 : data.totaleContributiFissi;
+
+            const totaleSaldo = data.saldoImposte + data.saldoContributi;
             const totaleAcconti = data.accontoImposte + data.accontoContributi;
-            const totaleComplessivo = totaleSaldo + totaleAcconti + data.totaleContributiFissi;
+            const totaleComplessivo = totaleSaldo + totaleAcconti + contributiFissiTotale;
 
             // Calcolo delle percentuali relative al reddito lordo
-            const percSaldo = (((totaleSaldo + data.totaleContributiFissi) / data.redditoIncassato) * 100).toFixed(0);
+            const percSaldo = (((totaleSaldo + contributiFissiTotale) / data.redditoIncassato) * 100).toFixed(0);
             const percAcconti = ((totaleAcconti / data.redditoIncassato) * 100).toFixed(0);
             const percTotale = ((totaleComplessivo / data.redditoIncassato) * 100).toFixed(0);
 
             dettagli += `
                     <h3>Riepilogo dei Pagamenti:</h3>
-                    <p><strong>Totale tasse e contributi effettivi sul ${data.anno}:</strong> ${totaleSaldo + data.totaleContributiFissi}€ (circa il ${percSaldo}% del tuo reddito lordo)</p>
+                    <p><strong>Totale tasse e contributi effettivi sul ${data.anno}:</strong> ${totaleSaldo + contributiFissiTotale}€ (circa il ${percSaldo}% del tuo reddito lordo)</p>
                     <p><strong>Totale acconti per il ${parseInt(data.anno) + 1}:</strong> ${totaleAcconti}€ (circa il ${percAcconti}% del tuo reddito lordo)</p>
                     <p><strong>Totale da versare complessivamente:</strong> ${totaleComplessivo}€ (circa il ${percTotale}% del tuo reddito lordo)</p>
                     <p><em>Nota:</em> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (${parseInt(data.anno) + 1}) e non rappresentano un costo aggiuntivo.</p>
@@ -592,14 +597,14 @@
                             <td>30 giugno ${parseInt(data.anno) + 1}</td>
                             <td><strong>${totalePrimaRata}€</strong></td>
                             <td>
-                                <span class="saldo">Saldo imposta sostitutiva (${data.saldoImposte}€)</span> + <span class="acconto">Prima rata acconto imposta (${Math.round(data.accontoImposte / 2)}€)</span> + <span class="saldo">Saldo contributi INPS (${data.saldoContributi}€)</span> + <span class="acconto">Prima rata acconto contributi INPS (${Math.round(data.accontoContributi / 2)}€)</span>
+                                Saldo imposta sostitutiva (<span class="saldo">${data.saldoImposte}€</span>) + Prima rata acconto imposta (<span class="acconto">${Math.round(data.accontoImposte / 2)}€</span>) + Saldo contributi INPS (<span class="saldo">${data.saldoContributi}€</span>) + Prima rata acconto contributi INPS (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>)
                             </td>
                         </tr>
                         <tr>
                             <td>30 novembre ${parseInt(data.anno) + 1}</td>
                             <td><strong>${totaleSecondaRata}€</strong></td>
                             <td>
-                                <span class="acconto">Seconda rata acconto imposta (${Math.round(data.accontoImposte / 2)}€)</span> + <span class="acconto">Seconda rata acconto contributi INPS (${Math.round(data.accontoContributi / 2)}€)</span>
+                                Seconda rata acconto imposta (<span class="acconto">${Math.round(data.accontoImposte / 2)}€</span>) + Seconda rata acconto contributi INPS (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>)
                             </td>
                         </tr>
                     </table>
@@ -635,14 +640,14 @@
                             <td>30 giugno ${parseInt(data.anno) + 1}</td>
                             <td><strong>${totalePrimaRata}€</strong></td>
                             <td>
-                                <span class="saldo">Saldo imposta sostitutiva (${data.saldoImposte}€)</span> + <span class="acconto">Prima rata acconto imposta (${Math.round(data.accontoImposte / 2)}€)</span> ${data.contributiVariabili > 0 ? `+ <span class="saldo">Saldo contributi INPS variabili (${data.contributiVariabili}€)</span> + <span class="acconto">Prima rata acconto contributi INPS variabili (${Math.round(data.accontoContributi / 2)}€)</span>` : ''}
+                                Saldo imposta sostitutiva (<span class="saldo">${data.saldoImposte}€</span>) + Prima rata acconto imposta (<span class="acconto">${Math.round(data.accontoImposte / 2)}€</span>) ${data.contributiVariabili > 0 ? `+ Saldo contributi INPS variabili (<span class="saldo">${data.contributiVariabili}€</span>) + Prima rata acconto contributi INPS variabili (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>)` : ''}
                             </td>
                         </tr>
                         <tr>
                             <td>30 novembre ${parseInt(data.anno) + 1}</td>
                             <td><strong>${totaleSecondaRata}€</strong></td>
                             <td>
-                                <span class="acconto">Seconda rata acconto imposta (${Math.round(data.accontoImposte / 2)}€)</span> ${data.contributiVariabili > 0 ? `+ <span class="acconto">Seconda rata acconto contributi INPS variabili (${Math.round(data.accontoContributi / 2)}€)</span>` : ''}
+                                Seconda rata acconto imposta (<span class="acconto">${Math.round(data.accontoImposte / 2)}€</span>) ${data.contributiVariabili > 0 ? `+ Seconda rata acconto contributi INPS variabili (<span class="acconto">${Math.round(data.accontoContributi / 2)}€</span>)` : ''}
                             </td>
                         </tr>
                     </table>
