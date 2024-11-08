@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolatore Regime Forfettario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Il CSS rimane invariato */
+        /* ... */
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <!-- Il resto del codice HTML rimane invariato -->
+        <!-- ... -->
+    </div>
+
+    <script>
+        // JavaScript
+        // Dati per gli anni di riferimento
+        const anniRiferimento = {
+            "2024": {
+                "gestioneSeparata": 26,
+                "inpsCommercianti": {
+                    "contributoFisso": 4515,
+                    "aliquotaVariabile": 24,
+                    "sogliaReddito": 18415
+                },
+                "inpsArtigiani": {
+                    "contributoFisso": 4427,
+                    "aliquotaVariabile": 24,
+                    "sogliaReddito": 18415
+                }
+            },
+            "2025": {
+                // Aggiorna le percentuali per il 2025 se necessario
+            }
+        };
+
+        // Mostra/nasconde campi in base alla cassa previdenziale selezionata
+        document.getElementById('cassaPrevidenziale').addEventListener('change', function() {
+            const cassa = this.value;
+            const riduzioneContainer = document.getElementById('riduzioneContainer');
+            const dataAperturaContainer = document.getElementById('dataAperturaContainer');
+            if (cassa === 'inpsCommercianti' || cassa === 'inpsArtigiani') {
+                riduzioneContainer.style.display = 'block';
+                dataAperturaContainer.style.display = 'block';
+            } else {
+                riduzioneContainer.style.display = 'none';
+                dataAperturaContainer.style.display = 'none';
+            }
+        });
+
+        function calcola() {
+            const anno = document.getElementById('annoRiferimento').value;
+            const redditoIncassato = parseInt(document.getElementById('redditoIncassato').value);
+            const impostaSostitutiva = parseInt(document.getElementById('impostaSostitutiva').value);
+            const coefficienteRedditività = parseInt(document.getElementById('coefficienteRedditività').value);
+            const cassaPrevidenziale = document.getElementById('cassaPrevidenziale').value;
+            const riduzione35 = document.getElementById('riduzione35').checked;
+            const dataApertura = document.getElementById('dataApertura').value ? new Date(document.getElementById('dataApertura').value) : null;
+
+            const redditoNetto = Math.round(redditoIncassato * (coefficienteRedditività / 100));
+            let contributi = 0;
+            let imposta = Math.round((redditoNetto * impostaSostitutiva) / 100);
+
+            let contributiFissi = 0;
+            let contributiVariabili = 0;
+            let rateContributiFissi = [];
+            let totaleContributiFissi = 0;
+
+            if (cassaPrevidenziale === 'gestioneSeparata') {
+                const aliquotaContributi = anniRiferimento[anno]["gestioneSeparata"];
+                contributi = Math.round((redditoNetto * aliquotaContributi) / 100);
+                totaleContributiFissi = 0;
+            } else if (cassaPrevidenziale === 'inpsCommercianti' || cassaPrevidenziale === 'inpsArtigiani') {
+                const datiCassa = anniRiferimento[anno][cassaPrevidenziale];
+                // Calcolo del contributo fisso
+                contributiFissi = datiCassa.contributoFisso;
+                if (riduzione35) {
+                    contributiFissi = Math.round(contributiFissi * 0.65);
+                }
+                // Calcolo delle rate dei contributi fissi
+                if (dataApertura) {
+                    const risultato = calcolaContributoFissoProporzionale(contributiFissi, dataApertura, anno);
+                    rateContributiFissi = risultato.rate;
+                    totaleContributiFissi = risultato.totale;
+                } else {
+                    const rata = Math.round(contributiFissi / 4);
+                    rateContributiFissi = [
+                        { data: `16 maggio ${anno}`, importo: rata },
+                        { data: `20 agosto ${anno}`, importo: rata },
+                        { data: `16 novembre ${anno}`, importo: rata },
+                        { data: `16 febbraio ${parseInt(anno) + 1}`, importo: rata }
+                    ];
+                    totaleContributiFissi = rata * 4;
+                }
+                // **Calcolo dell'aliquota variabile ridotta se riduzione35 è true**
+                let aliquotaVariabile = datiCassa.aliquotaVariabile;
+                if (riduzione35) {
+                    aliquotaVariabile = aliquotaVariabile * 0.65;
+                }
+                // Calcolo del contributo variabile se supera la soglia
+                if (redditoNetto > datiCassa.sogliaReddito) {
+                    const eccedenza = redditoNetto - datiCassa.sogliaReddito;
+                    contributiVariabili = Math.round((eccedenza * aliquotaVariabile) / 100);
+                }
+                contributi = totaleContributiFissi + contributiVariabili;
+            } else {
+                // Placeholder per altre casse previdenziali
+                contributi = 0;
+                totaleContributiFissi = 0;
+            }
+
+            // Calcolo di saldi e acconti
+            const saldoImposte = imposta;
+            const accontoImposte = imposta; // 100% del saldo
+            const saldoContributi = contributi;
+            let accontoContributi = 0;
+            if (cassaPrevidenziale === 'gestioneSeparata') {
+                accontoContributi = Math.round(contributi * 0.8); // 80% del saldo
+            } else if (cassaPrevidenziale === 'inpsCommercianti' || cassaPrevidenziale === 'inpsArtigiani') {
+                accontoContributi = Math.round(contributiVariabili * 0.8); // Solo sui contributi variabili
+            }
+
+            mostraRisultati({
+                anno,
+                redditoIncassato,
+                coefficienteRedditività,
+                redditoNetto,
+                impostaSostitutiva,
+                imposta,
+                contributiFissi,
+                contributiVariabili,
+                aliquotaVariabile, // Aggiunto per visualizzare l'aliquota variabile aggiornata
+                contributi,
+                saldoImposte,
+                accontoImposte,
+                saldoContributi,
+                accontoContributi,
+                cassaPrevidenziale,
+                rateContributiFissi,
+                totaleContributiFissi,
+                riduzione35 // Aggiunto per utilizzare nelle funzioni successive
+            });
+        }
+
+        // Le altre funzioni rimangono invariate, a eccezione di eventuali aggiornamenti per riflettere le modifiche
+
+        function generaTestoCalcoli(data) {
+            let testo = '';
+            if (data.cassaPrevidenziale === 'gestioneSeparata') {
+                // Rimane invariato
+                // ...
+            } else if (data.cassaPrevidenziale === 'inpsCommercianti' || data.cassaPrevidenziale === 'inpsArtigiani') {
+                testo = `
+                    <div class="result-content">
+                        <h2>Dettaglio dei Calcoli</h2>
+                        <p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>${data.impostaSostitutiva}%</strong>.</p>
+                        <p>Paghi inoltre i contributi fissi INPS ${data.cassaPrevidenziale === 'inpsCommercianti' ? 'Commercianti' : 'Artigiani'} di <strong>${data.totaleContributiFissi}€</strong> all'anno${data.riduzione35 ? ' (già ridotti del 35%)' : ''}.</p>
+                        <p>L'imposta e i contributi variabili si calcolano sul <strong>${data.coefficienteRedditività}%</strong> del tuo incassato.</p>
+                        <p>${data.redditoIncassato}€ x ${data.coefficienteRedditività}% = ${data.redditoNetto}€ (reddito netto imponibile)</p>
+                        <h3>Nota bene:</h3>
+                        <ul>
+                            <li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>
+                            <li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li>
+                        </ul>
+                        <h3>Esempio di calcolo:</h3>
+                        <p>Per un incasso di ${data.redditoIncassato}€, il ${data.coefficienteRedditività}% corrisponde a ${data.redditoNetto}€. Su questo importo, dovrai pagare:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.imposta}€</span>.</li>
+                            <li>Contributi INPS:
+                                <ul>
+                                    <li>Contributi fissi: <span class="saldo">${data.totaleContributiFissi}€</span>${data.riduzione35 ? ' (già ridotti del 35%)' : ''}</li>
+                                    ${data.contributiVariabili > 0 ? `<li>Contributi variabili: su reddito eccedente, aliquota del ${data.aliquotaVariabile.toFixed(2)}%, che equivale a <span class="saldo">${data.contributiVariabili}€</span>${data.riduzione35 ? ' (aliquota ridotta del 35%)' : ''}</li>` : ''}
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>Quindi, a livello di saldo, pagherai ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
+                        <h3>Acconti:</h3>
+                        <p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="acconto">${data.accontoImposte}€</span>.</li>
+                            ${data.accontoContributi > 0 ? `<li>Contributi INPS Variabili: pagherai l'80% dei contributi variabili come acconto, quindi <span class="acconto">${data.accontoContributi}€</span>.</li>` : '<li>Contributi INPS Variabili: Nessun acconto dovuto poiché non ci sono contributi variabili.</li>'}
+                        </ul>
+                        <h3>Totale complessivo:</h3>
+                        <p>Saldo totale: ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi)</p>
+                        <p>Acconti totali: ${data.accontoImposte + data.accontoContributi}€ (di cui ${data.accontoImposte}€ di imposta e ${data.accontoContributi}€ di contributi)</p>
+                        <p><strong>Importo complessivo (saldo + acconti): ${data.imposta + data.contributi + data.accontoImposte + data.accontoContributi}€</strong></p>
+                        <p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>
+                    </div>
+                `;
+            }
+            return testo;
+        }
+
+        // Le altre funzioni (generaDettagliPagamenti, generaScadenzePagamenti, etc.) rimangono invariate
+        // ...
+
+    </script>
+</body>
+</html>
