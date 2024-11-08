@@ -630,7 +630,7 @@
                     <p><em>Nota:</em> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo e non rappresentano un costo aggiuntivo.</p>
                 
 
-                <p>Saldo totale: ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi) </p>
+                <p>Saldo totale: ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi) che è circa il ${data.imposta + data.contributi / data.redditoIncassato) * 100).toFixed(0)} </p>
                         <p>Acconti totali: ${data.accontoImposte + data.accontoContributi}€ (di cui ${data.accontoImposte}€ di imposta e ${data.accontoContributi}€ di contributi)</p>
                         <p><strong>Importo complessivo (saldo + acconti): ${data.imposta + data.contributi + data.accontoImposte + data.accontoContributi}€</strong></p>
                        </div> 
