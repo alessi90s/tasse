@@ -614,7 +614,7 @@
 
             const contributiFissiTotale = data.cassaPrevidenziale === 'gestioneSeparata' ? 0 : data.totaleContributiFissi;
 
-            const totaleSaldo = data.saldoImposte + data.saldoContributi;
+            const totaleSaldo = data.imposta + data.contributi;
             const totaleAcconti = data.accontoImposte + data.accontoContributi;
             const totaleComplessivo = totaleSaldo + totaleAcconti + contributiFissiTotale;
 
