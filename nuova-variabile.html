@@ -244,7 +244,7 @@
     <script>
         // JavaScript
         // Dati per gli anni di riferimento
-        const anniRiferimento = {
+       const anniRiferimento = {
             "2024": {
                 "gestioneSeparata": 26,
                 "inpsCommercianti": {
@@ -371,13 +371,154 @@
             });
         }
 
-        // Le altre funzioni rimangono invariate, a eccezione di eventuali aggiornamenti per riflettere le modifiche
+        function calcolaContributoFissoProporzionale(contributoFisso, dataApertura, anno) {
+            const trimestri = [
+                { start: new Date(`${anno}-01-01`), end: new Date(`${anno}-03-31`), rata: 1, scadenza: `16 maggio ${anno}` },
+                { start: new Date(`${anno}-04-01`), end: new Date(`${anno}-06-30`), rata: 2, scadenza: `20 agosto ${anno}` },
+                { start: new Date(`${anno}-07-01`), end: new Date(`${anno}-09-30`), rata: 3, scadenza: `16 novembre ${anno}` },
+                { start: new Date(`${anno}-10-01`), end: new Date(`${anno}-12-31`), rata: 4, scadenza: `16 febbraio ${parseInt(anno) +1}` }
+            ];
+
+            let rate = [];
+            const contributoTrimestre = Math.round(contributoFisso / 4);
+            let totale = 0;
+
+            let trimestreApertura = -1;
+
+            for (let i = 0; i < trimestri.length; i++) {
+                const trimestre = trimestri[i];
+                if (dataApertura >= trimestre.start && dataApertura <= trimestre.end) {
+                    trimestreApertura = i;
+                    break;
+                }
+            }
+
+            if (trimestreApertura === -1) {
+                // Se la data di apertura è fuori dai trimestri (non dovrebbe accadere), considera tutti i trimestri
+                trimestreApertura = 0;
+            }
+
+            for (let i = trimestreApertura; i < 4; i++) {
+                const trimestre = trimestri[i];
+                if (i === trimestreApertura) {
+                    // Calcolo proporzionale della prima rata
+                    const daysInQuarter = (trimestre.end - trimestre.start) / (1000 * 60 * 60 * 24) + 1;
+                    const daysActive = (trimestre.end - dataApertura) / (1000 * 60 * 60 * 24) + 1;
+                    const proporzione = daysActive / daysInQuarter;
+                    const importo = Math.round(contributoTrimestre * proporzione);
+                    rate.push({ data: trimestre.scadenza, importo });
+                    totale += importo;
+                } else {
+                    // Paga l'intero contributo trimestrale
+                    rate.push({ data: trimestre.scadenza, importo: contributoTrimestre });
+                    totale += contributoTrimestre;
+                }
+            }
+
+            return { rate, totale };
+        }
+
+        function mostraRisultati(data) {
+            const risultatiDiv = document.getElementById('risultati');
+            risultatiDiv.innerHTML = `
+                <div class="result-overview">
+                    <h2>Risultati</h2>
+                    ${generaPanoramica(data)}
+                </div>
+                <div class="tabs">
+                    <button class="tablink active" onclick="openTab(event, 'calcoli')">Come si calcolano</button>
+                    <button class="tablink" onclick="openTab(event, 'dettagli')">Dettagli pagamenti</button>
+                    <button class="tablink" onclick="openTab(event, 'scadenze')">Scadenze pagamenti</button>
+                </div>
+                <div id="calcoli" class="tab active">
+                    ${generaTestoCalcoli(data)}
+                </div>
+                <div id="dettagli" class="tab">
+                    ${generaDettagliPagamenti(data)}
+                </div>
+                <div id="scadenze" class="tab">
+                    ${generaScadenzePagamenti(data)}
+                </div>
+            `;
+        }
+
+        function generaPanoramica(data) {
+            let panoramica = `
+                <table class="result-table">
+                    <tr>
+                        <th>Descrizione</th>
+                        <th>Importo</th>
+                    </tr>
+                    <tr>
+                        <td>Reddito Lordo:</td>
+                        <td class="highlight">${data.redditoIncassato}€</td>
+                    </tr>
+                    <tr>
+                        <td>Reddito Netto (${data.anno}):</td>
+                        <td class="highlight">${data.redditoNetto}€</td>
+                    </tr>
+                    <tr>
+                        <td>Imposta Sostitutiva (${data.impostaSostitutiva}%) sul ${data.anno}:</td>
+                        <td class="highlight">${data.imposta}€</td>
+                    </tr>
+                    <tr>
+                        <td>Acconto Imposta Sostitutiva (100%) sul ${parseInt(data.anno) + 1}:</td>
+                        <td class="highlight">${data.accontoImposte}€</td>
+                    </tr>
+                    <tr>
+                        <td>Contributi INPS sul ${data.anno}:</td>
+                        <td class="highlight">${data.saldoContributi}€</td>
+                    </tr>
+            `;
+
+            if (data.accontoContributi > 0) {
+                panoramica += `
+                    <tr>
+                        <td>Acconto Contributi INPS sul ${parseInt(data.anno) + 1}:</td>
+                        <td class="highlight">${data.accontoContributi}€</td>
+                    </tr>
+                `;
+            }
+
+            panoramica += `</table>`;
+            return panoramica;
+        }
 
         function generaTestoCalcoli(data) {
             let testo = '';
             if (data.cassaPrevidenziale === 'gestioneSeparata') {
-                // Rimane invariato
-                // ...
+                testo = `
+                    <div class="result-content">
+                        <h2>Dettaglio dei Calcoli</h2>
+                        <p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>${data.impostaSostitutiva}%</strong>.</p>
+                        <p>L'imposta come i contributi li paghi non sul totale incassato ma sul <strong>${data.coefficienteRedditività}%</strong> (che è il coefficiente di redditività del tuo codice ATECO).</p>
+                        <p>Quindi paghi il <strong>${data.impostaSostitutiva}%</strong> di imposta e il <strong>${anniRiferimento[data.anno]["gestioneSeparata"]}%</strong> di contributi INPS non sul totale incassato (<strong>${data.redditoIncassato}€</strong>) ma sul tuo incassato per il coefficiente di redditività.</p>
+                        <p>${data.redditoIncassato}€ x ${data.coefficienteRedditività}% = ${data.redditoNetto}€ (reddito netto imponibile)</p>
+                        <h3>Nota bene:</h3>
+                        <ul>
+                            <li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>
+                            <li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li>
+                        </ul>
+                        <h3>Esempio di calcolo:</h3>
+                        <p>Per un incasso di ${data.redditoIncassato}€, il ${data.coefficienteRedditività}% corrisponde a ${data.redditoNetto}€. Su questo importo, dovrai pagare:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.imposta}€</span>.</li>
+                            <li>Contributi INPS: ${anniRiferimento[data.anno]["gestioneSeparata"]}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.contributi}€</span>.</li>
+                        </ul>
+                        <p>Quindi, a livello di saldo, pagherai ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
+                        <h3>Acconti:</h3>
+                        <p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>
+                        <ul>
+                            <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="acconto">${data.accontoImposte}€</span>.</li>
+                            <li>Contributi INPS: pagherai l’80% dell'importo del saldo come acconto, quindi <span class="acconto">${data.accontoContributi}€</span>.</li>
+                        </ul>
+                        <h3>Totale complessivo:</h3>
+                        <p>Saldo totale: ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi)</p>
+                        <p>Acconti totali: ${data.accontoImposte + data.accontoContributi}€ (di cui ${data.accontoImposte}€ di imposta e ${data.accontoContributi}€ di contributi)</p>
+                        <p><strong>Importo complessivo (saldo + acconti): ${data.imposta + data.contributi + data.accontoImposte + data.accontoContributi}€</strong></p>
+                        <p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>
+                    </div>
+                `;
             } else if (data.cassaPrevidenziale === 'inpsCommercianti' || data.cassaPrevidenziale === 'inpsArtigiani') {
                 testo = `
                     <div class="result-content">
@@ -419,8 +560,7 @@
             }
             return testo;
         }
-
-      function generaDettagliPagamenti(data) {
+        function generaDettagliPagamenti(data) {
             let dettagli = `
                 <div class="result-content">
                     <h2>Dettagli dei Pagamenti per l'anno ${data.anno}</h2>
@@ -597,7 +737,6 @@
             document.getElementById(tabName).classList.add('active');
             evt.currentTarget.classList.add('active');
         }
-
     </script>
 </body>
 </html>
