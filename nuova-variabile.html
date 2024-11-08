@@ -525,7 +525,7 @@
                     <div class="result-content">
                         <h2>Dettaglio dei Calcoli</h2>
                         <p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>${data.impostaSostitutiva}%</strong>.</p>
-                        <p>Paghi inoltre i contributi fissi INPS ${data.cassaPrevidenziale === 'inpsCommercianti' ? 'Commercianti' : 'Artigiani'} di <strong>${data.totaleContributiFissi}€</strong> all'anno.</p>
+                        <p>Paghi inoltre i contributi fissi INPS ${data.cassaPrevidenziale === 'inpsCommercianti' ? 'Commercianti' : 'Artigiani'} di <strong>${data.totaleContributiFissi}€</strong> all'anno${data.riduzione35 ? ' (già ridotti del 35%)' : ''}.</p>
                         <p>L'imposta e i contributi variabili si calcolano sul <strong>${data.coefficienteRedditività}%</strong> del tuo incassato.</p>
                         <p>${data.redditoIncassato}€ x ${data.coefficienteRedditività}% = ${data.redditoNetto}€ (reddito netto imponibile)</p>
                         <h3>Nota bene:</h3>
@@ -537,7 +537,12 @@
                         <p>Per un incasso di ${data.redditoIncassato}€, il ${data.coefficienteRedditività}% corrisponde a ${data.redditoNetto}€. Su questo importo, dovrai pagare:</p>
                         <ul>
                             <li>Imposta sostitutiva: ${data.impostaSostitutiva}% su ${data.redditoNetto}€, che equivale a <span class="saldo">${data.imposta}€</span>.</li>
-                            <li>Contributi INPS: Contributi fissi di ${data.totaleContributiFissi}€${data.contributiVariabili > 0 ? ` e contributi variabili di <span class="saldo">${data.contributiVariabili}€</span>` : ''}. Totale contributi: <span class="saldo">${data.contributi}€</span>.</li>
+                            <li>Contributi INPS:
+                                <ul>
+                                    <li>Contributi fissi: <span class="saldo">${data.totaleContributiFissi}€</span>${data.riduzione35 ? ' (già ridotti del 35%)' : ''}</li>
+                                    ${data.contributiVariabili > 0 ? `<li>Contributi variabili: su reddito eccedente, aliquota del ${data.aliquotaVariabile.toFixed(2)}%, che equivale a <span class="saldo">${data.contributiVariabili}€</span>${data.riduzione35 ? ' (aliquota ridotta del 35%)' : ''}</li>` : ''}
+                                </ul>
+                            </li>
                         </ul>
                         <p>Quindi, a livello di saldo, pagherai ${data.imposta + data.contributi}€ (di cui ${data.imposta}€ di imposta e ${data.contributi}€ di contributi).</p>
                         <h3>Acconti:</h3>
