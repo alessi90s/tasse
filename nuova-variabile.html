@@ -5,14 +5,240 @@
     <title>Calcolatore Regime Forfettario</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Il CSS rimane invariato */
-        /* ... */
+        /* CSS */
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+#disclaimer {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 20px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .calculator-container {
+            background-color: #fff;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .calculator-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        #risultati {
+            margin-top: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background-color: #ddd;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 2px;
+        }
+
+        .tabs button.active {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .result-content {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .result-content h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        .result-content h3 {
+            color: #000000;
+            margin-top: 20px;
+        }
+
+        .result-content p {
+            margin: 10px 0;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .result-table th,
+        .result-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .result-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Stili per evidenziare saldi e acconti */
+        .saldo {
+            background-color: #d4edda; /* Verde pastello per i saldi */
+            font-weight: bold;
+        }
+
+        .acconto {
+            background-color: #d1ecf1; /* Celeste per gli acconti */
+            font-weight: bold;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        @media (max-width: 600px) {
+            .tabs button {
+                font-size: 14px;
+            }
+
+            .result-table th,
+            .result-table td {
+                font-size: 14px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group button {
+                font-size: 14px;
+            }
+
+            .result-content {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
+
+     <div id="disclaimer">
+            <strong>Questo calcolatore è da usare solo per previsioni a grandi linee e non sostituisce un vero calcolo effettuato da un commercialista.</strong>
+        </div>
+
     <div class="calculator-container">
-        <!-- Il resto del codice HTML rimane invariato -->
-        <!-- ... -->
+        <h1>Calcolatore Regime Forfettario</h1>
+        <form id="calculator-form">
+            <div class="form-group">
+                <label for="annoRiferimento">Anno di riferimento:</label>
+                <select id="annoRiferimento">
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="redditoIncassato">Reddito incassato con partita IVA (€):</label>
+                <input type="number" id="redditoIncassato" required>
+            </div>
+            <div class="form-group">
+                <label for="impostaSostitutiva">Imposta sostitutiva:</label>
+                <select id="impostaSostitutiva">
+                    <option value="5">5%</option>
+                    <option value="15">15%</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="coefficienteRedditività">Coefficiente di redditività del tuo codice Ateco:</label>
+                <select id="coefficienteRedditività">
+                    <option value="86">86%</option>
+                    <option value="78">78%</option>
+                    <option value="67">67%</option>
+                    <option value="40">40%</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="cassaPrevidenziale">Seleziona la cassa previdenziale a cui sei iscritto:</label>
+                <select id="cassaPrevidenziale">
+                    <option value="gestioneSeparata">Gestione Separata INPS</option>
+                    <option value="inpsCommercianti">INPS Commercianti</option>
+                    <option value="inpsArtigiani">INPS Artigiani</option>
+                    <!-- Altre casse previdenziali -->
+                </select>
+            </div>
+            <div class="form-group" id="riduzioneContainer" style="display: none;">
+                <label for="riduzione35">Ho richiesto la riduzione del 35%:</label>
+                <input type="checkbox" id="riduzione35">
+            </div>
+            <div class="form-group" id="dataAperturaContainer" style="display: none;">
+                <label for="dataApertura">Data di apertura della Partita IVA:</label>
+                <input type="date" id="dataApertura">
+            </div>
+            <div class="form-group">
+                <button type="button" onclick="calcola()">Calcola</button>
+            </div>
+        </form>
+        <div id="risultati"></div>
     </div>
 
     <script>
