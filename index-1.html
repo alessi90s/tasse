@@ -589,7 +589,7 @@
                 accontoInps = Math.round(accontoInps);
             } else if (cassaInps === "inps_commercianti") {
                 // INPS Commercianti
-                var contributiFissiAnnui = 2446; // Contributi fissi annui
+                var contributiFissiAnnui = 4515.43; // Contributi fissi annui corretti
                 aliquotaContributivaPercentuale = 24.48;
 
                 // Applica la proporzione dei mesi e la riduzione
@@ -612,7 +612,7 @@
                 accontoInps = Math.round(contributiVariabili * 0.80);
             } else if (cassaInps === "inps_artigiani") {
                 // INPS Artigiani
-                var contributiFissiAnnui = 2446; // Contributi fissi annui
+                var contributiFissiAnnui = 4427.04; // Contributi fissi annui corretti
                 aliquotaContributivaPercentuale = 24;
 
                 // Applica la proporzione dei mesi e la riduzione
@@ -645,9 +645,9 @@
 
                     var contributiFissiAnnui;
                     if (cassaInps === "inps_commercianti") {
-                        contributiFissiAnnui = 2446; // Corretto
+                        contributiFissiAnnui = 4515.43; // Corretto
                     } else if (cassaInps === "inps_artigiani") {
-                        contributiFissiAnnui = 2446; // Corretto
+                        contributiFissiAnnui = 4427.04; // Corretto
                     }
 
                     // Se apertura dopo il periodo di copertura, skip rate
@@ -802,15 +802,19 @@
                 testoPersonalizzato += "<p>Quindi <span class='evidenziato-giallo'>paghi il <strong>" + aliquotaImpostaPercentuale + "%</strong> di imposta e il <strong>" + aliquotaContributivaPercentuale + "%</strong> di contributi INPS</span> non sul totale incassato (<strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong>) ma sul tuo incassato per il coefficiente di redditività.</p>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
+                var contributiFissiAnnui = cassaInps === "inps_commercianti" ? 4515.43 : 4427.04;
                 testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
-                testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? ", e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
 
-                // Importo completo dei contributi fissi
-                var contributiFissiCompleti = (cassaInps === "inps_commercianti") ? 2446 : 2446; // Entrambi 2446€ dopo la correzione
-                if (proporzioneContributi < 1) {
-                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>." + (riduzioneContributiApplicata ? " Ricorda che avrai una copertura non di 12 mesi di contributi per la pensione ma di 8 mesi." : "") + "</p>";
+                if (dataAperturaVal) {
+                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? ", e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
                 } else {
-                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>." + (riduzioneContributiApplicata ? " Ricorda che avrai una copertura non di 12 mesi di contributi per la pensione ma di 8 mesi." : "") + "</p>";
+                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
+                }
+
+                if (dataAperturaVal) {
+                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnui.toLocaleString('it-IT') + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di contributi per la pensione di 8 mesi invece di 12." : ".") + "</p>";
+                } else {
+                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnui.toLocaleString('it-IT') + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di contributi per la pensione di 8 mesi invece di 12." : ".") + "</p>";
                 }
 
                 if (redditoNetto > sogliaReddito) {
@@ -844,7 +848,7 @@
             }
 
             var saldoTotaleEsempio = impostaEsempio + contributiInpsEsempio;
-            var accontiTotaliEsempio = accontoImpostaEsempio + accontoInpsEsempio;
+            var accontiTotaliEsempio = accontoImpostaEsempia + accontoInpsEsempio;
             var importoComplessivoEsempio = saldoTotaleEsempio + accontiTotaliEsempio;
 
             testoPersonalizzato += "<p>Per un incasso di <strong>" + redditoEsempio.toLocaleString('it-IT') + "€</strong>, il " + coefficientePercentuale + "% corrisponde a <strong>" + redditoNettoEsempio.toLocaleString('it-IT') + "€</strong>. Su questo importo, dovrai pagare:</p>";
@@ -1014,44 +1018,25 @@
             const doc = new jsPDF();
 
             // Funzione per aggiungere contenuto con stili simili al quaderno
-            function aggiungiContenutoPagina(pagina, classeQuaderno) {
-                // Aggiungi il contenuto HTML come testo semplice
-                // Nota: jsPDF non supporta direttamente l'HTML complesso con stili CSS
-                // Per una migliore resa, potresti utilizzare librerie aggiuntive come html2canvas
-                // Tuttavia, per semplicità, aggiungeremo il testo manualmente
-
-                var contenuto = pagina.innerHTML;
-
-                // Rimuovi le tag HTML per ottenere solo il testo
-                var testo = pagina.innerText;
-
-                // Aggiungi il testo al PDF
-                doc.text(testo, 10, 20);
+            function aggiungiContenutoPagina(testo, titolo) {
+                doc.addPage();
+                doc.setFontSize(16);
+                doc.text(titolo, 105, 20, { align: 'center' });
+                doc.setFontSize(12);
+                // Splitta il testo in righe per evitare overflow
+                var righe = doc.splitTextToSize(testo, 180);
+                doc.text(righe, 10, 30);
             }
 
-            // Aggiungi la prima pagina: "Come si calcolano?"
-            var pagina1 = document.getElementById("testoConsulenza");
-            doc.addPage();
-            doc.setFontSize(16);
-            doc.text("Come si calcolano?", 105, 20, { align: 'center' });
-            doc.setFontSize(12);
-            doc.text(pagina1.innerText, 10, 30);
+            // Ottieni i contenuti delle sezioni
+            var pagina1 = document.getElementById("testoConsulenza").innerText;
+            var pagina2 = document.getElementById("dettaglioPagamenti").innerText;
+            var pagina3 = document.getElementById("scadenzaPagamenti").innerText;
 
-            // Aggiungi la seconda pagina: "Dettaglio Pagamenti"
-            var pagina2 = document.getElementById("dettaglioPagamenti");
-            doc.addPage();
-            doc.setFontSize(16);
-            doc.text("Dettaglio Pagamenti", 105, 20, { align: 'center' });
-            doc.setFontSize(12);
-            doc.text(pagina2.innerText, 10, 30);
-
-            // Aggiungi la terza pagina: "Scadenza Pagamenti"
-            var pagina3 = document.getElementById("scadenzaPagamenti");
-            doc.addPage();
-            doc.setFontSize(16);
-            doc.text("Scadenza Pagamenti", 105, 20, { align: 'center' });
-            doc.setFontSize(12);
-            doc.text(pagina3.innerText, 10, 30);
+            // Aggiungi il contenuto alle pagine del PDF
+            aggiungiContenutoPagina(pagina1, "Come si calcolano?");
+            aggiungiContenutoPagina(pagina2, "Dettaglio Pagamenti");
+            aggiungiContenutoPagina(pagina3, "Scadenza Pagamenti");
 
             // Rimuovi la prima pagina vuota creata automaticamente
             doc.deletePage(1);
