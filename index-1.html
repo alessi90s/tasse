@@ -150,8 +150,11 @@
                 <!-- Aggiungi altre opzioni se necessario -->
             </select>
 
-            <label for="dataApertura">Data di apertura della Partita IVA:</label>
-            <input type="date" id="dataApertura">
+            <!-- Campo Data di Apertura della Partita IVA (visibile solo per Commercianti e Artigiani) -->
+            <div id="dataAperturaContainer" style="display: none;">
+                <label for="dataApertura">Data di apertura della Partita IVA:</label>
+                <input type="date" id="dataApertura">
+            </div>
 
             <label for="aliquotaImposta">Seleziona l'aliquota dell'imposta sostitutiva:</label>
             <select id="aliquotaImposta">
@@ -179,7 +182,7 @@
                 <option value="inps_artigiani">INPS Artigiani</option>
             </select>
 
-            <!-- Checkbox per la riduzione del 35% -->
+            <!-- Checkbox per la riduzione del 35% (visibile solo per Commercianti e Artigiani) -->
             <div id="riduzioneContainer" style="display: none;">
                 <label>
                     <input type="checkbox" id="riduzioneContributi">
@@ -314,29 +317,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Event listener per mostrare/nascondere il checkbox
-            document.getElementById("cassaInps").addEventListener("change", function() {
-                var cassaInps = document.getElementById("cassaInps").value;
-                var riduzioneContainer = document.getElementById("riduzioneContainer");
-                if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                    riduzioneContainer.style.display = "block";
-                } else {
-                    riduzioneContainer.style.display = "none";
-                    document.getElementById("riduzioneContributi").checked = false;
-                }
-            });
+            const cassaInpsSelect = document.getElementById("cassaInps");
+            const riduzioneContainer = document.getElementById("riduzioneContainer");
+            const dataAperturaContainer = document.getElementById("dataAperturaContainer");
+            const riduzioneContributiCheckbox = document.getElementById("riduzioneContributi");
 
-            // Imposta lo stato iniziale del checkbox
-            (function() {
-                var cassaInps = document.getElementById("cassaInps").value;
-                var riduzioneContainer = document.getElementById("riduzioneContainer");
+            // Funzione per mostrare/nascondere il campo Data di Apertura e la Riduzione
+            function toggleFields() {
+                const cassaInps = cassaInpsSelect.value;
                 if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    dataAperturaContainer.style.display = "block";
                     riduzioneContainer.style.display = "block";
                 } else {
+                    dataAperturaContainer.style.display = "none";
                     riduzioneContainer.style.display = "none";
-                    document.getElementById("riduzioneContributi").checked = false;
+                    riduzioneContributiCheckbox.checked = false;
                 }
-            })();
+            }
+
+            // Inizializza lo stato dei campi al caricamento della pagina
+            toggleFields();
+
+            // Aggiungi un event listener per la selezione della cassa INPS
+            cassaInpsSelect.addEventListener("change", toggleFields);
 
             // Funzione per aprire le schede
             window.openTab = function(evt, tabName) {
@@ -374,38 +377,33 @@
                     return;
                 }
 
-                // Ottieni la data di apertura della partita IVA
+                // Ottieni la data di apertura della partita IVA (solo per Commercianti e Artigiani)
                 var dataAperturaInput = document.getElementById("dataApertura").value;
                 var dataApertura = new Date(dataAperturaInput);
                 var annoRedditoInt = parseInt(annoReddito);
-
-                // Verifica che la data di apertura sia valida
-                if (isNaN(dataApertura.getTime())) {
-                    alert("Per favore, inserisci una data di apertura valida della Partita IVA.");
-                    return;
-                }
+                var meseApertura = dataApertura.getMonth() + 1; // I mesi in JavaScript vanno da 0 (Gennaio) a 11 (Dicembre), aggiungo 1
 
                 // Calcola il numero di mesi di attività nell'anno
-                var annoApertura = dataApertura.getFullYear();
-                var meseApertura = dataApertura.getMonth(); // I mesi in JavaScript vanno da 0 (Gennaio) a 11 (Dicembre)
-                var mesiAttivita = 0;
+                var mesiAttivita = 12; // Default a 12 mesi
 
-                if (annoApertura < annoRedditoInt) {
-                    // Se la partita IVA è stata aperta prima dell'anno di reddito, i mesi di attività sono 12
-                    mesiAttivita = 12;
-                } else if (annoApertura === annoRedditoInt) {
-                    // Se la partita IVA è stata aperta nell'anno di reddito
-                    mesiAttivita = 12 - meseApertura;
-                } else {
-                    // Se la partita IVA è stata aperta dopo l'anno di reddito
-                    mesiAttivita = 0;
+                if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    if (dataAperturaInput) {
+                        var annoApertura = dataApertura.getFullYear();
+                        var meseApertura = dataApertura.getMonth() + 1; // 1-12
+
+                        if (annoApertura === annoRedditoInt) {
+                            mesiAttivita = 13 - meseApertura; // Se apertura a gennaio, 12 mesi; a febbraio, 11 mesi, etc.
+                            mesiAttivita = mesiAttivita < 1 ? 1 : mesiAttivita; // Almeno 1 mese
+                        }
+                        // Se l'apertura è in un anno diverso, mantenere 12 mesi
+                    }
                 }
 
                 // Calcola la proporzione dei contributi fissi
                 var proporzioneContributi = mesiAttivita / 12;
 
                 // Verifica se applicare la riduzione del 35%
-                var riduzioneContributiApplicata = document.getElementById("riduzioneContributi").checked;
+                var riduzioneContributiApplicata = riduzioneContributiCheckbox.checked;
                 var aliquotaRiduzione = riduzioneContributiApplicata ? 0.65 : 1;
 
                 // Esegui i calcoli comuni
@@ -650,7 +648,7 @@
                 }
 
                 var saldoTotaleEsempio = impostaEsempio + contributiInpsEsempio;
-                var accontiTotaliEsempio = accontoImpostaEsempia + accontoInpsEsempio;
+                var accontiTotaliEsempio = accontoImpostaEsempio + accontoInpsEsempio;
                 var importoComplessivoEsempio = saldoTotaleEsempio + accontiTotaliEsempio;
 
                 testoPersonalizzato += "<p>Per un incasso di <strong>" + redditoEsempio.toLocaleString('it-IT') + "€</strong>, il " + coefficientePercentuale + "% corrisponde a <strong>" + redditoNettoEsempio.toLocaleString('it-IT') + "€</strong>. Su questo importo, dovrai pagare:</p>";
@@ -691,7 +689,7 @@
 
                 testoPersonalizzato += "<h4>Totale complessivo:</h4>";
                 testoPersonalizzato += "<p><strong>Saldo totale:</strong> <span class='evidenziato-giallo'><strong>" + saldoTotaleEsempio.toLocaleString('it-IT') + "€</strong></span> (di cui " + impostaEsempio.toLocaleString('it-IT') + "€ di imposta e " + contributiInpsEsempio.toLocaleString('it-IT') + "€ di contributi)</p>";
-                testoPersonalizzato += "<p><strong>Acconti totali:</strong> <span class='evidenziato-azzurro'><strong>" + accontiTotaliEsempio.toLocaleString('it-IT') + "€</strong></span> (di cui " + accontoImpostaEsempio.toLocaleString('it-IT') + "€ di imposta e " + accontoInpsEsempio.toLocaleString('it-IT') + "€ di contributi)</p>";
+                testoPersonalizzato += "<p><strong>Acconti totali:</strong> <span class='evidenziato-azzurro'><strong>" + totaleAcconti.toLocaleString('it-IT') + "€</strong></span> (di cui " + accontoImpostaEsempio.toLocaleString('it-IT') + "€ di imposta e " + accontoInpsEsempio.toLocaleString('it-IT') + "€ di contributi)</p>";
                 testoPersonalizzato += "<p><strong>Totale da versare complessivamente: " + totaleDaVersare.toLocaleString('it-IT') + "€</strong> (circa il " + percentualeTotale + "% del tuo reddito lordo)</p>";
                 testoPersonalizzato += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (" + annoDichiarazione + ") e non rappresentano un costo aggiuntivo.</p>";
 
@@ -786,7 +784,102 @@
                 messaggio += "<ul>";
                 messaggio += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + "€ (circa il " + percentualeTasseContributi + "% del tuo reddito lordo)</span></li>";
                 messaggio += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: " + totaleAcconti.toLocaleString('it-IT') + "€ (circa il " + percentualeAcconti + "% del tuo reddito lordo)</span></li>";
-                messaggio += "<li><strong>Totale da versare complessivamente: " + totaleDaVersare.toLocaleString('it-IT') + "€ (circa il " + percentualeTotale + "% del tuo reddito lordo)</strong></li>";
+                messaggio += "<li><strong>Totale da versare complessivamente: " + totaleDaVersare.toLocaleString('it-IT') + "€</strong> (circa il " + percentualeTotale + "% del tuo reddito lordo)</li>";
+                messaggio += "</ul>";
+                messaggio += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (" + annoDichiarazione + ") e non rappresentano un costo aggiuntivo.</p>";
+
+                // Inserisci il testo personalizzato nell'elemento HTML
+                document.getElementById("testoPersonalizzato").innerHTML = testoPersonalizzato;
+
+                // Visualizza la sezione dei risultati
+                document.getElementById("risultati").style.display = "block";
+
+                // Apri la prima scheda di default
+                document.getElementById("defaultOpen").click();
+
+                // Crea il messaggio per il cliente
+                var messaggio = "<h3>Dettaglio dei pagamenti per l'anno " + annoReddito + "</h3>";
+
+                messaggio += "<p>Hai guadagnato <strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong> nel " + annoReddito + ".</p>";
+
+                // Spiegazione del calcolo sul reddito netto
+                messaggio += "<div class='calcoli-dettagliati'>";
+                messaggio += "<h4>Calcolo del Reddito Netto:</h4>";
+                messaggio += "<p><strong>Reddito Lordo</strong> (" + redditoLordo.toLocaleString('it-IT') + "€) x <strong>Coefficiente di Redditività</strong> (" + coefficientePercentuale + "%) = <strong>" + redditoNetto.toLocaleString('it-IT') + "€</strong></p>";
+                messaggio += "</div>";
+
+                // Calcolo dell'Imposta Sostitutiva
+                messaggio += "<div class='calcoli-dettagliati'>";
+                messaggio += "<h4>Calcolo dell'Imposta Sostitutiva:</h4>";
+                messaggio += "<p><strong>Reddito Netto</strong> (" + redditoNetto.toLocaleString('it-IT') + "€) x <strong>Aliquota Imposta Sostitutiva</strong> (" + aliquotaImpostaPercentuale + "%) = <span class='evidenziato-giallo'><strong>" + impostaSostitutiva.toLocaleString('it-IT') + "€</strong></span></p>";
+                messaggio += "</div>";
+
+                // Calcolo dei Contributi INPS
+                messaggio += "<div class='calcoli-dettagliati'>";
+                if (cassaInps === "gs_inps") {
+                    // Gestione Separata INPS
+                    messaggio += "<h4>Calcolo dei Contributi INPS (Gestione Separata):</h4>";
+                    messaggio += "<p><strong>Reddito Netto</strong> (" + redditoNetto.toLocaleString('it-IT') + "€) x <strong>Aliquota Contributiva</strong> (" + aliquotaContributivaPercentuale + "%) = <span class='evidenziato-giallo'><strong>" + contributiInps.toLocaleString('it-IT') + "€</strong></span></p>";
+                } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
+                    messaggio += "<h4>Calcolo dei Contributi INPS (" + tipoCassa + "):</h4>";
+                    messaggio += "<p><strong>Contributi Fissi</strong> (stabiliti da INPS): <span class='evidenziato-giallo'><strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong></span></p>";
+                    if (contributiVariabili > 0) {
+                        messaggio += "<p><strong>Reddito Netto Eccedente</strong> (" + (redditoNetto - sogliaReddito).toLocaleString('it-IT') + "€) x <strong>Aliquota Variabile</strong> (" + aliquotaContributivaPercentuale + "%) = <span class='evidenziato-giallo'><strong>" + contributiVariabili.toLocaleString('it-IT') + "€</strong></span></p>";
+                    }
+                    messaggio += "<p><strong>Totale Contributi INPS</strong> = <span class='evidenziato-giallo'><strong>" + contributiInps.toLocaleString('it-IT') + "€</strong></span></p>";
+                }
+                messaggio += "</div>";
+
+                // Tasse da pagare
+                messaggio += "<h4>Tasse da pagare:</h4>";
+                messaggio += "<ul>";
+                messaggio += "<li><span class='evidenziato-giallo'>Saldo imposta sostitutiva sul 2024 (" + impostaSostitutiva.toLocaleString('it-IT') + "€)</span> da pagare entro il <strong>" + scadenzaSaldoImposta + "</strong>.</li>";
+                messaggio += "<li><span class='evidenziato-azzurro'>Acconto imposta sostitutiva per il 2025 (" + accontoImpostaSostitutiva.toLocaleString('it-IT') + "€)</span> da pagare in due rate:</li>";
+                messaggio += "<ul>";
+                messaggio += "<li>Prima rata (" + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzaAccontoImposta1 + "</strong>.</li>";
+                messaggio += "<li>Seconda rata (" + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzaAccontoImposta2 + "</strong>.</li>";
+                messaggio += "</ul>";
+                messaggio += "</ul>";
+
+                // Contributi previdenziali
+                messaggio += "<h4>Contributi previdenziali:</h4>";
+                messaggio += "<ul>";
+
+                if (cassaInps === "gs_inps") {
+                    // Gestione Separata INPS
+                    messaggio += "<li><span class='evidenziato-giallo'>Saldo contributi INPS Gestione Separata sul 2024 (" + contributiInps.toLocaleString('it-IT') + "€)</span> da pagare entro il <strong>" + scadenzaSaldoContributi + "</strong>.</li>";
+                    messaggio += "<li><span class='evidenziato-azzurro'>Acconto contributi INPS per il 2025 (" + accontoInps.toLocaleString('it-IT') + "€)</span> da pagare in due rate:</li>";
+                    messaggio += "<ul>";
+                    messaggio += "<li>Prima rata (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzaAccontoContributi1 + "</strong>.</li>";
+                    messaggio += "<li>Seconda rata (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzaAccontoContributi2 + "</strong>.</li>";
+                    messaggio += "</ul>";
+                } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    messaggio += "<li><span class='evidenziato-giallo'>Contributi fissi INPS sul 2024 (" + contributiFissi.toLocaleString('it-IT') + "€)</span> da pagare in quattro rate:</li>";
+                    messaggio += "<ul>";
+                    for (var i = 0; i < scadenzeContributiFissi.length; i++) {
+                        messaggio += "<li>Rata " + (i + 1) + " (" + Math.round(contributiFissi / 4).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzeContributiFissi[i] + "</strong>.</li>";
+                    }
+                    messaggio += "</ul>";
+                    // Contributi variabili
+                    if (contributiVariabili > 0) {
+                        messaggio += "<li><span class='evidenziato-giallo'>Saldo contributi variabili sul 2024 (" + contributiVariabili.toLocaleString('it-IT') + "€)</span> da pagare entro il <strong>" + scadenzaSaldoContributi + "</strong>.</li>";
+                        messaggio += "<li><span class='evidenziato-azzurro'>Acconto contributi variabili per il 2025 (" + accontoInps.toLocaleString('it-IT') + "€)</span> da pagare in due rate:</li>";
+                        messaggio += "<ul>";
+                        messaggio += "<li>Prima rata (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzaAccontoContributi1 + "</strong>.</li>";
+                        messaggio += "<li>Seconda rata (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€) entro il <strong>" + scadenzaAccontoContributi2 + "</strong>.</li>";
+                        messaggio += "</ul>";
+                    }
+                }
+
+                messaggio += "</ul>";
+
+                // Riepilogo finale
+                messaggio += "<h4>Riepilogo dei Pagamenti:</h4>";
+                messaggio += "<ul>";
+                messaggio += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + "€ (circa il " + percentualeTasseContributi + "% del tuo reddito lordo)</span></li>";
+                messaggio += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: " + totaleAcconti.toLocaleString('it-IT') + "€ (circa il " + percentualeAcconti + "% del tuo reddito lordo)</span></li>";
+                messaggio += "<li><strong>Totale da versare complessivamente: " + totaleDaVersare.toLocaleString('it-IT') + "€</strong> (circa il " + percentualeTotale + "% del tuo reddito lordo)</li>";
                 messaggio += "</ul>";
                 messaggio += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (" + annoDichiarazione + ") e non rappresentano un costo aggiuntivo.</p>";
 
