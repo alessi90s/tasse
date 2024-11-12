@@ -161,18 +161,15 @@
         #dataAperturaContainer {
             margin-top: 10px;
         }
-        /* Stile per la sezione calcoli a quaderno nella tab Dettaglio Pagamenti */
-        #dettaglioPagamenti {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
+        /* Stili per il quaderno a righe e a quadri */
+        /* Quaderno a Righe */
+        .quaderno-righe {
             background-image: linear-gradient(to bottom, transparent 24px, #e0e0e0 25px);
             background-size: 100% 25px;
             background-repeat: repeat-y;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
             position: relative;
         }
-        #dettaglioPagamenti::before {
+        .quaderno-righe::before {
             content: "";
             position: absolute;
             top: 0;
@@ -183,7 +180,32 @@
             background-size: 100% 25px;
             pointer-events: none;
         }
-        #dettaglioPagamenti > * {
+        .quaderno-righe > * {
+            position: relative;
+            z-index: 1;
+        }
+        /* Quaderno a Quadri */
+        .quaderno-quadri {
+            background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+                              linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-repeat: repeat;
+            position: relative;
+        }
+        .quaderno-quadri::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+                              linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-repeat: repeat;
+            pointer-events: none;
+        }
+        .quaderno-quadri > * {
             position: relative;
             z-index: 1;
         }
@@ -202,6 +224,14 @@
         }
         .tabcontent ul li {
             margin-bottom: 10px;
+        }
+        /* Evidenziazione della prima parte in Dettaglio Pagamenti */
+        .prima-parte {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 5px solid #2980b9;
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -327,13 +357,13 @@
         </div>
 
         <!-- Sezione 1: Come si calcolano? -->
-        <div id="testoConsulenza" class="tabcontent">
+        <div id="testoConsulenza" class="tabcontent quaderno-righe">
             <!-- Nuova sezione di testo personalizzato -->
             <div id="testoPersonalizzato"></div>
         </div>
 
         <!-- Sezione 2: Dettaglio Pagamenti -->
-        <div id="dettaglioPagamenti" class="tabcontent">
+        <div id="dettaglioPagamenti" class="tabcontent quaderno-quadri">
             <!-- Messaggio per il cliente -->
             <div id="messaggioCliente"></div>
         </div>
@@ -580,25 +610,6 @@
                     accontoInps = Math.round(contributiVariabili * 0.80);
                 }
 
-                // Calcola il totale delle tasse e dei contributi effettivi
-                var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
-
-                // Calcola il totale degli acconti
-                var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
-
-                // Calcola il totale complessivo da versare
-                var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
-
-                // Arrotonda i totali
-                totaleTasseContributiEffettivi = Math.round(totaleTasseContributiEffettivi);
-                totaleAcconti = Math.round(totaleAcconti);
-                totaleDaVersare = Math.round(totaleDaVersare);
-
-                // Calcola le percentuali rispetto al reddito lordo (arrotondate)
-                var percentualeTasseContributi = Math.round((totaleTasseContributiEffettivi / redditoLordo) * 100);
-                var percentualeAcconti = Math.round((totaleAcconti / redditoLordo) * 100);
-                var percentualeTotale = Math.round((totaleDaVersare / redditoLordo) * 100);
-
                 // Gestione delle Rate Fisse Proporzionate
                 if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                     for (var i = 0; i < rate.length; i++) {
@@ -607,10 +618,11 @@
                         var inizio = periodo.inizio;
                         var fine = periodo.fine;
 
+                        var contributiFissiAnnui;
                         if (cassaInps === "inps_commercianti") {
-                            var contributiFissiAnnui = 4515.43;
+                            contributiFissiAnnui = 4515.43;
                         } else if (cassaInps === "inps_artigiani") {
-                            var contributiFissiAnnui = 4427.04;
+                            contributiFissiAnnui = 4427.04;
                         }
 
                         // Se apertura dopo il periodo di copertura, skip rate
@@ -639,20 +651,60 @@
                     totaleRateFisse += rate[i].importo;
                 }
 
-                // Aggiorna le rate nella tabella delle scadenze
-                for (var i = 0; i < rate.length; i++) {
-                    var scadenzaElement = document.getElementById("scadenzaFissa" + (i + 1));
-                    var importoElement = document.getElementById("importoFissa" + (i + 1));
-                    var dettaglioElement = document.getElementById("dettaglioFissa" + (i + 1));
+                // Calcola il totale delle tasse e dei contributi effettivi
+                var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
 
-                    if (rate[i].importo > 0) {
-                        document.getElementById("rowScadenzaFissa" + (i + 1)).style.display = "";
-                        scadenzaElement.innerText = rate[i].scadenza;
-                        importoElement.innerText = rate[i].importo.toLocaleString('it-IT') + "€";
-                        dettaglioElement.innerText = "Rata " + (i + 1) + " contributi fissi INPS";
+                // Calcola il totale degli acconti
+                var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
+
+                // Calcola il totale complessivo da versare
+                var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
+
+                // Arrotonda i totali
+                totaleTasseContributiEffettivi = Math.round(totaleTasseContributiEffettivi);
+                totaleAcconti = Math.round(totaleAcconti);
+                totaleDaVersare = Math.round(totaleDaVersare);
+
+                // Calcola le percentuali rispetto al reddito lordo (arrotondate)
+                var percentualeTasseContributi = Math.round((totaleTasseContributiEffettivi / redditoLordo) * 100);
+                var percentualeAcconti = Math.round((totaleAcconti / redditoLordo) * 100);
+                var percentualeTotale = Math.round((totaleDaVersare / redditoLordo) * 100);
+
+                // Aggiorna i valori nella tabella
+                document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
+                document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
+                document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100) + "%";
+                document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT') + "€";
+                document.getElementById("accontoImpostaSostitutivaOutput").innerText = accontoImpostaSostitutiva.toLocaleString('it-IT') + "€";
+                document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
+                document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
+
+                // Gestisci la visualizzazione dei contributi
+                if (cassaInps === "gs_inps") {
+                    // Per Gestione Separata, mostra solo il totale dei contributi INPS
+                    document.getElementById("rowContributiInps").style.display = "";
+                    document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
+                    // Nascondi le altre righe
+                    document.getElementById("rowContributiFissi").style.display = "none";
+                    document.getElementById("rowContributiVariabili").style.display = "none";
+                    document.getElementById("rowTotaleContributiInps").style.display = "none";
+                } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    // Nascondi la riga dei Contributi INPS totali
+                    document.getElementById("rowContributiInps").style.display = "none";
+                    // Mostra i contributi fissi
+                    document.getElementById("rowContributiFissi").style.display = "";
+                    document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT') + "€";
+                    if (contributiVariabili > 0) {
+                        // Mostra i contributi variabili
+                        document.getElementById("rowContributiVariabili").style.display = "";
+                        document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT') + "€";
                     } else {
-                        document.getElementById("rowScadenzaFissa" + (i + 1)).style.display = "none";
+                        // Nascondi la riga dei contributi variabili
+                        document.getElementById("rowContributiVariabili").style.display = "none";
                     }
+                    // Mostra la riga del totale dei contributi INPS
+                    document.getElementById("rowTotaleContributiInps").style.display = "";
+                    document.getElementById("totaleContributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
                 }
 
                 // Calcola le scadenze dei pagamenti generali
@@ -670,11 +722,15 @@
 
                 // Calcola le scadenze delle rate fisse
                 for (var i = 0; i < rate.length; i++) {
+                    var scadenzaElement = document.getElementById("scadenzaFissa" + (i + 1));
+                    var importoElement = document.getElementById("importoFissa" + (i + 1));
+                    var dettaglioElement = document.getElementById("dettaglioFissa" + (i + 1));
+
                     if (rate[i].importo > 0) {
                         document.getElementById("rowScadenzaFissa" + (i + 1)).style.display = "";
-                        document.getElementById("scadenzaFissa" + (i + 1)).innerText = rate[i].scadenza;
-                        document.getElementById("importoFissa" + (i + 1)).innerText = rate[i].importo.toLocaleString('it-IT') + "€";
-                        document.getElementById("dettaglioFissa" + (i + 1)).innerText = "Rata " + (i + 1) + " contributi fissi INPS";
+                        scadenzaElement.innerText = rate[i].scadenza;
+                        importoElement.innerText = rate[i].importo.toLocaleString('it-IT') + "€";
+                        dettaglioElement.innerText = rate[i].dettagli;
                     } else {
                         document.getElementById("rowScadenzaFissa" + (i + 1)).style.display = "none";
                     }
@@ -803,31 +859,25 @@
                 // Inserisci il testo personalizzato nell'elemento HTML
                 document.getElementById("testoPersonalizzato").innerHTML = testoPersonalizzato;
 
-                // Visualizza la sezione dei risultati
-                document.getElementById("risultati").style.display = "block";
-
-                // Apri la prima scheda di default
-                document.getElementById("defaultOpen").click();
-
                 // Crea il messaggio per il cliente
-                var messaggio = "<h3>Dettaglio dei pagamenti per l'anno " + annoReddito + "</h3>";
+                var messaggio = "<h3>Dettaglio dei Pagamenti per l'Anno " + annoReddito + "</h3>";
 
+                messaggio += "<div class='prima-parte'>";
                 messaggio += "<p>Hai guadagnato <strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong> nel " + annoReddito + ".</p>";
 
                 // Spiegazione del calcolo sul reddito netto
-                messaggio += "<div class='calcoli-dettagliati'>";
                 messaggio += "<h4>Calcolo del Reddito Netto:</h4>";
                 messaggio += "<p><strong>Reddito Lordo</strong> (" + redditoLordo.toLocaleString('it-IT') + "€) x <strong>Coefficiente di Redditività</strong> (" + coefficientePercentuale + "%) = <strong>" + redditoNetto.toLocaleString('it-IT') + "€</strong></p>";
                 messaggio += "</div>";
 
                 // Calcolo dell'Imposta Sostitutiva
-                messaggio += "<div class='calcoli-dettagliati'>";
+                messaggio += "<div class='prima-parte'>";
                 messaggio += "<h4>Calcolo dell'Imposta Sostitutiva:</h4>";
                 messaggio += "<p><strong>Reddito Netto</strong> (" + redditoNetto.toLocaleString('it-IT') + "€) x <strong>Aliquota Imposta Sostitutiva</strong> (" + aliquotaImpostaPercentuale + "%) = <span class='evidenziato-giallo'><strong>" + impostaSostitutiva.toLocaleString('it-IT') + "€</strong></span></p>";
                 messaggio += "</div>";
 
                 // Calcolo dei Contributi INPS
-                messaggio += "<div class='calcoli-dettagliati'>";
+                messaggio += "<div class='prima-parte'>";
                 if (cassaInps === "gs_inps") {
                     // Gestione Separata INPS
                     messaggio += "<h4>Calcolo dei Contributi INPS (Gestione Separata):</h4>";
@@ -844,7 +894,7 @@
                 messaggio += "</div>";
 
                 // Tasse da pagare
-                messaggio += "<h4>Tasse da pagare:</h4>";
+                messaggio += "<h4>Tasse da Pagare:</h4>";
                 messaggio += "<ul>";
                 messaggio += "<li><span class='evidenziato-giallo'>Saldo imposta sostitutiva sul 2024 (" + impostaSostitutiva.toLocaleString('it-IT') + "€)</span> da pagare entro il <strong>" + scadenzaSaldoImposta + "</strong>.</li>";
                 messaggio += "<li><span class='evidenziato-azzurro'>Acconto imposta sostitutiva per il 2025 (" + accontoImpostaSostitutiva.toLocaleString('it-IT') + "€)</span> da pagare in due rate:</li>";
@@ -855,7 +905,7 @@
                 messaggio += "</ul>";
 
                 // Contributi previdenziali
-                messaggio += "<h4>Contributi previdenziali:</h4>";
+                messaggio += "<h4>Contributi Previdenziali:</h4>";
                 messaggio += "<ul>";
 
                 if (cassaInps === "gs_inps") {
@@ -897,8 +947,14 @@
                 messaggio += "</ul>";
                 messaggio += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (" + annoDichiarazione + ") e non rappresentano un costo aggiuntivo.</p>";
 
-                // Visualizza il messaggio nell'elemento HTML
+                // Inserisci il messaggio nell'elemento HTML
                 document.getElementById("messaggioCliente").innerHTML = messaggio;
+
+                // Visualizza la sezione dei risultati
+                document.getElementById("risultati").style.display = "block";
+
+                // Apri la prima scheda di default
+                document.getElementById("defaultOpen").click();
             }
 
             // Apri la prima scheda di default
