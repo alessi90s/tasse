@@ -582,6 +582,7 @@
             // Calcoli specifici per la cassa INPS selezionata
             var aliquotaContributivaPercentuale = 0;
             var contributiFissiAnnui = 0;
+            var contributiFissiAnnuiDisplay = "";
 
             if (cassaInps === "gs_inps") {
                 // Gestione Separata INPS
@@ -805,7 +806,7 @@
                 testoPersonalizzato += "<p>Quindi <span class='evidenziato-giallo'>paghi il <strong>" + aliquotaImpostaPercentuale + "%</strong> di imposta e il <strong>" + aliquotaContributivaPercentuale + "%</strong> di contributi INPS</span> non sul totale incassato (<strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong>) ma sul tuo incassato per il coefficiente di redditività.</p>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
-                var contributiFissiAnnuiDisplay = (cassaInps === "inps_commercianti") ? "4.515,43€" : "4.427,04€";
+                var contributiFissiAnnuiDisplay = (cassaInps === "inps_commercianti") ? "4.515,43" : "4.427,04";
 
                 testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
                 
@@ -816,9 +817,17 @@
                 }
 
                 if (!dataAperturaVal) {
-                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnuiDisplay + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di 8 mesi di contributi per la pensione invece di 12." : ".") + "</p>";
+                    if (riduzioneContributiApplicata) {
+                        testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
+                    } else {
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + Math.round(contributiFissiAnnuiDisplay) + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                    }
                 } else {
-                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnuiDisplay + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di 8 mesi di contributi per la pensione invece di 12." : ".") + "</p>";
+                    if (riduzioneContributiApplicata) {
+                        testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
+                    } else {
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + Math.round(contributiFissiAnnuiDisplay) + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                    }
                 }
 
                 if (redditoNetto > sogliaReddito) {
@@ -891,11 +900,13 @@
             }
             testoPersonalizzato += "</ul>";
 
-            testoPersonalizzato += "<h4>Totale complessivo:</h4>";
-            testoPersonalizzato += "<p><strong>Saldo totale:</strong> <span class='evidenziato-giallo'><strong>" + saldoTotaleEsempio.toLocaleString('it-IT') + "€</strong></span> (di cui " + impostaEsempio.toLocaleString('it-IT') + "€ di imposta e " + contributiInpsEsempio.toLocaleString('it-IT') + "€ di contributi).</p>";
-
-            testoPersonalizzato += "<p><strong>Acconti totali:</strong> <span class='evidenziato-azzurro'><strong>" + totaleAcconti.toLocaleString('it-IT') + "€</strong></span> (di cui " + accontoImpostaEsempio.toLocaleString('it-IT') + "€ di imposta e " + accontoInpsEsempio.toLocaleString('it-IT') + "€ di contributi).</p>";
-            testoPersonalizzato += "<p><strong>Totale da versare complessivamente: " + totaleDaVersare.toLocaleString('it-IT') + "€</strong> (circa il " + percentualeTotale + "% del tuo reddito lordo)</p>";
+            // Riepilogo finale
+            testoPersonalizzato += "<h4>Riepilogo dei Pagamenti:</h4>";
+            testoPersonalizzato += "<ul>";
+            testoPersonalizzato += "<li><span class='evidenziato-giallo'>Totale tasse e contributi effettivi sul 2024: " + totaleTasseContributiEffettivi.toLocaleString('it-IT') + "€ (circa il " + percentualeTasseContributi + "% del tuo reddito lordo)</span></li>";
+            testoPersonalizzato += "<li><span class='evidenziato-azzurro'>Totale acconti per il 2025: " + totaleAcconti.toLocaleString('it-IT') + "€ (circa il " + percentualeAcconti + "% del tuo reddito lordo)</span></li>";
+            testoPersonalizzato += "<li><strong>Totale da versare complessivamente: " + totaleDaVersare.toLocaleString('it-IT') + "€</strong> (circa il " + percentualeTotale + "% del tuo reddito lordo)</li>";
+            testoPersonalizzato += "</ul>";
             testoPersonalizzato += "<p><strong>Nota:</strong> Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (" + annoDichiarazione + ") e non rappresentano un costo aggiuntivo.</p>";
 
             // Inserisci il testo personalizzato nell'elemento HTML
