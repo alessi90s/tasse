@@ -602,14 +602,12 @@
                 contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
 
                 // Applica la proporzione dei mesi e la riduzione
-                contributiFissi = contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione;
-                contributiFissi = Math.round(contributiFissi);
+                contributiFissi = Math.round(contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione);
 
                 // Calcola i contributi variabili se il reddito netto supera la soglia
                 if (redditoNetto > sogliaReddito) {
                     var eccedenza = redditoNetto - sogliaReddito;
-                    contributiVariabili = eccedenza * (aliquotaContributivaPercentuale / 100);
-                    contributiVariabili = Math.round(contributiVariabili);
+                    contributiVariabili = Math.round(eccedenza * (aliquotaContributivaPercentuale / 100));
                 } else {
                     contributiVariabili = 0;
                 }
@@ -629,14 +627,12 @@
                 contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
 
                 // Applica la proporzione dei mesi e la riduzione
-                contributiFissi = contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione;
-                contributiFissi = Math.round(contributiFissi);
+                contributiFissi = Math.round(contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione);
 
                 // Calcola i contributi variabili se il reddito netto supera la soglia
                 if (redditoNetto > sogliaReddito) {
                     var eccedenza = redditoNetto - sogliaReddito;
-                    contributiVariabili = eccedenza * (aliquotaContributivaPercentuale / 100);
-                    contributiVariabili = Math.round(contributiVariabili);
+                    contributiVariabili = Math.round(eccedenza * (aliquotaContributivaPercentuale / 100));
                 } else {
                     contributiVariabili = 0;
                 }
@@ -819,12 +815,14 @@
 
                 testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
                 
+                // Testo con data di apertura
                 if (dataAperturaVal) {
                     testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? " e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
                 } else {
                     testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
                 }
 
+                // Testo senza data di apertura
                 if (!dataAperturaVal) {
                     if (riduzioneContributiApplicata) {
                         testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissiRidotti.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
@@ -1039,7 +1037,7 @@
             const { jsPDF } = window.jspdf;
 
             // Crea un nuovo documento
-            const doc = new jsPDF();
+            const doc = new jsPDF('p', 'mm', 'a4');
 
             // Definisci le sezioni da includere nel PDF
             var sezioni = [
@@ -1050,7 +1048,7 @@
 
             for (var i = 0; i < sezioni.length; i++) {
                 if (i > 0) doc.addPage();
-                await html2canvas(sezioni[i]).then(canvas => {
+                await html2canvas(sezioni[i], { scale: 2 }).then(canvas => {
                     var imgData = canvas.toDataURL('image/png');
                     var imgWidth = 210; // Larghezza A4 in mm
                     var pageHeight = 297; // Altezza A4 in mm
@@ -1059,6 +1057,7 @@
 
                     var position = 0;
 
+                    // Aggiungi l'immagine al PDF
                     doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 });
             }
