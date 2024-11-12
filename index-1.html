@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Calcolatore Regime Forfettario</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Inclusione della libreria jsPDF tramite CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* Stili di base */
         body {
@@ -233,6 +235,24 @@
         .tabcontent ul li {
             margin-bottom: 10px;
         }
+        /* Pulsante per Scaricare il PDF */
+        .pdf-button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .pdf-button {
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        .pdf-button:hover {
+            background-color: #1e8449;
+        }
     </style>
 </head>
 <body>
@@ -414,12 +434,18 @@
         </div>
     </div>
 
+    <!-- Pulsante per Scaricare il PDF -->
+    <div class="pdf-button-container">
+        <button class="pdf-button" onclick="scaricaPDF()">Scarica PDF</button>
+    </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const cassaInpsSelect = document.getElementById("cassaInps");
         const riduzioneContainer = document.getElementById("riduzioneContainer");
         const dataAperturaContainer = document.getElementById("dataAperturaContainer");
         const riduzioneContributiCheckbox = document.getElementById("riduzioneContributi");
+        const dataAperturaInput = document.getElementById("dataApertura");
 
         // Funzione per mostrare/nascondere il campo Data di Apertura e la Riduzione
         function toggleFields() {
@@ -477,8 +503,8 @@
             }
 
             // Ottieni la data di apertura della partita IVA (solo per Commercianti e Artigiani)
-            var dataAperturaInput = document.getElementById("dataApertura").value;
-            var dataApertura = new Date(dataAperturaInput);
+            var dataAperturaVal = dataAperturaInput.value;
+            var dataApertura = new Date(dataAperturaVal);
             var annoRedditoInt = parseInt(annoReddito);
             var meseApertura = dataApertura.getMonth() + 1; // 1-12
 
@@ -514,7 +540,7 @@
             var mesiAttivita = 12; // Default a 12 mesi
 
             if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                if (dataAperturaInput) {
+                if (dataAperturaVal) {
                     var annoApertura = dataApertura.getFullYear();
                     var meseApertura = dataApertura.getMonth() + 1; // 1-12
 
@@ -563,7 +589,7 @@
                 accontoInps = Math.round(accontoInps);
             } else if (cassaInps === "inps_commercianti") {
                 // INPS Commercianti
-                var contributiFissiAnnui = 4515.43; // Contributi fissi annui
+                var contributiFissiAnnui = 2446; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24.48;
 
                 // Applica la proporzione dei mesi e la riduzione
@@ -586,7 +612,7 @@
                 accontoInps = Math.round(contributiVariabili * 0.80);
             } else if (cassaInps === "inps_artigiani") {
                 // INPS Artigiani
-                var contributiFissiAnnui = 4427.04; // Contributi fissi annui
+                var contributiFissiAnnui = 2446; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24;
 
                 // Applica la proporzione dei mesi e la riduzione
@@ -613,15 +639,15 @@
             if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 for (var i = 0; i < rate.length; i++) {
                     var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaInput);
+                    var apertura = new Date(dataAperturaVal);
                     var inizio = periodo.inizio;
                     var fine = periodo.fine;
 
                     var contributiFissiAnnui;
                     if (cassaInps === "inps_commercianti") {
-                        contributiFissiAnnui = 4515.43;
+                        contributiFissiAnnui = 2446; // Corretto
                     } else if (cassaInps === "inps_artigiani") {
-                        contributiFissiAnnui = 4427.04;
+                        contributiFissiAnnui = 2446; // Corretto
                     }
 
                     // Se apertura dopo il periodo di copertura, skip rate
@@ -777,7 +803,16 @@
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
                 testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
-                testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
+                testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? ", e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
+
+                // Importo completo dei contributi fissi
+                var contributiFissiCompleti = (cassaInps === "inps_commercianti") ? 2446 : 2446; // Entrambi 2446€ dopo la correzione
+                if (proporzioneContributi < 1) {
+                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>." + (riduzioneContributiApplicata ? " Ricorda che avrai una copertura non di 12 mesi di contributi per la pensione ma di 8 mesi." : "") + "</p>";
+                } else {
+                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>." + (riduzioneContributiApplicata ? " Ricorda che avrai una copertura non di 12 mesi di contributi per la pensione ma di 8 mesi." : "") + "</p>";
+                }
+
                 if (redditoNetto > sogliaReddito) {
                     testoPersonalizzato += "<p>Dal momento che il tuo reddito netto supera la soglia di <strong>" + sogliaReddito.toLocaleString('it-IT') + "€</strong>, paghi anche i contributi variabili del <strong>" + aliquotaContributivaPercentuale + "%</strong> sull'eccedenza.</p>";
                 }
@@ -956,8 +991,74 @@
             document.getElementById("defaultOpen").click();
         }
 
-        // Apri la prima scheda di default
-        document.getElementById("defaultOpen").click();
+        // Funzione per formattare la data in "3 Novembre 2024"
+        function formattaData(data) {
+            if (!data || isNaN(data.getTime())) return "Data non valida";
+            var giorno = data.getDate();
+            var mese = data.toLocaleString('it-IT', { month: 'long' });
+            var anno = data.getFullYear();
+            return giorno + " " + capitalizeFirstLetter(mese) + " " + anno;
+        }
+
+        // Funzione per capitalizzare la prima lettera
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Funzione per scaricare il PDF
+        window.scaricaPDF = async function() {
+            // Carica la libreria jsPDF
+            const { jsPDF } = window.jspdf;
+
+            // Crea un nuovo documento
+            const doc = new jsPDF();
+
+            // Funzione per aggiungere contenuto con stili simili al quaderno
+            function aggiungiContenutoPagina(pagina, classeQuaderno) {
+                // Aggiungi il contenuto HTML come testo semplice
+                // Nota: jsPDF non supporta direttamente l'HTML complesso con stili CSS
+                // Per una migliore resa, potresti utilizzare librerie aggiuntive come html2canvas
+                // Tuttavia, per semplicità, aggiungeremo il testo manualmente
+
+                var contenuto = pagina.innerHTML;
+
+                // Rimuovi le tag HTML per ottenere solo il testo
+                var testo = pagina.innerText;
+
+                // Aggiungi il testo al PDF
+                doc.text(testo, 10, 20);
+            }
+
+            // Aggiungi la prima pagina: "Come si calcolano?"
+            var pagina1 = document.getElementById("testoConsulenza");
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text("Come si calcolano?", 105, 20, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(pagina1.innerText, 10, 30);
+
+            // Aggiungi la seconda pagina: "Dettaglio Pagamenti"
+            var pagina2 = document.getElementById("dettaglioPagamenti");
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text("Dettaglio Pagamenti", 105, 20, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(pagina2.innerText, 10, 30);
+
+            // Aggiungi la terza pagina: "Scadenza Pagamenti"
+            var pagina3 = document.getElementById("scadenzaPagamenti");
+            doc.addPage();
+            doc.setFontSize(16);
+            doc.text("Scadenza Pagamenti", 105, 20, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(pagina3.innerText, 10, 30);
+
+            // Rimuovi la prima pagina vuota creata automaticamente
+            doc.deletePage(1);
+
+            // Scarica il PDF
+            doc.save("Calcolatore_Regime_Forfettario.pdf");
+        }
     });
 </script>
 
