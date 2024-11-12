@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <title>Calcolatore Regime Forfettario</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Inclusione della libreria jsPDF tramite CDN -->
+    <!-- Inclusione delle librerie jsPDF e html2canvas tramite CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Stili di base */
         body {
@@ -579,6 +580,7 @@
 
             // Calcoli specifici per la cassa INPS selezionata
             var aliquotaContributivaPercentuale = 0;
+            var contributiFissiAnnui = 0;
 
             if (cassaInps === "gs_inps") {
                 // Gestione Separata INPS
@@ -589,7 +591,7 @@
                 accontoInps = Math.round(accontoInps);
             } else if (cassaInps === "inps_commercianti") {
                 // INPS Commercianti
-                var contributiFissiAnnui = 4515.43; // Contributi fissi annui corretti
+                contributiFissiAnnui = 4515.43; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24.48;
 
                 // Applica la proporzione dei mesi e la riduzione
@@ -612,7 +614,7 @@
                 accontoInps = Math.round(contributiVariabili * 0.80);
             } else if (cassaInps === "inps_artigiani") {
                 // INPS Artigiani
-                var contributiFissiAnnui = 4427.04; // Contributi fissi annui corretti
+                contributiFissiAnnui = 4427.04; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24;
 
                 // Applica la proporzione dei mesi e la riduzione
@@ -643,19 +645,19 @@
                     var inizio = periodo.inizio;
                     var fine = periodo.fine;
 
-                    var contributiFissiAnnui;
+                    // Contributi fissi annui specifici
                     if (cassaInps === "inps_commercianti") {
-                        contributiFissiAnnui = 4515.43; // Corretto
+                        contributiFissiAnnui = 4515.43;
                     } else if (cassaInps === "inps_artigiani") {
-                        contributiFissiAnnui = 4427.04; // Corretto
+                        contributiFissiAnnui = 4427.04;
                     }
 
                     // Se apertura dopo il periodo di copertura, skip rate
-                    if (apertura > fine) {
+                    if (dataAperturaVal && apertura > fine) {
                         rate[i].importo = 0;
                     }
                     // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (apertura >= inizio && apertura <= fine) {
+                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
                         var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
                         var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
                         giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
@@ -802,19 +804,20 @@
                 testoPersonalizzato += "<p>Quindi <span class='evidenziato-giallo'>paghi il <strong>" + aliquotaImpostaPercentuale + "%</strong> di imposta e il <strong>" + aliquotaContributivaPercentuale + "%</strong> di contributi INPS</span> non sul totale incassato (<strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong>) ma sul tuo incassato per il coefficiente di redditività.</p>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
-                var contributiFissiAnnui = cassaInps === "inps_commercianti" ? 4515.43 : 4427.04;
-                testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
+                var contributiFissiAnnuiDisplay = (cassaInps === "inps_commercianti") ? "4.515,43€" : "4.427,04€";
 
+                testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
+                
                 if (dataAperturaVal) {
-                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? ", e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
+                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? " e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
                 } else {
                     testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
                 }
 
-                if (dataAperturaVal) {
-                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnui.toLocaleString('it-IT') + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di contributi per la pensione di 8 mesi invece di 12." : ".") + "</p>";
+                if (!dataAperturaVal) {
+                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnuiDisplay + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di 8 mesi di contributi per la pensione invece di 12." : ".") + "</p>";
                 } else {
-                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnui.toLocaleString('it-IT') + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di contributi per la pensione di 8 mesi invece di 12." : ".") + "</p>";
+                    testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiAnnuiDisplay + "€</strong>" + (riduzioneContributiApplicata ? ", con una copertura di 8 mesi di contributi per la pensione invece di 12." : ".") + "</p>";
                 }
 
                 if (redditoNetto > sogliaReddito) {
@@ -1011,35 +1014,33 @@
 
         // Funzione per scaricare il PDF
         window.scaricaPDF = async function() {
-            // Carica la libreria jsPDF
+            // Carica le librerie jsPDF e html2canvas
             const { jsPDF } = window.jspdf;
 
             // Crea un nuovo documento
             const doc = new jsPDF();
 
-            // Funzione per aggiungere contenuto con stili simili al quaderno
-            function aggiungiContenutoPagina(testo, titolo) {
-                doc.addPage();
-                doc.setFontSize(16);
-                doc.text(titolo, 105, 20, { align: 'center' });
-                doc.setFontSize(12);
-                // Splitta il testo in righe per evitare overflow
-                var righe = doc.splitTextToSize(testo, 180);
-                doc.text(righe, 10, 30);
+            // Definisci le sezioni da includere nel PDF
+            var sezioni = [
+                document.getElementById("testoConsulenza"),
+                document.getElementById("dettaglioPagamenti"),
+                document.getElementById("scadenzaPagamenti")
+            ];
+
+            for (var i = 0; i < sezioni.length; i++) {
+                if (i > 0) doc.addPage();
+                await html2canvas(sezioni[i]).then(canvas => {
+                    var imgData = canvas.toDataURL('image/png');
+                    var imgWidth = 210; // A4 width in mm
+                    var pageHeight = 297; // A4 height in mm
+                    var imgHeight = canvas.height * imgWidth / canvas.width;
+                    var heightLeft = imgHeight;
+
+                    var position = 0;
+
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                });
             }
-
-            // Ottieni i contenuti delle sezioni
-            var pagina1 = document.getElementById("testoConsulenza").innerText;
-            var pagina2 = document.getElementById("dettaglioPagamenti").innerText;
-            var pagina3 = document.getElementById("scadenzaPagamenti").innerText;
-
-            // Aggiungi il contenuto alle pagine del PDF
-            aggiungiContenutoPagina(pagina1, "Come si calcolano?");
-            aggiungiContenutoPagina(pagina2, "Dettaglio Pagamenti");
-            aggiungiContenutoPagina(pagina3, "Scadenza Pagamenti");
-
-            // Rimuovi la prima pagina vuota creata automaticamente
-            doc.deletePage(1);
 
             // Scarica il PDF
             doc.save("Calcolatore_Regime_Forfettario.pdf");
