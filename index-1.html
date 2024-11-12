@@ -429,12 +429,6 @@
         const riduzioneContributiCheckbox = document.getElementById("riduzioneContributi");
         const dataAperturaInput = document.getElementById("dataApertura");
 
-        // Definizione dei Contributi Fissi per ciascuna cassa
-        const contributiFissiPerCassa = {
-            "inps_commercianti": 3010.00, // Contributi fissi annui per Commercianti
-            "inps_artigiani": 4427.04     // Contributi fissi annui per Artigiani
-        };
-
         // Funzione per mostrare/nascondere il campo Data di Apertura e la Riduzione
         function toggleFields() {
             const cassaInps = cassaInpsSelect.value;
@@ -566,11 +560,11 @@
             var contributiVariabili = 0;
             var sogliaReddito = 18415.00; // Soglia per i contributi variabili
 
-            // Ottieni il contributo fisso annuo corretto per la cassa selezionata
-            var contributiFissiAnnui = contributiFissiPerCassa[cassaInps] || 0;
-
             // Calcoli specifici per la cassa INPS selezionata
             var aliquotaContributivaPercentuale = 0;
+            var contributiFissiAnnui = 0;
+            var contributiFissiCompleti = 0; // Contributi fissi senza riduzione
+            var contributiFissiRidotti = 0; // Contributi fissi con riduzione
 
             if (cassaInps === "gs_inps") {
                 // Gestione Separata INPS
@@ -581,11 +575,12 @@
                 accontoInps = Math.round(accontoInps);
             } else if (cassaInps === "inps_commercianti") {
                 // INPS Commercianti
+                contributiFissiAnnui = 3010.00; // Contributi fissi annui (aggiornato secondo l'esempio)
                 aliquotaContributivaPercentuale = 24.48;
 
                 // Calcola i contributi fissi completi e ridotti
-                var contributiFissiCompleti = Math.round(contributiFissiAnnui);
-                var contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
+                contributiFissiCompleti = Math.round(contributiFissiAnnui);
+                contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
 
                 // Applica la proporzione dei mesi e la riduzione
                 contributiFissi = Math.round(contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione);
@@ -605,11 +600,12 @@
                 accontoInps = Math.round(contributiVariabili * 0.80);
             } else if (cassaInps === "inps_artigiani") {
                 // INPS Artigiani
+                contributiFissiAnnui = 4427.04; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24;
 
                 // Calcola i contributi fissi completi e ridotti
-                var contributiFissiCompleti = Math.round(contributiFissiAnnui);
-                var contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
+                contributiFissiCompleti = Math.round(contributiFissiAnnui);
+                contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
 
                 // Applica la proporzione dei mesi e la riduzione
                 contributiFissi = Math.round(contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione);
@@ -636,6 +632,13 @@
                     var apertura = new Date(dataAperturaVal);
                     var inizio = periodo.inizio;
                     var fine = periodo.fine;
+
+                    // Contributi fissi annui specifici
+                    if (cassaInps === "inps_commercianti") {
+                        contributiFissiAnnui = 3010.00; // Aggiornato secondo l'esempio
+                    } else if (cassaInps === "inps_artigiani") {
+                        contributiFissiAnnui = 4427.04;
+                    }
 
                     // Se apertura dopo il periodo di copertura, skip rate
                     if (dataAperturaVal && apertura > fine) {
@@ -795,17 +798,23 @@
                 
                 // Testo con data di apertura
                 if (dataAperturaVal) {
-                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? " e in base alla riduzione del 35% che hai richiesto." : "") + "</p>";
+                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? " e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
                 } else {
-                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong> all'anno." + (riduzioneContributiApplicata ? " Con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi." : "") + "</p>";
+                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
                 }
 
-                // Se la riduzione è selezionata, aggiungi la copertura di 8 mesi
-                if (riduzioneContributiApplicata) {
-                    if (dataAperturaVal) {
-                        testoPersonalizzato += "<p>Con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                // Testo senza data di apertura
+                if (!dataAperturaVal) {
+                    if (riduzioneContributiApplicata) {
+                        testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissiRidotti.toLocaleString('it-IT') + "€</strong>.</p>";
                     } else {
-                        testoPersonalizzato += "<p>Con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>.</p>";
+                    }
+                } else {
+                    if (riduzioneContributiApplicata) {
+                        testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>.</p>";
+                    } else {
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>.</p>";
                     }
                 }
 
@@ -899,7 +908,7 @@
 
             // Spiegazione del calcolo sul reddito netto
             messaggio += "<h4>Calcolo del Reddito Netto:</h4>";
-            messaggio += "<p><strong>Reddito Lordo</strong> (" + redditoLordo.toLocaleString('it-IT') + "€) x <strong>Coefficiente di Redditività</strong> (" + coefficientePercentuale + "%) = <strong>" + redditoNetto.toLocaleString('it-IT') + "€</strong></p>";
+            messaggio += "<p><strong>Reddito Lordo</strong> (" + redditoLordo.toLocaleString('it-IT') + "€) x <strong>Coefficiente di Redditività</strong> (" + coefficientePercentuale + "%) = <strong>" + redditoNettoEsempio.toLocaleString('it-IT') + "€</strong></p>";
             messaggio += "</div>";
 
             // Calcolo dell'Imposta Sostitutiva
@@ -989,7 +998,7 @@
             document.getElementById("defaultOpen").click();
         }
 
-        // Funzione per formattare la data in "1 Maggio 2024"
+        // Funzione per formattare la data in "3 Novembre 2024"
         function formattaData(data) {
             if (!data || isNaN(data.getTime())) return "Data non valida";
             var giorno = data.getDate();
