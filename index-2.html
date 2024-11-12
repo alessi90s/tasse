@@ -7,1123 +7,435 @@
     <style>
         /* Stili di base */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
             padding: 20px;
             color: #333;
         }
         h1, h2 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 20px;
         }
         form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 10px;
             max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         label {
-            font-weight: 600;
-            color: #34495e;
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
         }
-        input[type="number"],
-        input[type="date"],
-        select {
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px;
+        input, select, button {
             width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
             box-sizing: border-box;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        input[type="number"]:focus,
-        input[type="date"]:focus,
-        select:focus {
-            border-color: #2980b9;
-            outline: none;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
         }
         button {
-            padding: 12px 25px;
             background-color: #2980b9;
             color: #fff;
             border: none;
-            border-radius: 25px;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #1c5980;
         }
-        /* Stili per la tabella dei risultati */
         .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
             max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 20px auto;
+            overflow-x: auto;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: #ffffff;
+            background-color: #fff;
         }
         th, td {
             padding: 12px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #ddd;
             text-align: left;
-            font-size: 0.95rem;
         }
         th {
             background-color: #2980b9;
-            color: #ffffff;
-            position: sticky;
-            top: 0;
+            color: #fff;
         }
-        .evidenziato-giallo {
+        .highlight-yellow {
             background-color: #fff9c4;
-            padding: 5px;
-            border-radius: 4px;
         }
-        .evidenziato-azzurro {
+        .highlight-blue {
             background-color: #bbdefb;
-            padding: 5px;
-            border-radius: 4px;
         }
-        .indent {
-            padding-left: 20px;
-        }
-        /* Responsive design */
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
-            h1, h2 {
-                font-size: 1.5rem;
-                margin-bottom: 15px;
-            }
-            label {
-                font-size: 0.9rem;
-            }
-            input[type="number"],
-            input[type="date"],
-            select {
-                font-size: 0.9rem;
-            }
-            button {
+            form, .table-container {
                 width: 100%;
-                padding: 10px 20px;
-                font-size: 0.9rem;
+                margin: 0;
             }
-            th, td {
-                padding: 10px;
-                font-size: 0.85rem;
-            }
-        }
-        /* Stile per il contenitore della riduzione e della data di apertura */
-        #riduzioneContainer,
-        #dataAperturaContainer {
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Disclaimer -->
-    <div id="disclaimer" style="background-color: #ffdddd; padding: 15px; border-radius: 4px; text-align: center; max-width: 600px; margin: 0 auto;">
-        <strong>Questo calcolatore è da usare solo per previsioni a grandi linee e non sostituisce un vero calcolo effettuato da un commercialista.</strong>
-    </div>
-
     <h1>Calcolatore Regime Forfettario</h1>
 
-    <form>
-        <label for="annoReddito">Seleziona l'anno di riferimento del reddito:</label>
-        <select id="annoReddito">
+    <form id="calcolatoreForm">
+        <label for="annoReddito">Anno di Riferimento del Reddito:</label>
+        <select id="annoReddito" required>
+            <option value="">-- Seleziona l'anno --</option>
             <option value="2024">2024</option>
-            <!-- Aggiungi altre opzioni se necessario -->
+            <option value="2025">2025</option>
+            <!-- Aggiungi altri anni se necessario -->
         </select>
 
-        <label for="cassaInps">Seleziona la cassa di riferimento INPS:</label>
-        <select id="cassaInps">
+        <label for="cassaInps">Cassa di Riferimento INPS:</label>
+        <select id="cassaInps" required>
+            <option value="">-- Seleziona la cassa INPS --</option>
             <option value="gs_inps">Gestione Separata INPS</option>
             <option value="inps_commercianti">INPS Commercianti</option>
             <option value="inps_artigiani">INPS Artigiani</option>
         </select>
 
-        <!-- Checkbox per la riduzione del 35% (visibile solo per Commercianti e Artigiani) -->
-        <div id="riduzioneContainer" style="display: none;">
+        <div id="opzioniCommercianteArtigiano" style="display: none;">
             <label>
                 <input type="checkbox" id="riduzioneContributi">
                 Applica riduzione del 35% sui contributi INPS
             </label>
-        </div>
 
-        <!-- Campo Data di Apertura della Partita IVA (visibile solo per Commercianti e Artigiani) -->
-        <div id="dataAperturaContainer" style="display: none;">
-            <label for="dataApertura">Data di apertura della Partita IVA:</label>
+            <label for="dataApertura">Data di Apertura della Partita IVA:</label>
             <input type="date" id="dataApertura">
         </div>
 
-        <label for="aliquotaImposta">Seleziona l'aliquota dell'imposta sostitutiva:</label>
-        <select id="aliquotaImposta">
+        <label for="aliquotaImposta">Aliquota Imposta Sostitutiva:</label>
+        <select id="aliquotaImposta" required>
+            <option value="">-- Seleziona l'aliquota --</option>
             <option value="0.05">5%</option>
             <option value="0.15">15%</option>
         </select>
 
-        <label for="coefficienteRedditivita">Seleziona il Coefficiente di Redditività (%):</label>
-        <select id="coefficienteRedditivita">
+        <label for="coefficienteRedditivita">Coefficiente di Redditività (%):</label>
+        <select id="coefficienteRedditivita" required>
             <option value="">-- Seleziona il coefficiente --</option>
             <option value="86">86%</option>
             <option value="78">78%</option>
             <option value="67">67%</option>
             <option value="40">40%</option>
-            <!-- Aggiungi altri coefficienti secondo necessità -->
+            <!-- Aggiungi altri coefficienti se necessario -->
         </select>
 
-        <label for="redditoLordo">Reddito Lordo:</label>
-        <input type="number" id="redditoLordo" placeholder="Inserisci il reddito lordo" min="0" step="0">
+        <label for="redditoLordo">Reddito Lordo (€):</label>
+        <input type="number" id="redditoLordo" min="0" step="1" required>
 
-        <!-- Pulsante "Calcola" centrato -->
-        <div class="button-container">
-            <button type="button" onclick="calcola()">Calcola</button>
-        </div>
+        <button type="submit">Calcola</button>
     </form>
 
     <!-- Sezione per i risultati -->
-    <div id="risultati" style="display:none;">
+    <div class="table-container" id="risultati" style="display:none;">
         <h2>Risultati</h2>
-        <!-- Tabella centrata -->
-        <div class="table-container">
-            <table>
-                <tr>
-                    <th>Descrizione</th>
-                    <th>Importo</th>
-                </tr>
-                <tr>
-                    <td>Reddito Lordo:</td>
-                    <td id="redditoLordoOutput"></td>
-                </tr>
-                <tr>
-                    <td>Reddito Netto (anno 2024):</td>
-                    <td id="redditoNettoOutput"></td>
-                </tr>
-                <tr class="evidenziato-giallo">
-                    <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul 2024:</td>
-                    <td id="impostaSostitutivaOutput"></td>
-                </tr>
-                <tr class="evidenziato-azzurro">
-                    <td>Acconto Imposta Sostitutiva (100%) sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
-                    <td id="accontoImpostaSostitutivaOutput"></td>
-                </tr>
-                <!-- Righe per contributi INPS -->
-                <tr id="rowContributiInps" class="evidenziato-giallo">
-                    <td>Contributi INPS sul 2024:</td>
-                    <td id="contributiInpsOutput"></td>
-                </tr>
-                <tr id="rowContributiFissi" class="evidenziato-giallo" style="display: none;">
-                    <td class="indent">Contributi Fissi sul 2024:</td>
-                    <td id="contributiFissiOutput"></td>
-                </tr>
-                <tr id="rowContributiVariabili" class="evidenziato-giallo" style="display: none;">
-                    <td class="indent">Contributi Variabili sul 2024:</td>
-                    <td id="contributiVariabiliOutput"></td>
-                </tr>
-                <tr id="rowTotaleContributiInps" class="evidenziato-giallo" style="display: none;">
-                    <td><strong>Totale Contributi INPS sul 2024:</strong></td>
-                    <td id="totaleContributiInpsOutput"></td>
-                </tr>
-                <!-- Nuova riga per Contributi Fissi Ipotetici -->
-                <tr class="evidenziato-giallo">
-                    <td>Contributi Fissi (ipotetici su anno completo):</td>
-                    <td id="contributiFissiIpoteticiOutput"></td>
-                </tr>
-                <tr class="evidenziato-azzurro">
-                    <td>Acconto Contributi INPS sul 2025 <br><small>(calcolato con metodo storico)</small>:</td>
-                    <td id="accontoInpsOutput"></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Sezione delle Scadenze -->
-    <div id="scadenzaPagamenti" class="table-container" style="display:none;">
-        <h2>Scadenze dei Pagamenti</h2>
         <table>
             <tr>
-                <th>Data Scadenza</th>
-                <th>Importo Totale</th>
-                <th>Dettaglio</th>
-            </tr>
-            <!-- Righe per contributi fissi -->
-            <tr id="rowScadenzaFissa1" style="display: none;">
-                <td id="scadenzaFissa1"></td>
-                <td id="importoFissa1"></td>
-                <td id="dettaglioFissa1"></td>
-            </tr>
-            <tr id="rowScadenzaFissa2" style="display: none;">
-                <td id="scadenzaFissa2"></td>
-                <td id="importoFissa2"></td>
-                <td id="dettaglioFissa2"></td>
-            </tr>
-            <tr id="rowScadenzaFissa3" style="display: none;">
-                <td id="scadenzaFissa3"></td>
-                <td id="importoFissa3"></td>
-                <td id="dettaglioFissa3"></td>
-            </tr>
-            <tr id="rowScadenzaFissa4" style="display: none;">
-                <td id="scadenzaFissa4"></td>
-                <td id="importoFissa4"></td>
-                <td id="dettaglioFissa4"></td>
-            </tr>
-            <!-- Righe per le altre scadenze -->
-            <tr>
-                <td>30 giugno 2025</td>
-                <td id="totale30Giugno"></td>
-                <td id="dettaglio30Giugno"></td>
+                <th>Descrizione</th>
+                <th>Importo (€)</th>
             </tr>
             <tr>
-                <td>30 novembre 2025</td>
-                <td id="totale30Novembre"></td>
-                <td id="dettaglio30Novembre"></td>
+                <td>Reddito Lordo:</td>
+                <td id="redditoLordoOutput"></td>
+            </tr>
+            <tr>
+                <td>Reddito Netto (Anno <span id="annoRedditoOutput"></span>):</td>
+                <td id="redditoNettoOutput"></td>
+            </tr>
+            <tr class="highlight-yellow">
+                <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul <span id="annoRedditoOutput2"></span>:</td>
+                <td id="impostaSostitutivaOutput"></td>
+            </tr>
+            <tr class="highlight-blue">
+                <td>Acconto Imposta Sostitutiva (100%) sul <span id="annoAccontoImposta"></span>:</td>
+                <td id="accontoImpostaOutput"></td>
+            </tr>
+            <!-- Contributi INPS -->
+            <tr id="contributiInpsRow" class="highlight-yellow">
+                <td>Contributi INPS sul <span id="annoRedditoOutput3"></span>:</td>
+                <td id="contributiInpsOutput"></td>
+            </tr>
+            <tr id="contributiFissiRow" class="highlight-yellow" style="display: none;">
+                <td class="indent">Contributi Fissi sul <span id="annoRedditoOutput4"></span>:</td>
+                <td id="contributiFissiOutput"></td>
+            </tr>
+            <tr id="contributiVariabiliRow" class="highlight-yellow" style="display: none;">
+                <td class="indent">Contributi Variabili sul <span id="annoRedditoOutput5"></span>:</td>
+                <td id="contributiVariabiliOutput"></td>
+            </tr>
+            <tr id="totaleContributiInpsRow" class="highlight-yellow" style="display: none;">
+                <td><strong>Totale Contributi INPS sul <span id="annoRedditoOutput6"></span>:</strong></td>
+                <td id="totaleContributiInpsOutput"></td>
+            </tr>
+            <!-- Contributi Fissi Ipotetici -->
+            <tr class="highlight-yellow">
+                <td>Contributi Fissi (ipotetici su anno completo):</td>
+                <td id="contributiFissiIpoteticiOutput"></td>
+            </tr>
+            <tr class="highlight-blue">
+                <td>Acconto Contributi INPS sul <span id="annoAccontoInps"></span>:</td>
+                <td id="accontoInpsOutput"></td>
             </tr>
         </table>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const cassaInpsSelect = document.getElementById("cassaInps");
-        const riduzioneContainer = document.getElementById("riduzioneContainer");
-        const dataAperturaContainer = document.getElementById("dataAperturaContainer");
-        const riduzioneContributiCheckbox = document.getElementById("riduzioneContributi");
-        const dataAperturaInput = document.getElementById("dataApertura");
+    <!-- Sezione delle Scadenze -->
+    <div class="table-container" id="scadenze" style="display:none;">
+        <h2>Scadenze dei Pagamenti</h2>
+        <table>
+            <tr>
+                <th>Data Scadenza</th>
+                <th>Importo Totale (€)</th>
+                <th>Dettaglio</th>
+            </tr>
+            <tr id="scadenzaFissa1Row" style="display: none;">
+                <td id="scadenzaFissa1"></td>
+                <td id="importoFissa1"></td>
+                <td id="dettaglioFissa1"></td>
+            </tr>
+            <tr id="scadenzaFissa2Row" style="display: none;">
+                <td id="scadenzaFissa2"></td>
+                <td id="importoFissa2"></td>
+                <td id="dettaglioFissa2"></td>
+            </tr>
+            <tr id="scadenzaFissa3Row" style="display: none;">
+                <td id="scadenzaFissa3"></td>
+                <td id="importoFissa3"></td>
+                <td id="dettaglioFissa3"></td>
+            </tr>
+            <tr id="scadenzaFissa4Row" style="display: none;">
+                <td id="scadenzaFissa4"></td>
+                <td id="importoFissa4"></td>
+                <td id="dettaglioFissa4"></td>
+            </tr>
+            <!-- Scadenze Generali -->
+            <tr>
+                <td>30 giugno <span id="annoScadenzaGiugno"></span></td>
+                <td id="totaleGiugno"></td>
+                <td id="dettaglioGiugno"></td>
+            </tr>
+            <tr>
+                <td>30 novembre <span id="annoScadenzaNovembre"></span></td>
+                <td id="totaleNovembre"></td>
+                <td id="dettaglioNovembre"></td>
+            </tr>
+        </table>
+    </div>
 
-        // Funzione per mostrare/nascondere il campo Data di Apertura e la Riduzione
-        function toggleFields() {
-            const cassaInps = cassaInpsSelect.value;
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                riduzioneContainer.style.display = "block";
-                dataAperturaContainer.style.display = "block";
-            } else {
-                riduzioneContainer.style.display = "none";
-                dataAperturaContainer.style.display = "none";
-                riduzioneContributiCheckbox.checked = false;
-                dataAperturaInput.value = ""; // Reset data apertura
-            }
-        }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cassaInpsSelect = document.getElementById("cassaInps");
+            const opzioniContainer = document.getElementById("opzioniCommercianteArtigiano");
+            const form = document.getElementById("calcolatoreForm");
 
-        // Inizializza lo stato dei campi al caricamento della pagina
-        toggleFields();
-
-        // Aggiungi un event listener per la selezione della cassa INPS
-        cassaInpsSelect.addEventListener("change", toggleFields);
-
-        // Funzione di calcolo
-        window.calcola = function() {
-            // Ottieni i valori di input
-            var annoReddito = document.getElementById("annoReddito").value;
-            var redditoLordo = parseFloat(document.getElementById("redditoLordo").value);
-            var coefficienteInput = document.getElementById("coefficienteRedditivita").value;
-            var coefficiente = parseFloat(coefficienteInput) / 100;
-            var cassaInps = document.getElementById("cassaInps").value;
-            var aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
-
-            // Verifica che i valori siano numeri validi
-            if (isNaN(redditoLordo) || redditoLordo <= 0) {
-                alert("Per favore, inserisci un reddito lordo valido e maggiore di zero.");
-                return;
-            }
-
-            if (isNaN(coefficiente) || coefficiente <= 0) {
-                alert("Per favore, seleziona un coefficiente di redditività valido.");
-                return;
-            }
-
-            // Ottieni la data di apertura della partita IVA (solo per Commercianti e Artigiani)
-            var dataAperturaVal = dataAperturaInput.value;
-            var dataApertura = new Date(dataAperturaVal);
-            var annoRedditoInt = parseInt(annoReddito);
-            var meseApertura = dataApertura.getMonth() + 1; // 1-12
-
-            // Calcola il numero di mesi di attività nell'anno di riferimento
-            var mesiAttivita = 12; // Default a 12 mesi
-
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                if (dataAperturaVal) {
-                    var annoApertura = dataApertura.getFullYear();
-                    var meseApertura = dataApertura.getMonth() + 1; // 1-12
-
-                    if (annoApertura === annoRedditoInt) {
-                        mesiAttivita = 13 - meseApertura; // Se apertura a gennaio, 12 mesi; a febbraio, 11 mesi, etc.
-                        mesiAttivita = mesiAttivita < 1 ? 1 : mesiAttivita; // Almeno 1 mese
-                    }
-                    // Se l'apertura è in un anno diverso, mantenere 12 mesi
-                }
-            }
-
-            // Calcola la proporzione dei contributi fissi
-            var proporzioneContributi = mesiAttivita / 12;
-
-            // Verifica se applicare la riduzione del 35%
-            var riduzioneContributiApplicata = riduzioneContributiCheckbox.checked;
-            var aliquotaRiduzione = riduzioneContributiApplicata ? 0.65 : 1;
-
-            // Esegui i calcoli comuni
-            var redditoNetto = redditoLordo * coefficiente;
-            var impostaSostitutiva = redditoNetto * aliquotaImposta;
-            var accontoImpostaSostitutiva = impostaSostitutiva * 1.0; // 100%
-
-            // Arrotonda gli importi al numero intero più vicino
-            redditoLordo = Math.round(redditoLordo);
-            redditoNetto = Math.round(redditoNetto);
-            impostaSostitutiva = Math.round(impostaSostitutiva);
-            accontoImpostaSostitutiva = Math.round(accontoImpostaSostitutiva);
-
-            // Inizializza le variabili per i contributi INPS
-            var contributiInps = 0;
-            var accontoInps = 0;
-            var contributiFissi = 0;
-            var contributiVariabili = 0;
-            var sogliaReddito = 18415.00; // Soglia per i contributi variabili
-
-            // Calcoli specifici per la cassa INPS selezionata
-            var aliquotaContributivaPercentuale = 0;
-            var contributiFissiAnnui = 0;
-            var contributiFissiCompleti = 0; // Contributi fissi senza riduzione
-            var contributiFissiRidotti = 0; // Contributi fissi con riduzione
-
-            if (cassaInps === "gs_inps") {
-                // Gestione Separata INPS
-                aliquotaContributivaPercentuale = 26.07;
-                contributiInps = redditoNetto * (aliquotaContributivaPercentuale / 100);
-                accontoInps = contributiInps * 0.80; // 80%
-                contributiInps = Math.round(contributiInps);
-                accontoInps = Math.round(accontoInps);
-            } else if (cassaInps === "inps_commercianti") {
-                // INPS Commercianti
-                contributiFissiAnnui = 4515.43; // Contributi fissi annui
-                aliquotaContributivaPercentuale = 24.48;
-
-                // Calcola i contributi fissi completi e ridotti
-                contributiFissiCompleti = Math.round(contributiFissiAnnui);
-                contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
-
-                // Applica la proporzione dei mesi e la riduzione
-                contributiFissi = Math.round(contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione);
-
-                // Calcola i contributi variabili se il reddito netto supera la soglia
-                if (redditoNetto > sogliaReddito) {
-                    var eccedenza = redditoNetto - sogliaReddito;
-                    contributiVariabili = Math.round(eccedenza * (aliquotaContributivaPercentuale / 100));
+            // Mostra/Nascondi le opzioni aggiuntive per Commercianti e Artigiani
+            cassaInpsSelect.addEventListener("change", function() {
+                const cassa = cassaInpsSelect.value;
+                if (cassa === "inps_commercianti" || cassa === "inps_artigiani") {
+                    opzioniContainer.style.display = "block";
                 } else {
-                    contributiVariabili = 0;
+                    opzioniContainer.style.display = "none";
+                    document.getElementById("riduzioneContributi").checked = false;
+                    document.getElementById("dataApertura").value = "";
+                }
+            });
+
+            form.addEventListener("submit", function(event) {
+                event.preventDefault(); // Previene il comportamento predefinito del form
+
+                // Recupera i valori di input
+                const annoReddito = parseInt(document.getElementById("annoReddito").value);
+                const cassaInps = document.getElementById("cassaInps").value;
+                const riduzioneContributi = document.getElementById("riduzioneContributi").checked;
+                const dataApertura = document.getElementById("dataApertura").value;
+                const aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
+                const coefficienteRedditivita = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
+                const redditoLordo = parseInt(document.getElementById("redditoLordo").value);
+
+                // Validazione base
+                if (isNaN(annoReddito) || isNaN(cassaInps) || isNaN(aliquotaImposta) || isNaN(coefficienteRedditivita) || isNaN(redditoLordo)) {
+                    alert("Per favore, compila tutti i campi correttamente.");
+                    return;
                 }
 
-                // Totale contributi INPS
-                contributiInps = Math.round(contributiFissi + contributiVariabili);
+                // Calcolo del Reddito Netto
+                const redditoNetto = Math.round(redditoLordo * coefficienteRedditivita);
 
-                // Acconto INPS per il prossimo anno (80% dei contributi variabili)
-                accontoInps = Math.round(contributiVariabili * 0.80);
-            } else if (cassaInps === "inps_artigiani") {
-                // INPS Artigiani
-                contributiFissiAnnui = 4427.04; // Contributi fissi annui
-                aliquotaContributivaPercentuale = 24;
+                // Calcolo dell'Imposta Sostitutiva
+                const impostaSostitutiva = Math.round(redditoNetto * aliquotaImposta);
 
-                // Calcola i contributi fissi completi e ridotti
-                contributiFissiCompleti = Math.round(contributiFissiAnnui);
-                contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
+                // Calcolo dell'Acconto Imposta Sostitutiva
+                const accontoImposta = impostaSostitutiva;
 
-                // Applica la proporzione dei mesi e la riduzione
-                contributiFissi = Math.round(contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione);
+                // Calcolo dei Contributi INPS
+                let contributiFissi = 0;
+                let contributiVariabili = 0;
+                let contributiInps = 0;
+                let accontoInps = 0;
+                const sogliaReddito = 18415; // Soglia per i contributi variabili
 
-                // Calcola i contributi variabili se il reddito netto supera la soglia
-                if (redditoNetto > sogliaReddito) {
-                    var eccedenza = redditoNetto - sogliaReddito;
-                    contributiVariabili = Math.round(eccedenza * (aliquotaContributivaPercentuale / 100));
+                if (cassaInps === "gs_inps") {
+                    // Gestione Separata INPS
+                    const aliquotaGsInps = 26.07 / 100;
+                    contributiInps = Math.round(redditoNetto * aliquotaGsInps);
+                    accontoInps = Math.round(contributiInps * 0.80);
+                } else if (cassaInps === "inps_commercianti") {
+                    // INPS Commercianti
+                    const contributiFissiAnnui = 4515; // Arrotondato
+                    const aliquotaVariabile = 24.48 / 100;
+
+                    // Applicazione della riduzione del 35% se selezionata
+                    contributiFissi = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
+
+                    // Calcolo dei contributi variabili
+                    if (redditoNetto > sogliaReddito) {
+                        contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile);
+                    }
+
+                    contributiInps = contributiFissi + contributiVariabili;
+                    accontoInps = Math.round(contributiVariabili * 0.80);
+                } else if (cassaInps === "inps_artigiani") {
+                    // INPS Artigiani
+                    const contributiFissiAnnui = 4427; // Arrotondato
+                    const aliquotaVariabile = 24 / 100;
+
+                    // Applicazione della riduzione del 35% se selezionata
+                    contributiFissi = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
+
+                    // Calcolo dei contributi variabili
+                    if (redditoNetto > sogliaReddito) {
+                        contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile);
+                    }
+
+                    contributiInps = contributiFissi + contributiVariabili;
+                    accontoInps = Math.round(contributiVariabili * 0.80);
+                }
+
+                // Calcolo dei Contributi Fissi Ipotetici (su anno completo)
+                let contributiFissiIpotetici = 0;
+                if (cassaInps === "inps_commercianti") {
+                    contributiFissiIpotetici = riduzioneContributi ? Math.round(4515 * 0.65) : 4515;
+                } else if (cassaInps === "inps_artigiani") {
+                    contributiFissiIpotetici = riduzioneContributi ? Math.round(4427 * 0.65) : 4427;
+                }
+
+                // Popola la tabella dei risultati
+                document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT');
+                document.getElementById("annoRedditoOutput").innerText = annoReddito;
+                document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT');
+                document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100) + "%";
+                document.getElementById("annoRedditoOutput2").innerText = annoReddito;
+                document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT');
+                document.getElementById("annoAccontoImposta").innerText = annoReddito + 1;
+                document.getElementById("accontoImpostaOutput").innerText = accontoImposta.toLocaleString('it-IT');
+                document.getElementById("annoRedditoOutput3").innerText = annoReddito;
+                document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT');
+                document.getElementById("annoRedditoOutput4").innerText = annoReddito;
+                document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT');
+                document.getElementById("annoRedditoOutput5").innerText = annoReddito;
+                document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT');
+                document.getElementById("annoRedditoOutput6").innerText = annoReddito;
+                document.getElementById("totaleContributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT');
+                document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT');
+                document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
+                document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT');
+
+                // Gestione della visualizzazione delle righe
+                if (cassaInps === "gs_inps") {
+                    document.getElementById("contributiInpsRow").style.display = "table-row";
+                    document.getElementById("contributiInpsOutput").style.display = "";
+                    document.getElementById("contributiFissiRow").style.display = "none";
+                    document.getElementById("contributiVariabiliRow").style.display = "none";
+                    document.getElementById("totaleContributiInpsRow").style.display = "none";
                 } else {
-                    contributiVariabili = 0;
+                    document.getElementById("contributiInpsRow").style.display = "none";
+                    document.getElementById("contributiFissiRow").style.display = "table-row";
+                    document.getElementById("contributiFissiOutput").style.display = "";
+                    if (contributiVariabili > 0) {
+                        document.getElementById("contributiVariabiliRow").style.display = "table-row";
+                        document.getElementById("contributiVariabiliOutput").style.display = "";
+                    } else {
+                        document.getElementById("contributiVariabiliRow").style.display = "none";
+                    }
+                    document.getElementById("totaleContributiInpsRow").style.display = "table-row";
+                    document.getElementById("totaleContributiInpsOutput").style.display = "";
                 }
 
-                // Totale contributi INPS
-                contributiInps = Math.round(contributiFissi + contributiVariabili);
+                // Calcolo delle Scadenze
+                const annoScadenza = annoReddito + 1;
+                document.getElementById("annoScadenzaGiugno").innerText = annoScadenza;
+                document.getElementById("annoScadenzaNovembre").innerText = annoScadenza;
+                document.getElementById("annoRedditoOutput3").innerText = annoReddito;
+                document.getElementById("annoRedditoOutput4").innerText = annoReddito;
+                document.getElementById("annoRedditoOutput5").innerText = annoReddito;
+                document.getElementById("annoRedditoOutput6").innerText = annoReddito;
+                document.getElementById("annoAccontoInps").innerText = annoScadenza;
 
-                // Acconto INPS per il prossimo anno (80% dei contributi variabili)
-                accontoInps = Math.round(contributiVariabili * 0.80);
-            }
+                // Popolazione delle Scadenze Generali
+                let totaleGiugno = impostaSostitutiva + Math.round(accontoImposta / 2);
+                let dettaglioGiugno = `Saldo Imposta Sostitutiva (${impostaSostitutiva.toLocaleString('it-IT')}€) + Prima Rata Acconto Imposta (${Math.round(accontoImposta / 2).toLocaleString('it-IT')}€)`;
+                let totaleNovembre = Math.round(accontoImposta / 2);
+                let dettaglioNovembre = `Seconda Rata Acconto Imposta (${totaleNovembre.toLocaleString('it-IT')}€)`;
 
-            // Calcola le scadenze delle rate fisse (solo per Commercianti e Artigiani)
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
-                    }
-                }
-            }
-
-            // Calcola il totale delle rate fisse
-            var totaleRateFisse = 0;
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
+                if (cassaInps === "gs_inps") {
+                    totaleGiugno += contributiInps + Math.round(accontoInps / 2);
+                    dettaglioGiugno += ` + Contributi INPS (${contributiInps.toLocaleString('it-IT')}€) + Prima Rata Acconto INPS (${Math.round(accontoInps / 2).toLocaleString('it-IT')}€)`;
+                    totaleNovembre += Math.round(accontoInps / 2);
+                    dettaglioNovembre += ` + Seconda Rata Acconto INPS (${Math.round(accontoInps / 2).toLocaleString('it-IT')}€)`;
+                } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    if (contributiVariabili > 0) {
+                        totaleGiugno += contributiVariabili + Math.round(accontoInps / 2);
+                        dettaglioGiugno += ` + Contributi Variabili (${contributiVariabili.toLocaleString('it-IT')}€) + Prima Rata Acconto INPS (${Math.round(accontoInps / 2).toLocaleString('it-IT')}€)`;
+                        totaleNovembre += Math.round(accontoInps / 2);
+                        dettaglioNovembre += ` + Seconda Rata Acconto INPS (${Math.round(accontoInps / 2).toLocaleString('it-IT')}€)`;
                     }
                 }
 
-                // Calcola il totale delle rate fisse
-                for (var i = 0; i < rate.length; i++) {
-                    totaleRateFisse += rate[i].importo;
-                }
-            }
+                document.getElementById("totaleGiugno").innerText = totaleGiugno.toLocaleString('it-IT');
+                document.getElementById("dettaglioGiugno").innerText = dettaglioGiugno;
+                document.getElementById("totaleNovembre").innerText = totaleNovembre.toLocaleString('it-IT');
+                document.getElementById("dettaglioNovembre").innerText = dettaglioNovembre;
 
-            // Calcola il totale delle tasse e dei contributi effettivi
-            var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
+                // Visualizza le scadenze
+                document.getElementById("scadenzaFissa1Row").style.display = "none";
+                document.getElementById("scadenzaFissa2Row").style.display = "none";
+                document.getElementById("scadenzaFissa3Row").style.display = "none";
+                document.getElementById("scadenzaFissa4Row").style.display = "none";
 
-            // Calcola il totale degli acconti
-            var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
+                // Popola le scadenze delle rate fisse (semplice esempio, puoi personalizzare ulteriormente)
+                if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    const rateScadenze = [
+                        { id: "1", scadenza: "16 maggio " + annoReddito, dettaglio: "Contributi Fissi Gennaio - Marzo" },
+                        { id: "2", scadenza: "20 agosto " + annoReddito, dettaglio: "Contributi Fissi Aprile - Giugno" },
+                        { id: "3", scadenza: "16 novembre " + annoReddito, dettaglio: "Contributi Fissi Luglio - Settembre" },
+                        { id: "4", scadenza: "16 febbraio " + (annoReddito + 1), dettaglio: "Contributi Fissi Ottobre - Dicembre" }
+                    ];
 
-            // Calcola il totale complessivo da versare
-            var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
-
-            // Arrotonda i totali
-            totaleTasseContributiEffettivi = Math.round(totaleTasseContributiEffettivi);
-            totaleAcconti = Math.round(totaleAcconti);
-            totaleDaVersare = Math.round(totaleDaVersare);
-
-            // Calcola le percentuali rispetto al reddito lordo (arrotondate)
-            var percentualeTasseContributi = Math.round((totaleTasseContributiEffettivi / redditoLordo) * 100);
-            var percentualeAcconti = Math.round((totaleAcconti / redditoLordo) * 100);
-            var percentualeTotale = Math.round((totaleDaVersare / redditoLordo) * 100);
-
-            // Aggiorna i valori nella tabella
-            document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
-            document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
-            document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100) + "%";
-            document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT') + "€";
-            document.getElementById("accontoImpostaSostitutivaOutput").innerText = accontoImpostaSostitutiva.toLocaleString('it-IT') + "€";
-            document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-            document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
-
-            // Popola la nuova casella "Contributi Fissi (ipotetici su anno completo)"
-            var contributiFissiIpotetici = 0;
-            if (cassaInps === "inps_commercianti") {
-                contributiFissiIpotetici = 4515; // Importo fisso per Commercianti (arrotondato)
-            } else if (cassaInps === "inps_artigiani") {
-                contributiFissiIpotetici = 4427; // Importo fisso per Artigiani (arrotondato)
-            }
-            document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT') + "€";
-
-            // Gestisci la visualizzazione dei contributi
-            if (cassaInps === "gs_inps") {
-                // Per Gestione Separata, mostra solo il totale dei contributi INPS
-                document.getElementById("rowContributiInps").style.display = "";
-                document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-                // Nascondi le altre righe
-                document.getElementById("rowContributiFissi").style.display = "none";
-                document.getElementById("rowContributiVariabili").style.display = "none";
-                document.getElementById("rowTotaleContributiInps").style.display = "none";
-            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                // Nascondi la riga dei Contributi INPS totali
-                document.getElementById("rowContributiInps").style.display = "none";
-                // Mostra i contributi fissi
-                document.getElementById("rowContributiFissi").style.display = "";
-                document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT') + "€";
-                if (contributiVariabili > 0) {
-                    // Mostra i contributi variabili
-                    document.getElementById("rowContributiVariabili").style.display = "";
-                    document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT') + "€";
-                } else {
-                    // Nascondi la riga dei contributi variabili
-                    document.getElementById("rowContributiVariabili").style.display = "none";
-                }
-                // Mostra la riga del totale dei contributi INPS
-                document.getElementById("rowTotaleContributiInps").style.display = "";
-                document.getElementById("totaleContributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-            }
-
-            // Calcola le scadenze dei pagamenti generali
-            var annoDichiarazione = annoRedditoInt + 1;
-
-            // Date di scadenza per imposta sostitutiva
-            var scadenzaSaldoImposta = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta2 = "30 novembre " + annoDichiarazione;
-
-            // Date di scadenza per contributi INPS
-            var scadenzaSaldoContributi = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi2 = "30 novembre " + annoDichiarazione;
-
-            // Calcola le scadenze delle rate fisse (solo per Commercianti e Artigiani)
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
-                    }
-                }
-            }
-
-            // Calcola il totale delle rate fisse
-            var totaleRateFisse = 0;
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
-                    }
+                    rateScadenze.forEach(function(rate) {
+                        document.getElementById("scadenzaFissa" + rate.id).innerText = rate.scadenza;
+                        document.getElementById("importoFissa" + rate.id).innerText = contributiFissi.toLocaleString('it-IT');
+                        document.getElementById("dettaglioFissa" + rate.id).innerText = rate.dettaglio;
+                        document.getElementById("scadenzaFissa" + rate.id + "Row").style.display = "table-row";
+                    });
                 }
 
-                // Calcola il totale delle rate fisse
-                for (var i = 0; i < rate.length; i++) {
-                    totaleRateFisse += rate[i].importo;
-                }
-            }
-
-            // Calcola il totale delle tasse e dei contributi effettivi
-            var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
-
-            // Calcola il totale degli acconti
-            var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
-
-            // Calcola il totale complessivo da versare
-            var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
-
-            // Arrotonda i totali
-            totaleTasseContributiEffettivi = Math.round(totaleTasseContributiEffettivi);
-            totaleAcconti = Math.round(totaleAcconti);
-            totaleDaVersare = Math.round(totaleDaVersare);
-
-            // Calcola le percentuali rispetto al reddito lordo (arrotondate)
-            var percentualeTasseContributi = Math.round((totaleTasseContributiEffettivi / redditoLordo) * 100);
-            var percentualeAcconti = Math.round((totaleAcconti / redditoLordo) * 100);
-            var percentualeTotale = Math.round((totaleDaVersare / redditoLordo) * 100);
-
-            // Aggiorna i valori nella tabella
-            document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
-            document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
-            document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100) + "%";
-            document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT') + "€";
-            document.getElementById("accontoImpostaSostitutivaOutput").innerText = accontoImpostaSostitutiva.toLocaleString('it-IT') + "€";
-            document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-            document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
-
-            // Popola la nuova casella "Contributi Fissi (ipotetici su anno completo)"
-            var contributiFissiIpotetici = 0;
-            if (cassaInps === "inps_commercianti") {
-                contributiFissiIpotetici = 4515; // Importo fisso per Commercianti (arrotondato)
-            } else if (cassaInps === "inps_artigiani") {
-                contributiFissiIpotetici = 4427; // Importo fisso per Artigiani (arrotondato)
-            }
-            document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT') + "€";
-
-            // Gestisci la visualizzazione dei contributi
-            if (cassaInps === "gs_inps") {
-                // Per Gestione Separata, mostra solo il totale dei contributi INPS
-                document.getElementById("rowContributiInps").style.display = "";
-                document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-                // Nascondi le altre righe
-                document.getElementById("rowContributiFissi").style.display = "none";
-                document.getElementById("rowContributiVariabili").style.display = "none";
-                document.getElementById("rowTotaleContributiInps").style.display = "none";
-            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                // Nascondi la riga dei Contributi INPS totali
-                document.getElementById("rowContributiInps").style.display = "none";
-                // Mostra i contributi fissi
-                document.getElementById("rowContributiFissi").style.display = "";
-                document.getElementById("contributiFissiOutput").innerText = contributiFissi.toLocaleString('it-IT') + "€";
-                if (contributiVariabili > 0) {
-                    // Mostra i contributi variabili
-                    document.getElementById("rowContributiVariabili").style.display = "";
-                    document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT') + "€";
-                } else {
-                    // Nascondi la riga dei contributi variabili
-                    document.getElementById("rowContributiVariabili").style.display = "none";
-                }
-                // Mostra la riga del totale dei contributi INPS
-                document.getElementById("rowTotaleContributiInps").style.display = "";
-                document.getElementById("totaleContributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-            }
-
-            // Calcola le scadenze dei pagamenti generali
-            var annoDichiarazione = annoRedditoInt + 1;
-
-            // Date di scadenza per imposta sostitutiva
-            var scadenzaSaldoImposta = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta2 = "30 novembre " + annoDichiarazione;
-
-            // Date di scadenza per contributi INPS
-            var scadenzaSaldoContributi = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi2 = "30 novembre " + annoDichiarazione;
-
-            // Calcola le scadenze delle rate fisse (solo per Commercianti e Artigiani)
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
-                    }
-                }
-            }
-
-            // Calcola il totale delle rate fisse
-            var totaleRateFisse = 0;
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
-                    }
-                }
-
-                // Calcola il totale delle rate fisse
-                for (var i = 0; i < rate.length; i++) {
-                    totaleRateFisse += rate[i].importo;
-                }
-            }
-
-            // Calcola il totale delle tasse e dei contributi effettivi
-            var totaleTasseContributiEffettivi = impostaSostitutiva + contributiInps;
-
-            // Calcola il totale degli acconti
-            var totaleAcconti = accontoImpostaSostitutiva + accontoInps;
-
-            // Calcola il totale complessivo da versare
-            var totaleDaVersare = totaleTasseContributiEffettivi + totaleAcconti;
-
-            // Arrotonda i totali
-            totaleTasseContributiEffettivi = Math.round(totaleTasseContributiEffettivi);
-            totaleAcconti = Math.round(totaleAcconti);
-            totaleDaVersare = Math.round(totaleDaVersare);
-
-            // Calcola le percentuali rispetto al reddito lordo (arrotondate)
-            var percentualeTasseContributi = Math.round((totaleTasseContributiEffettivi / redditoLordo) * 100);
-            var percentualeAcconti = Math.round((totaleAcconti / redditoLordo) * 100);
-            var percentualeTotale = Math.round((totaleDaVersare / redditoLordo) * 100);
-
-            // Aggiorna i valori nella tabella
-            document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
-            document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
-            document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100) + "%";
-            document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT') + "€";
-            document.getElementById("accontoImpostaSostitutivaOutput").innerText = accontoImpostaSostitutiva.toLocaleString('it-IT') + "€";
-            document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-            document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
-
-            // Popola la nuova casella "Contributi Fissi (ipotetici su anno completo)"
-            var contributiFissiIpotetici = 0;
-            if (cassaInps === "inps_commercianti") {
-                contributiFissiIpotetici = 4515; // Importo fisso per Commercianti (arrotondato)
-            } else if (cassaInps === "inps_artigiani") {
-                contributiFissiIpotetici = 4427; // Importo fisso per Artigiani (arrotondato)
-            }
-            document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT') + "€";
-
-            // Calcola le scadenze dei pagamenti generali
-            var annoDichiarazione = annoRedditoInt + 1;
-
-            // Date di scadenza per imposta sostitutiva
-            var scadenzaSaldoImposta = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoImposta2 = "30 novembre " + annoDichiarazione;
-
-            // Date di scadenza per contributi INPS
-            var scadenzaSaldoContributi = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi1 = "30 giugno " + annoDichiarazione;
-            var scadenzaAccontoContributi2 = "30 novembre " + annoDichiarazione;
-
-            // Calcola le scadenze delle rate fisse (solo per Commercianti e Artigiani)
-            if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                var rate = [
-                    {
-                        scadenza: "16 maggio " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 0, 1), fine: new Date(annoReddito, 2, 31) }, // Gennaio - Marzo
-                        importo: 0,
-                        dettagli: "Contributi fissi da Gennaio a Marzo"
-                    },
-                    {
-                        scadenza: "20 agosto " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 3, 1), fine: new Date(annoReddito, 5, 30) }, // Aprile - Giugno
-                        importo: 0,
-                        dettagli: "Contributi fissi da Aprile a Giugno"
-                    },
-                    {
-                        scadenza: "16 novembre " + annoReddito,
-                        copertura: { inizio: new Date(annoReddito, 6, 1), fine: new Date(annoReddito, 8, 30) }, // Luglio - Settembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Luglio a Settembre"
-                    },
-                    {
-                        scadenza: "16 febbraio " + (annoRedditoInt + 1),
-                        copertura: { inizio: new Date(annoReddito, 9, 1), fine: new Date(annoReddito, 11, 31) }, // Ottobre - Dicembre
-                        importo: 0,
-                        dettagli: "Contributi fissi da Ottobre a Dicembre"
-                    }
-                ];
-
-                for (var i = 0; i < rate.length; i++) {
-                    var periodo = rate[i].copertura;
-                    var apertura = new Date(dataAperturaVal);
-                    var inizio = periodo.inizio;
-                    var fine = periodo.fine;
-
-                    // Se apertura dopo il periodo di copertura, skip rate
-                    if (dataAperturaVal && apertura > fine) {
-                        rate[i].importo = 0;
-                    }
-                    // Se apertura durante il periodo di copertura, proporziona la rata
-                    else if (dataAperturaVal && apertura >= inizio && apertura <= fine) {
-                        var giorniTotali = (fine - inizio) / (1000 * 60 * 60 * 24) + 1;
-                        var giorniAttivi = (fine - apertura) / (1000 * 60 * 60 * 24) + 1;
-                        giorniAttivi = giorniAttivi < 0 ? 0 : giorniAttivi;
-                        var proporzione = giorniAttivi / giorniTotali;
-                        var importoProporzionato = (contributiFissiAnnui / 4) * aliquotaRiduzione * proporzione;
-                        rate[i].importo = Math.round(importoProporzionato);
-                    }
-                    // Se apertura prima del periodo di copertura, paga rata intera
-                    else {
-                        rate[i].importo = Math.round((contributiFissiAnnui / 4) * aliquotaRiduzione);
-                    }
-                }
-
-                // Calcola il totale delle rate fisse
-                for (var i = 0; i < rate.length; i++) {
-                    totaleRateFisse += rate[i].importo;
-                }
-            }
-
-            // Calcola le scadenze generali
-            var totale30Giugno = impostaSostitutiva + Math.round(accontoImpostaSostitutiva / 2);
-            var totale30Novembre = Math.round(accontoImpostaSostitutiva / 2);
-            var dettaglio30Giugno = "Saldo imposta sostitutiva (" + impostaSostitutiva.toLocaleString('it-IT') + "€) + Prima rata acconto imposta (" + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + "€)";
-            var dettaglio30Novembre = "Seconda rata acconto imposta (" + Math.round(accontoImpostaSostitutiva / 2).toLocaleString('it-IT') + "€)";
-
-            if (cassaInps === "gs_inps") {
-                // Aggiorna i totali per Gestione Separata
-                totale30Giugno += contributiInps + Math.round(accontoInps / 2);
-                totale30Novembre += Math.round(accontoInps / 2);
-                dettaglio30Giugno += " + Saldo contributi INPS (" + contributiInps.toLocaleString('it-IT') + "€) + Prima rata acconto contributi INPS (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€)";
-                dettaglio30Novembre += " + Seconda rata acconto contributi INPS (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€)";
-            } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-                // Aggiorna i totali per contributi variabili
-                if (contributiVariabili > 0) {
-                    totale30Giugno += contributiVariabili + Math.round(accontoInps / 2);
-                    totale30Novembre += Math.round(accontoInps / 2);
-                    dettaglio30Giugno += " + Saldo contributi variabili (" + contributiVariabili.toLocaleString('it-IT') + "€) + Prima rata acconto contributi variabili (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€)";
-                    dettaglio30Novembre += " + Seconda rata acconto contributi variabili (" + Math.round(accontoInps / 2).toLocaleString('it-IT') + "€)";
-                }
-            }
-
-            // Aggiorna la tabella delle scadenze generali
-            document.getElementById("totale30Giugno").innerText = totale30Giugno.toLocaleString('it-IT') + "€";
-            document.getElementById("dettaglio30Giugno").innerText = dettaglio30Giugno;
-            document.getElementById("totale30Novembre").innerText = totale30Novembre.toLocaleString('it-IT') + "€";
-            document.getElementById("dettaglio30Novembre").innerText = dettaglio30Novembre;
-
-            // Visualizza la sezione delle scadenze
-            document.getElementById("scadenzaPagamenti").style.display = "block";
-
-            // Visualizza la sezione dei risultati
-            document.getElementById("risultati").style.display = "block";
-        }
-
-        // Funzione per formattare la data in "3 Novembre 2024"
-        function formattaData(data) {
-            if (!data || isNaN(data.getTime())) return "Data non valida";
-            var giorno = data.getDate();
-            var mese = data.toLocaleString('it-IT', { month: 'long' });
-            var anno = data.getFullYear();
-            return giorno + " " + capitalizeFirstLetter(mese) + " " + anno;
-        }
-
-        // Funzione per capitalizzare la prima lettera
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
+                // Mostra le sezioni dei risultati e delle scadenze
+                document.getElementById("risultati").style.display = "block";
+                document.getElementById("scadenze").style.display = "block";
+            });
+        });
     </script>
 
 </body>
 </html>
-
