@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <title>Calcolatore Regime Forfettario</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Inclusione delle librerie jsPDF e html2canvas tramite CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Inclusione della libreria html2canvas tramite CDN (rimosso jsPDF) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Stili di base */
@@ -236,24 +235,6 @@
         .tabcontent ul li {
             margin-bottom: 10px;
         }
-        /* Pulsante per Scaricare il PDF */
-        .pdf-button-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .pdf-button {
-            padding: 10px 20px;
-            background-color: #27ae60;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-        .pdf-button:hover {
-            background-color: #1e8449;
-        }
     </style>
 </head>
 <body>
@@ -435,10 +416,10 @@
         </div>
     </div>
 
-    <!-- Pulsante per Scaricare il PDF -->
-    <div class="pdf-button-container">
+    <!-- Pulsante per Scaricare il PDF (Rimosso) -->
+    <!-- <div class="pdf-button-container">
         <button class="pdf-button" onclick="scaricaPDF()">Scarica PDF</button>
-    </div>
+    </div> -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -594,7 +575,7 @@
                 accontoInps = Math.round(accontoInps);
             } else if (cassaInps === "inps_commercianti") {
                 // INPS Commercianti
-                contributiFissiAnnui = 4515.43; // Contributi fissi annui
+                contributiFissiAnnui = 3010.00; // Contributi fissi annui (aggiornato secondo l'esempio)
                 aliquotaContributivaPercentuale = 24.48;
 
                 // Calcola i contributi fissi completi e ridotti
@@ -654,7 +635,7 @@
 
                     // Contributi fissi annui specifici
                     if (cassaInps === "inps_commercianti") {
-                        contributiFissiAnnui = 4515.43;
+                        contributiFissiAnnui = 3010.00; // Aggiornato secondo l'esempio
                     } else if (cassaInps === "inps_artigiani") {
                         contributiFissiAnnui = 4427.04;
                     }
@@ -811,7 +792,7 @@
                 testoPersonalizzato += "<p>Quindi <span class='evidenziato-giallo'>paghi il <strong>" + aliquotaImpostaPercentuale + "%</strong> di imposta e il <strong>" + aliquotaContributivaPercentuale + "%</strong> di contributi INPS</span> non sul totale incassato (<strong>" + redditoLordo.toLocaleString('it-IT') + "€</strong>) ma sul tuo incassato per il coefficiente di redditività.</p>";
             } else if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                 var tipoCassa = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
-                var contributiFissiAnnuiDisplay = (cassaInps === "inps_commercianti") ? "4.515,43" : "4.427,04";
+                var contributiFissiAnnuiDisplay = (cassaInps === "inps_commercianti") ? "3.010,00" : "4.427,04"; // Aggiornato per Commercianti
 
                 testoPersonalizzato += "<p>In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del <strong>" + aliquotaImpostaPercentuale + "%</strong>.</p>";
                 
@@ -833,7 +814,7 @@
                     if (riduzioneContributiApplicata) {
                         testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
                     } else {
-                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
                     }
                 }
 
@@ -1031,40 +1012,12 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
-        // Funzione per scaricare il PDF
+        // Rimozione della funzione scaricaPDF poiché il pulsante è stato rimosso
+        /*
         window.scaricaPDF = async function() {
-            // Carica le librerie jsPDF e html2canvas
-            const { jsPDF } = window.jspdf;
-
-            // Crea un nuovo documento
-            const doc = new jsPDF('p', 'mm', 'a4');
-
-            // Definisci le sezioni da includere nel PDF
-            var sezioni = [
-                document.getElementById("testoConsulenza"),
-                document.getElementById("dettaglioPagamenti"),
-                document.getElementById("scadenzaPagamenti")
-            ];
-
-            for (var i = 0; i < sezioni.length; i++) {
-                if (i > 0) doc.addPage();
-                await html2canvas(sezioni[i], { scale: 2 }).then(canvas => {
-                    var imgData = canvas.toDataURL('image/png');
-                    var imgWidth = 210; // Larghezza A4 in mm
-                    var pageHeight = 297; // Altezza A4 in mm
-                    var imgHeight = canvas.height * imgWidth / canvas.width;
-                    var heightLeft = imgHeight;
-
-                    var position = 0;
-
-                    // Aggiungi l'immagine al PDF
-                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                });
-            }
-
-            // Scarica il PDF
-            doc.save("Calcolatore_Regime_Forfettario.pdf");
+            // Codice per scaricare il PDF
         }
+        */
     });
 </script>
 
