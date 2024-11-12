@@ -582,7 +582,8 @@
             // Calcoli specifici per la cassa INPS selezionata
             var aliquotaContributivaPercentuale = 0;
             var contributiFissiAnnui = 0;
-            var contributiFissiAnnuiDisplay = "";
+            var contributiFissiCompleti = 0; // Contributi fissi senza riduzione
+            var contributiFissiRidotti = 0; // Contributi fissi con riduzione
 
             if (cassaInps === "gs_inps") {
                 // Gestione Separata INPS
@@ -595,6 +596,10 @@
                 // INPS Commercianti
                 contributiFissiAnnui = 4515.43; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24.48;
+
+                // Calcola i contributi fissi completi e ridotti
+                contributiFissiCompleti = Math.round(contributiFissiAnnui);
+                contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
 
                 // Applica la proporzione dei mesi e la riduzione
                 contributiFissi = contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione;
@@ -618,6 +623,10 @@
                 // INPS Artigiani
                 contributiFissiAnnui = 4427.04; // Contributi fissi annui
                 aliquotaContributivaPercentuale = 24;
+
+                // Calcola i contributi fissi completi e ridotti
+                contributiFissiCompleti = Math.round(contributiFissiAnnui);
+                contributiFissiRidotti = Math.round(contributiFissiAnnui * 0.65); // 35% riduzione
 
                 // Applica la proporzione dei mesi e la riduzione
                 contributiFissi = contributiFissiAnnui * proporzioneContributi * aliquotaRiduzione;
@@ -813,20 +822,20 @@
                 if (dataAperturaVal) {
                     testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno, che sono riproporzionati in base alla tua data di apertura -> <strong>" + formattaData(dataApertura) + "</strong>" + (riduzioneContributiApplicata ? " e in base alla riduzione del 35% che hai richiesto." : ".") + "</p>";
                 } else {
-                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
+                    testoPersonalizzato += "<p>Paghi inoltre i contributi fissi INPS " + tipoCassa + " di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong> all'anno.</p>";
                 }
 
                 if (!dataAperturaVal) {
                     if (riduzioneContributiApplicata) {
-                        testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
+                        testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissiRidotti.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
                     } else {
-                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + Math.round(contributiFissiAnnuiDisplay) + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissiCompleti.toLocaleString('it-IT') + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
                     }
                 } else {
                     if (riduzioneContributiApplicata) {
                         testoPersonalizzato += "<p>Nel tuo caso, avendo richiesto la riduzione del 35%, pagherai dei contributi fissi per un anno -> <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, che andranno a coprire 8 mesi di contributi invece di 12 mesi.</p>";
                     } else {
-                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + Math.round(contributiFissiAnnuiDisplay) + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
+                        testoPersonalizzato += "<p>Normalmente invece per un anno completo i contributi fissi sono di <strong>" + contributiFissi.toLocaleString('it-IT') + "€</strong>, con una copertura di 8 mesi di contributi per la pensione invece di 12 mesi.</p>";
                     }
                 }
 
