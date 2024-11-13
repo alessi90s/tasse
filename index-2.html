@@ -191,6 +191,7 @@
                 <td id="accontoInpsOutput"></td>
             </tr>
         </table>
+        <button id="downloadRecap">Scarica Recap</button>
     </div>
 
     <!-- Sezione delle Scadenze -->
@@ -241,6 +242,7 @@
             const cassaInpsSelect = document.getElementById("cassaInps");
             const opzioniContainer = document.getElementById("opzioniCommercianteArtigiano");
             const form = document.getElementById("calcolatoreForm");
+            const downloadButton = document.getElementById("downloadRecap");
 
             // Mostra/Nascondi le opzioni aggiuntive per Commercianti e Artigiani
             cassaInpsSelect.addEventListener("change", function() {
@@ -408,22 +410,18 @@
                 // Gestione della visualizzazione delle righe
                 if (cassaInps === "gs_inps") {
                     document.getElementById("contributiInpsRow").style.display = "table-row";
-                    document.getElementById("contributiInpsOutput").style.display = "";
                     document.getElementById("contributiFissiRow").style.display = "none";
                     document.getElementById("contributiVariabiliRow").style.display = "none";
                     document.getElementById("totaleContributiInpsRow").style.display = "none";
                 } else {
                     document.getElementById("contributiInpsRow").style.display = "none";
                     document.getElementById("contributiFissiRow").style.display = "table-row";
-                    document.getElementById("contributiFissiOutput").style.display = "";
                     if (contributiVariabili > 0) {
                         document.getElementById("contributiVariabiliRow").style.display = "table-row";
-                        document.getElementById("contributiVariabiliOutput").style.display = "";
                     } else {
                         document.getElementById("contributiVariabiliRow").style.display = "none";
                     }
                     document.getElementById("totaleContributiInpsRow").style.display = "table-row";
-                    document.getElementById("totaleContributiInpsOutput").style.display = "";
                 }
 
                 // Calcolo delle Scadenze
@@ -474,6 +472,76 @@
                 // Mostra le sezioni dei risultati e delle scadenze
                 document.getElementById("risultati").style.display = "block";
                 document.getElementById("scadenze").style.display = "block";
+            });
+
+            // Funzione per scaricare il recap in un file TXT
+            downloadButton.addEventListener("click", function() {
+                const annoReddito = document.getElementById("annoReddito").value;
+                const cassaInps = document.getElementById("cassaInps").value;
+                const riduzioneContributi = document.getElementById("riduzioneContributi").checked ? "Sì" : "No";
+                const dataApertura = document.getElementById("dataApertura").value || "N/A";
+                const aliquotaImposta = document.getElementById("aliquotaImpostaOutput").innerText;
+                const redditoLordo = document.getElementById("redditoLordoOutput").innerText;
+                const redditoNetto = document.getElementById("redditoNettoOutput").innerText;
+                const impostaSostitutiva = document.getElementById("impostaSostitutivaOutput").innerText;
+                const accontoImposta = document.getElementById("accontoImpostaOutput").innerText;
+                const contributiInps = document.getElementById("contributiInpsOutput").innerText;
+                const contributiFissi = document.getElementById("contributiFissiOutput").innerText;
+                const contributiVariabili = document.getElementById("contributiVariabiliOutput").innerText;
+                const totaleContributiInps = document.getElementById("totaleContributiInpsOutput").innerText;
+                const contributiFissiIpotetici = document.getElementById("contributiFissiIpoteticiOutput").innerText;
+                const accontoInps = document.getElementById("accontoInpsOutput").innerText;
+                const scadenze = [];
+
+                // Raccogli le scadenze
+                const scadenzeRows = document.querySelectorAll("#scadenze table tr");
+                scadenzeRows.forEach(row => {
+                    const date = row.querySelector("td:nth-child(1)").innerText;
+                    const amount = row.querySelector("td:nth-child(2)").innerText;
+                    const detail = row.querySelector("td:nth-child(3)").innerText;
+                    if (date && amount && detail) {
+                        scadenze.push(`- ${date}: ${amount}€ (${detail})`);
+                    }
+                });
+
+                // Compila il contenuto del file
+                const content = `
+Recap Calcolatore Regime Forfettario
+
+Dati Inseriti:
+- Anno di Riferimento del Reddito: ${annoReddito}
+- Cassa INPS: ${cassaInps === "gs_inps" ? "Gestione Separata INPS" : (cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani")}
+- Applica riduzione del 35% sui contributi INPS: ${riduzioneContributi}
+- Data di Apertura della Partita IVA: ${dataApertura}
+- Aliquota Imposta Sostitutiva: ${aliquotaImposta}
+- Reddito Lordo: ${redditoLordo}€
+
+Risultati:
+- Reddito Netto (Anno ${annoReddito}): ${redditoNetto}€
+- Imposta Sostitutiva (${aliquotaImposta}) sul ${annoReddito}: ${impostaSostitutiva}€
+- Acconto Imposta Sostitutiva (100%) sul ${parseInt(annoReddito) + 1}: ${accontoImposta}€
+- Contributi INPS sul ${annoReddito}: ${contributiInps}€
+    - Contributi Fissi sul ${annoReddito}: ${contributiFissi}€
+    - Contributi Variabili sul ${annoReddito}: ${contributiVariabili}€
+    - Totale Contributi INPS sul ${annoReddito}: ${totaleContributiInps}€
+- Contributi Fissi (ipotetici su anno completo): ${contributiFissiIpotetici}€
+- Acconto Contributi INPS sul ${parseInt(annoReddito) + 1}: ${accontoInps}€
+
+Scadenze dei Pagamenti:
+${scadenze.join('\n')}
+`;
+
+                // Crea un blob con il contenuto
+                const blob = new Blob([content], { type: 'text/plain' });
+
+                // Crea un link per il download
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Recap_Regime_Forfettario_${annoReddito}.txt`;
+                link.click();
+
+                // Libera l'URL
+                URL.revokeObjectURL(link.href);
             });
         });
     </script>
