@@ -263,8 +263,15 @@
                 const coefficienteRedditivita = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
                 const redditoLordo = parseInt(document.getElementById("redditoLordo").value);
 
-                // Validazione base
-                if (isNaN(annoReddito) || isNaN(cassaInps) || isNaN(aliquotaImposta) || isNaN(coefficienteRedditivita) || isNaN(redditoLordo)) {
+                // Validazione corretta
+                if (
+                    isNaN(annoReddito) ||
+                    cassaInps === "" ||
+                    isNaN(aliquotaImposta) ||
+                    isNaN(coefficienteRedditivita) ||
+                    isNaN(redditoLordo) ||
+                    redditoLordo <= 0
+                ) {
                     alert("Per favore, compila tutti i campi correttamente.");
                     return;
                 }
@@ -376,11 +383,6 @@
                 const annoScadenza = annoReddito + 1;
                 document.getElementById("annoScadenzaGiugno").innerText = annoScadenza;
                 document.getElementById("annoScadenzaNovembre").innerText = annoScadenza;
-                document.getElementById("annoRedditoOutput3").innerText = annoReddito;
-                document.getElementById("annoRedditoOutput4").innerText = annoReddito;
-                document.getElementById("annoRedditoOutput5").innerText = annoReddito;
-                document.getElementById("annoRedditoOutput6").innerText = annoReddito;
-                document.getElementById("annoAccontoInps").innerText = annoScadenza;
 
                 // Popolazione delle Scadenze Generali
                 let totaleGiugno = impostaSostitutiva + Math.round(accontoImposta / 2);
@@ -407,24 +409,26 @@
                 document.getElementById("totaleNovembre").innerText = totaleNovembre.toLocaleString('it-IT');
                 document.getElementById("dettaglioNovembre").innerText = dettaglioNovembre;
 
-                // Visualizza le scadenze
+                // Mostra le scadenze delle rate fisse (solo per Commercianti e Artigiani)
                 document.getElementById("scadenzaFissa1Row").style.display = "none";
                 document.getElementById("scadenzaFissa2Row").style.display = "none";
                 document.getElementById("scadenzaFissa3Row").style.display = "none";
                 document.getElementById("scadenzaFissa4Row").style.display = "none";
 
-                // Popola le scadenze delle rate fisse (semplice esempio, puoi personalizzare ulteriormente)
                 if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    const contributiFissiAnnui = cassaInps === "inps_commercianti" ? 4515 : 4427;
+                    const contributiFissiTotali = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
+
                     const rateScadenze = [
                         { id: "1", scadenza: "16 maggio " + annoReddito, dettaglio: "Contributi Fissi Gennaio - Marzo" },
                         { id: "2", scadenza: "20 agosto " + annoReddito, dettaglio: "Contributi Fissi Aprile - Giugno" },
                         { id: "3", scadenza: "16 novembre " + annoReddito, dettaglio: "Contributi Fissi Luglio - Settembre" },
-                        { id: "4", scadenza: "16 febbraio " + (annoReddito + 1), dettaglio: "Contributi Fissi Ottobre - Dicembre" }
+                        { id: "4", scadenza: "16 febbraio " + annoScadenza, dettaglio: "Contributi Fissi Ottobre - Dicembre" }
                     ];
 
                     rateScadenze.forEach(function(rate) {
                         document.getElementById("scadenzaFissa" + rate.id).innerText = rate.scadenza;
-                        document.getElementById("importoFissa" + rate.id).innerText = contributiFissi.toLocaleString('it-IT');
+                        document.getElementById("importoFissa" + rate.id).innerText = contributiFissiTotali.toLocaleString('it-IT');
                         document.getElementById("dettaglioFissa" + rate.id).innerText = rate.dettaglio;
                         document.getElementById("scadenzaFissa" + rate.id + "Row").style.display = "table-row";
                     });
