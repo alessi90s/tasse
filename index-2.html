@@ -158,7 +158,7 @@
 
     <nav>
         <a href="#come-si-calcolano">Come si calcolano</a>
-        <a href="#dettaglio-pagamenti">Dettaglio Pagamenti</a>
+        <a href="#dettaglio-calcoli">Dettaglio dei Calcoli</a>
         <a href="#scadenza-pagamenti">Scadenza Pagamenti</a>
     </nav>
 
@@ -234,6 +234,57 @@
             </form>
         </section>
 
+        <!-- Sezione Dettaglio Calcoli -->
+        <section id="dettaglio-calcoli">
+            <h2>Dettaglio dei Calcoli</h2>
+            <p id="dettaglioCalcoli"></p>
+        </section>
+
+        <!-- Sezione Scadenza Pagamenti -->
+        <section id="scadenza-pagamenti">
+            <h2>Scadenza Pagamenti</h2>
+            <div class="table-container" id="scadenze" style="display:none;">
+                <table>
+                    <tr>
+                        <th>Data Scadenza</th>
+                        <th>Importo Totale (€)</th>
+                        <th>Dettaglio</th>
+                    </tr>
+                    <tr id="scadenzaFissa1Row" style="display: none;">
+                        <td id="scadenzaFissa1"></td>
+                        <td id="importoFissa1"></td>
+                        <td id="dettaglioFissa1"></td>
+                    </tr>
+                    <tr id="scadenzaFissa2Row" style="display: none;">
+                        <td id="scadenzaFissa2"></td>
+                        <td id="importoFissa2"></td>
+                        <td id="dettaglioFissa2"></td>
+                    </tr>
+                    <tr id="scadenzaFissa3Row" style="display: none;">
+                        <td id="scadenzaFissa3"></td>
+                        <td id="importoFissa3"></td>
+                        <td id="dettaglioFissa3"></td>
+                    </tr>
+                    <tr id="scadenzaFissa4Row" style="display: none;">
+                        <td id="scadenzaFissa4"></td>
+                        <td id="importoFissa4"></td>
+                        <td id="dettaglioFissa4"></td>
+                    </tr>
+                    <!-- Scadenze Generali -->
+                    <tr>
+                        <td>30 giugno <span id="annoScadenzaGiugno"></span></td>
+                        <td id="totaleGiugno"></td>
+                        <td id="dettaglioGiugno"></td>
+                    </tr>
+                    <tr>
+                        <td>30 novembre <span id="annoScadenzaNovembre"></span></td>
+                        <td id="totaleNovembre"></td>
+                        <td id="dettaglioNovembre"></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
         <!-- Sezione Dettaglio Pagamenti -->
         <section id="dettaglio-pagamenti">
             <h2>Dettaglio Pagamenti</h2>
@@ -290,51 +341,6 @@
             </div>
         </section>
 
-        <!-- Sezione Scadenza Pagamenti -->
-        <section id="scadenza-pagamenti">
-            <h2>Scadenza Pagamenti</h2>
-            <div class="table-container" id="scadenze" style="display:none;">
-                <table>
-                    <tr>
-                        <th>Data Scadenza</th>
-                        <th>Importo Totale (€)</th>
-                        <th>Dettaglio</th>
-                    </tr>
-                    <tr id="scadenzaFissa1Row" style="display: none;">
-                        <td id="scadenzaFissa1"></td>
-                        <td id="importoFissa1"></td>
-                        <td id="dettaglioFissa1"></td>
-                    </tr>
-                    <tr id="scadenzaFissa2Row" style="display: none;">
-                        <td id="scadenzaFissa2"></td>
-                        <td id="importoFissa2"></td>
-                        <td id="dettaglioFissa2"></td>
-                    </tr>
-                    <tr id="scadenzaFissa3Row" style="display: none;">
-                        <td id="scadenzaFissa3"></td>
-                        <td id="importoFissa3"></td>
-                        <td id="dettaglioFissa3"></td>
-                    </tr>
-                    <tr id="scadenzaFissa4Row" style="display: none;">
-                        <td id="scadenzaFissa4"></td>
-                        <td id="importoFissa4"></td>
-                        <td id="dettaglioFissa4"></td>
-                    </tr>
-                    <!-- Scadenze Generali -->
-                    <tr>
-                        <td>30 giugno <span id="annoScadenzaGiugno"></span></td>
-                        <td id="totaleGiugno"></td>
-                        <td id="dettaglioGiugno"></td>
-                    </tr>
-                    <tr>
-                        <td>30 novembre <span id="annoScadenzaNovembre"></span></td>
-                        <td id="totaleNovembre"></td>
-                        <td id="dettaglioNovembre"></td>
-                    </tr>
-                </table>
-            </div>
-        </section>
-
     </div>
 
     <script>
@@ -344,6 +350,7 @@
             const form = document.getElementById("calcolatoreForm");
             const downloadButton = document.getElementById("downloadRecap");
             const redditoLordoButtons = document.querySelectorAll('.reddito-buttons button');
+            const dettaglioCalcoli = document.getElementById("dettaglioCalcoli");
 
             // Impostazioni Predefinite
             document.getElementById("annoReddito").value = "2024";
@@ -588,6 +595,27 @@
                     });
                 }
 
+                // Popola la sezione "Dettaglio dei Calcoli"
+                let dettaglioTesto = "";
+                if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(2)}%.<br><br>`;
+                    dettaglioTesto += `Paghi inoltre i contributi fissi INPS ${cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani"} di ${contributiFissiSulAnno.toLocaleString('it-IT')}€ per quest'anno.<br><br>`;
+                    dettaglioTesto += `Normalmente invece per un anno completo i contributi fissi sono di ${contributiFissiIpotetici.toLocaleString('it-IT')}€.<br><br>`;
+                    if (contributiVariabili > 0) {
+                        const aliquotaVariabile = cassaInps === "inps_commercianti" ? "24.48%" : "24%";
+                        dettaglioTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabile} sull'eccedenza di ${redditoNetto - sogliaReddito}€.`;
+                    } else {
+                        dettaglioTesto += `Il tuo reddito netto non supera la soglia di 18.415€, quindi non paghi contributi variabili.`;
+                    }
+                } else if (cassaInps === "gs_inps") {
+                    dettaglioTesto += `Quindi paghi il ${(aliquotaImposta * 100).toFixed(2)}% di imposta e il ${(26.07).toFixed(2)}% di contributi INPS sulla parte del tuo incassato (${redditoNetto.toLocaleString('it-IT')}€) corrispondente al coefficiente di redditività.`;
+                }
+
+                dettaglioCalcoli.innerHTML = dettaglioTesto;
+
+                // Popola la sezione "Dettaglio dei Calcoli"
+                document.getElementById("dettaglio-pagamenti").style.display = "block";
+
                 // Mostra le sezioni dei risultati e delle scadenze
                 document.getElementById("risultati").style.display = "block";
                 document.getElementById("scadenze").style.display = "block";
@@ -666,7 +694,8 @@ ${scadenze.join('\n')}
                 // Libera l'URL
                 URL.revokeObjectURL(link.href);
             });
-        </script>
+        });
+    </script>
 
 </body>
 </html>
