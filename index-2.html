@@ -718,7 +718,8 @@
                     dettaglioTesto += `<p><strong>Nota bene:</strong></p>`;
                     dettaglioTesto += `<ul><li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>`;
                     dettaglioTesto += `<li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li></ul>`;
-                
+                    dettaglioTesto += `<p> Esempio di calcolo:</p>`;
+                    dettaglioTesto += `<p> Per un incasso di <strong id="detRedditoLordoDetPagamenti">€</strong>, il <strong id="detCoefficienteDetPagamenti"></strong> corrisponde a <strong id="detRedditoNettoDetPagamenti">€.</strong> Su questo importo, dovrai pagare:</p>`;
                 }
 
                 dettaglioCalcoli.innerHTML = dettaglioTesto;
