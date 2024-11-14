@@ -7,7 +7,7 @@
     <style>
         /* Stili di base */
         body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: Arial, Helvetica, sans-serif;
             background-color: #fff;
             margin: 0;
             padding: 0;
@@ -303,7 +303,7 @@
                         <td id="totaleContributiInpsOutput"></td>
                     </tr>
                     <!-- Contributi Fissi Ipotetici -->
-                    <tr class="highlight-yellow">
+                    <tr id="contributiFissiIpoteticiRow" class="highlight-yellow">
                         <td>Contributi Fissi (ipotetici su anno completo):</td>
                         <td id="contributiFissiIpoteticiOutput"></td>
                     </tr>
@@ -423,6 +423,7 @@
             const downloadButton = document.getElementById("downloadRecap");
             const redditoLordoButtons = document.querySelectorAll('.reddito-buttons button');
             const dettaglioCalcoli = document.getElementById("dettaglioCalcoli");
+            const contributiFissiIpoteticiRow = document.getElementById("contributiFissiIpoteticiRow");
 
             const tabs = document.querySelectorAll(".tab");
             const tabContents = document.querySelectorAll(".tab-content");
@@ -517,7 +518,7 @@
                 } else if (cassaInps === "inps_commercianti") {
                     // INPS Commercianti
                     const contributiFissiAnnui = 4515; // Arrotondato
-                    const aliquotaVariabile = 24.48 / 100;
+                    const aliquotaVariabile = 24 / 100; // Cambiato a 24% senza decimali
 
                     // Applicazione della riduzione del 35% se selezionata
                     const contributiFissiRidotti = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
@@ -533,7 +534,7 @@
                 } else if (cassaInps === "inps_artigiani") {
                     // INPS Artigiani
                     const contributiFissiAnnui = 4427; // Arrotondato
-                    const aliquotaVariabile = 24 / 100;
+                    const aliquotaVariabile = 24 / 100; // Cambiato a 24% senza decimali
 
                     // Applicazione della riduzione del 35% se selezionata
                     const contributiFissiRidotti = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
@@ -579,8 +580,8 @@
                                 importo = 0;
                             } else if (apertura > rate.periodo.start && apertura <= rate.periodo.end) {
                                 // Apertura durante il periodo: calcolare la proporzione
-                                const giorniTotali = (rate.periodo.end - rate.periodo.start) / (1000 * 60 * 60 * 24) + 1;
-                                const giorniAttivi = (rate.periodo.end - apertura) / (1000 * 60 * 60 * 24) + 1;
+                                const giorniTotali = Math.ceil((rate.periodo.end - rate.periodo.start) / (1000 * 60 * 60 * 24)) + 1;
+                                const giorniAttivi = Math.ceil((rate.periodo.end - apertura) / (1000 * 60 * 60 * 24)) + 1;
                                 const proporzione = giorniAttivi / giorniTotali;
                                 importo = Math.round(((cassaInps === "inps_commercianti" ? 4515 : 4427) / 4) * proporzione);
                             } else {
@@ -626,11 +627,13 @@
 
                 // Gestione della visualizzazione delle righe
                 if (cassaInps === "gs_inps") {
+                    contributiFissiIpoteticiRow.style.display = "none";
                     document.getElementById("contributiInpsRow").style.display = "table-row";
                     document.getElementById("contributiFissiRow").style.display = "none";
                     document.getElementById("contributiVariabiliRow").style.display = "none";
                     document.getElementById("totaleContributiInpsRow").style.display = "none";
                 } else {
+                    contributiFissiIpoteticiRow.style.display = "table-row";
                     document.getElementById("contributiInpsRow").style.display = "none";
                     document.getElementById("contributiFissiRow").style.display = "table-row";
                     if (contributiVariabili > 0) {
@@ -690,17 +693,19 @@
                 let dettaglioTesto = "";
                 if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
                     dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
-                    dettaglioTesto += `Paghi inoltre i contributi fissi INPS ${cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani"} di ${contributiFissiSulAnno.toLocaleString('it-IT')}€ per quest'anno.<br><br>`;
-                    dettaglioTesto += `Normalmente invece per un anno completo i contributi fissi sono di ${contributiFissiIpotetici.toLocaleString('it-IT')}€.<br><br>`;
+                    dettaglioTesto += `Paghi inoltre i contributi fissi INPS ${cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani"} di <u>${contributiFissiSulAnno.toLocaleString('it-IT')}€</u> per quest'anno.<br><br>`;
+                    dettaglioTesto += `Normalmente invece per un anno completo i contributi fissi sono di <u>${contributiFissiIpotetici.toLocaleString('it-IT')}€</u>.<br><br>`;
                     if (contributiVariabili > 0) {
-                        const aliquotaVariabile = cassaInps === "inps_commercianti" ? "24%" : "24%"; // Rimosso decimali
-                        const eccedenza = redditoNetto - sogliaReddito;
-                        dettaglioTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabile} sull'eccedenza di ${eccedenza.toLocaleString('it-IT')}€.`;
+                        const aliquotaVariabile = "24%"; // Sempre 24% senza decimali
+                        const eccedenza = 18415; // Costante eccedenza
+                        dettaglioTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabile} sull'eccedenza di <u>18.415€</u>.`;
                     } else {
                         dettaglioTesto += `Il tuo reddito netto non supera la soglia di 18.415€, quindi non paghi contributi variabili.`;
                     }
                 } else if (cassaInps === "gs_inps") {
-                    dettaglioTesto += `Quindi paghi il ${((aliquotaImposta * 100).toFixed(0))}% di imposta e il ${26}% di contributi INPS non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).`;
+                    dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
+                    dettaglioTesto += `Quindi paghi il ${(aliquotaImposta * 100).toFixed(0)}% di imposta e il ${Math.round(26.07)}% di contributi INPS non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).<br><br>`;
+                    dettaglioTesto += `30.000€ x 78% = 23.400€ (reddito netto imponibile)`;
                 }
 
                 dettaglioCalcoli.innerHTML = dettaglioTesto;
