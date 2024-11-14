@@ -333,76 +333,48 @@
                     Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.<br>
                     Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.
                 </p>
-                <h3>Esempio di calcolo:</h3>
-                <p>
-                    Per un incasso di 30.000€, il 78% corrisponde a 23.400€. Su questo importo, dovrai pagare:
-                </p>
-                <ul>
-                    <li>Imposta sostitutiva: 5% su 23.400€, che equivale a 1.170€.</li>
-                    <li>Contributi INPS: Contributi fissi di 3.010€ e contributi variabili di 1.220€. Totale contributi: 4.230€.</li>
-                </ul>
-                <p>
-                    Quindi, a livello di saldo, pagherai 5.400€ (di cui 1.170€ di imposta e 4.230€ di contributi).
-                </p>
-                <h3>Acconti:</h3>
-                <p>
-                    Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:
-                </p>
-                <ul>
-                    <li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori 1.170€.</li>
-                    <li>Contributi INPS Variabili: pagherai l’80% dell'importo dei contributi variabili come acconto, quindi 976€.</li>
-                </ul>
-                <h3>Riepilogo dei Pagamenti:</h3>
-                <ul>
-                    <li>Totale tasse e contributi effettivi sul 2024: 5.400€ (circa il 18% del tuo reddito lordo)</li>
-                    <li>Totale acconti per il 2025: 2.146€ (circa il 7% del tuo reddito lordo)</li>
-                    <li>Totale da versare complessivamente: 7.546€ (circa il 25% del tuo reddito lordo)</li>
-                </ul>
-                <p>
-                    Nota: Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025) e non rappresentano un costo aggiuntivo.
-                </p>
             </div>
             <div class="tab-content" id="dettaglio-pagamenti-tab">
                 <h2>Dettaglio pagamenti</h2>
                 <p>
-                    Dettaglio dei pagamenti per l'anno 2024<br>
-                    Hai guadagnato <strong id="detRedditoLordo"></strong> nel <strong id="detAnno"></strong>.
+                    Dettaglio dei pagamenti per l'anno <strong id="detAnnoPagamenti"></strong><br>
+                    Hai guadagnato <strong id="detRedditoLordoPagamenti"></strong> nel <strong id="detAnnoPagamenti"></strong>.
                 </p>
                 <h3>Calcolo del Reddito Netto:</h3>
                 <p>
-                    Reddito Lordo (<strong id="detRedditoLordoDet"></strong>) x Coefficiente di Redditività (<strong id="detCoefficiente"></strong>) = <strong id="detRedditoNetto"></strong>
+                    Reddito Lordo (<strong id="detRedditoLordoDetPagamenti"></strong>) x Coefficiente di Redditività (<strong id="detCoefficienteDetPagamenti"></strong>) = <strong id="detRedditoNettoPagamenti"></strong>
                 </p>
                 <h3>Calcolo dell'Imposta Sostitutiva:</h3>
                 <p>
-                    Reddito Netto (<strong id="detRedditoNettoDet"></strong>) x Aliquota Imposta Sostitutiva (<strong id="detAliquotaImposta"></strong>) = <strong id="detImpostaSostitutiva"></strong>
+                    Reddito Netto (<strong id="detRedditoNettoDetPagamenti"></strong>) x Aliquota Imposta Sostitutiva (<strong id="detAliquotaImpostaPagamenti"></strong>) = <strong id="detImpostaSostitutivaPagamenti"></strong>
                 </p>
-                <h3>Calcolo dei Contributi INPS (<span id="detContributiInpsTitolo"></span>):</h3>
+                <h3>Calcolo dei Contributi INPS (<span id="detContributiInpsTitoloPagamenti"></span>):</h3>
                 <p>
-                    Reddito Netto (<strong id="detRedditoNettoInps"></strong>) x Aliquota Contributiva (<strong id="detAliquotaContributiva"></strong>) = <strong id="detContributiInpsCalcolati"></strong>
+                    Reddito Netto (<strong id="detRedditoNettoInpsPagamenti"></strong>) x Aliquota Contributiva (<strong id="detAliquotaContributivaPagamenti"></strong>) = <strong id="detContributiInpsCalcolatiPagamenti"></strong>
                 </p>
                 <h3>Tasse da pagare:</h3>
                 <p class="highlight-yellow">
-                    Saldo imposta sostitutiva sul 2024 (<strong id="detSaldoImposta"></strong>) da pagare entro il 30 giugno 2025.
+                    Saldo imposta sostitutiva sul <strong id="detAnnoPagamenti"></strong> (<strong id="detSaldoImpostaPagamenti"></strong>) da pagare entro il 30 giugno 2025.
                 </p>
                 <p class="highlight-blue">
-                    Acconto imposta sostitutiva per il 2025 (<strong id="detAccontoImposta"></strong>) da pagare in due rate:<br>
-                    Prima rata (<strong id="detPrimaRataImposta"></strong>) entro il 30 giugno 2025.<br>
-                    Seconda rata (<strong id="detSecondaRataImposta"></strong>) entro il 30 novembre 2025.
+                    Acconto imposta sostitutiva per il 2025 (<strong id="detAccontoImpostaPagamenti"></strong>) da pagare in due rate:<br>
+                    Prima rata (<strong id="detPrimaRataImpostaPagamenti"></strong>) entro il 30 giugno 2025.<br>
+                    Seconda rata (<strong id="detSecondaRataImpostaPagamenti"></strong>) entro il 30 novembre 2025.
                 </p>
                 <h3>Contributi previdenziali:</h3>
                 <p class="highlight-yellow">
-                    Saldo contributi INPS <span id="detContributiInpsTipo"></span> sul 2024 (<strong id="detSaldoContributi"></strong>) da pagare entro il 30 giugno 2025.
+                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul <strong id="detAnnoPagamenti"></strong> (<strong id="detSaldoContributiPagamenti"></strong>) da pagare entro il 30 giugno 2025.
                 </p>
                 <p class="highlight-blue">
-                    Acconto contributi INPS per il 2025 (<strong id="detAccontoContributi"></strong>) da pagare in due rate:<br>
-                    Prima rata (<strong id="detPrimaRataContributi"></strong>) entro il 30 giugno 2025.<br>
-                    Seconda rata (<strong id="detSecondaRataContributi"></strong>) entro il 30 novembre 2025.
+                    Acconto contributi INPS per il 2025 (<strong id="detAccontoContributiPagamenti"></strong>) da pagare in due rate:<br>
+                    Prima rata (<strong id="detPrimaRataContributiPagamenti"></strong>) entro il 30 giugno 2025.<br>
+                    Seconda rata (<strong id="detSecondaRataContributiPagamenti"></strong>) entro il 30 novembre 2025.
                 </p>
                 <h3>Riepilogo dei Pagamenti:</h3>
                 <ul>
-                    <li>Totale tasse e contributi effettivi sul 2024: <strong id="detTotaleTasseContributi"></strong> (circa il 24% del tuo reddito lordo)</li>
-                    <li>Totale acconti per il 2025: <strong id="detTotaleAcconti"></strong> (circa il 20% del tuo reddito lordo)</li>
-                    <li>Totale da versare complessivamente: <strong id="detTotaleComplessivo"></strong> (circa il 44% del tuo reddito lordo)</li>
+                    <li>Totale tasse e contributi effettivi sul <strong id="detAnnoPagamenti"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong> (circa il 24% del tuo reddito lordo)</li>
+                    <li>Totale acconti per il 2025: <strong id="detTotaleAccontiPagamenti"></strong> (circa il 20% del tuo reddito lordo)</li>
+                    <li>Totale da versare complessivamente: <strong id="detTotaleComplessivoPagamenti"></strong> (circa il 44% del tuo reddito lordo)</li>
                 </ul>
                 <p>
                     Nota: Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025) e non rappresentano un costo aggiuntivo.
@@ -417,6 +389,7 @@
                             <th>Importo Totale (€)</th>
                             <th>Dettaglio</th>
                         </tr>
+                        <!-- Righe per le rate fisse (solo per Commercianti e Artigiani) -->
                         <tr id="scadenzaFissa1Row" style="display: none;">
                             <td id="scadenzaFissa1"></td>
                             <td id="importoFissa1"></td>
@@ -464,7 +437,6 @@
             const redditoLordoButtons = document.querySelectorAll('.reddito-buttons button');
             const dettaglioCalcoli = document.getElementById("dettaglioCalcoli");
             const contributiFissiIpoteticiRow = document.getElementById("contributiFissiIpoteticiRow");
-            const dettaglioPagamentiTab = document.getElementById("dettaglio-pagamenti-tab");
 
             const tabs = document.querySelectorAll(".tab");
             const tabContents = document.querySelectorAll(".tab-content");
@@ -745,51 +717,51 @@
                 } else if (cassaInps === "gs_inps") {
                     dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
                     dettaglioTesto += `Quindi paghi il ${(aliquotaImposta * 100).toFixed(0)}% di imposta e il ${Math.round(26.07)}% di contributi INPS non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).<br><br>`;
-                    dettaglioTesto += `<strong>30.000€ x 78% = 23.400€ (reddito netto imponibile)</strong>`;
+                    dettaglioTesto += `<strong>${redditoLordo.toLocaleString('it-IT')}€ x ${(coefficienteRedditivita * 100).toFixed(0)}% = ${redditoNetto.toLocaleString('it-IT')}€ (reddito netto imponibile)</strong>`;
                 }
 
                 dettaglioCalcoli.innerHTML = dettaglioTesto;
 
                 // Popola la sezione "Dettaglio pagamenti"
-                document.getElementById("detRedditoLordo").innerText = redditoLordo.toLocaleString('it-IT');
-                document.getElementById("detAnno").innerText = annoReddito;
-                document.getElementById("detRedditoLordoDet").innerText = redditoLordo.toLocaleString('it-IT');
-                document.getElementById("detCoefficiente").innerText = (coefficienteRedditivita * 100).toFixed(0) + "%";
-                document.getElementById("detRedditoNetto").innerText = redditoNetto.toLocaleString('it-IT');
-                document.getElementById("detRedditoNettoDet").innerText = redditoNetto.toLocaleString('it-IT');
-                document.getElementById("detAliquotaImposta").innerText = (aliquotaImposta * 100).toFixed(0) + "%";
-                document.getElementById("detImpostaSostitutiva").innerText = impostaSostitutiva.toLocaleString('it-IT');
+                document.getElementById("detAnnoPagamenti").innerText = annoReddito;
+                document.getElementById("detRedditoLordoPagamenti").innerText = redditoLordo.toLocaleString('it-IT');
+                document.getElementById("detRedditoLordoDetPagamenti").innerText = redditoLordo.toLocaleString('it-IT');
+                document.getElementById("detCoefficienteDetPagamenti").innerText = (coefficienteRedditivita * 100).toFixed(0) + "%";
+                document.getElementById("detRedditoNettoPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                document.getElementById("detRedditoNettoDetPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                document.getElementById("detAliquotaImpostaPagamenti").innerText = (aliquotaImposta * 100).toFixed(0) + "%";
+                document.getElementById("detImpostaSostitutivaPagamenti").innerText = impostaSostitutiva.toLocaleString('it-IT');
 
                 if (cassaInps === "gs_inps") {
-                    document.getElementById("detContributiInpsTitolo").innerText = "Gestione Separata";
-                    document.getElementById("detRedditoNettoInps").innerText = redditoNetto.toLocaleString('it-IT');
-                    document.getElementById("detAliquotaContributiva").innerText = Math.round(26.07) + "%";
-                    document.getElementById("detContributiInpsCalcolati").innerText = contributiInps.toLocaleString('it-IT');
+                    document.getElementById("detContributiInpsTitoloPagamenti").innerText = "Gestione Separata";
+                    document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = Math.round(26.07) + "%";
+                    document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                 } else {
-                    document.getElementById("detContributiInpsTitolo").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
-                    document.getElementById("detRedditoNettoInps").innerText = redditoNetto.toLocaleString('it-IT');
-                    document.getElementById("detAliquotaContributiva").innerText = "24%";
-                    document.getElementById("detContributiInpsCalcolati").innerText = contributiInps.toLocaleString('it-IT');
+                    document.getElementById("detContributiInpsTitoloPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
+                    document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = "24%";
+                    document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                 }
 
                 // Calcolo dei Saldi e Acconti
-                document.getElementById("detSaldoImposta").innerText = impostaSostitutiva.toLocaleString('it-IT');
-                document.getElementById("detAccontoImposta").innerText = accontoImposta.toLocaleString('it-IT');
-                document.getElementById("detPrimaRataImposta").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
-                document.getElementById("detSecondaRataImposta").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
+                document.getElementById("detSaldoImpostaPagamenti").innerText = impostaSostitutiva.toLocaleString('it-IT');
+                document.getElementById("detAccontoImpostaPagamenti").innerText = accontoImposta.toLocaleString('it-IT');
+                document.getElementById("detPrimaRataImpostaPagamenti").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
+                document.getElementById("detSecondaRataImpostaPagamenti").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
 
                 if (cassaInps !== "gs_inps") {
-                    document.getElementById("detSaldoContributi").innerText = contributiInps.toLocaleString('it-IT');
-                    document.getElementById("detAccontoContributi").innerText = Math.round(accontoInps).toLocaleString('it-IT');
-                    document.getElementById("detPrimaRataContributi").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
-                    document.getElementById("detSecondaRataContributi").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
-                    document.getElementById("detContributiInpsTipo").innerText = cassaInps === "inps_commercianti" ? "Gestione Separata" : "Artigiani";
+                    document.getElementById("detSaldoContributiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
+                    document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
+                    document.getElementById("detPrimaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detSecondaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detContributiInpsTipoPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
                 } else {
-                    document.getElementById("detSaldoContributi").innerText = contributiInps.toLocaleString('it-IT');
-                    document.getElementById("detAccontoContributi").innerText = Math.round(accontoInps).toLocaleString('it-IT');
-                    document.getElementById("detPrimaRataContributi").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
-                    document.getElementById("detSecondaRataContributi").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
-                    document.getElementById("detContributiInpsTipo").innerText = "Gestione Separata";
+                    document.getElementById("detSaldoContributiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
+                    document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
+                    document.getElementById("detPrimaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detSecondaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detContributiInpsTipoPagamenti").innerText = "Gestione Separata";
                 }
 
                 // Riepilogo dei Pagamenti
@@ -797,9 +769,52 @@
                 const totaleAcconti = accontoImposta + accontoInps;
                 const totaleComplessivo = totaleTasseContributi + totaleAcconti;
 
-                document.getElementById("detTotaleTasseContributi").innerText = totaleTasseContributi.toLocaleString('it-IT');
-                document.getElementById("detTotaleAcconti").innerText = totaleAcconti.toLocaleString('it-IT');
-                document.getElementById("detTotaleComplessivo").innerText = totaleComplessivo.toLocaleString('it-IT');
+                document.getElementById("detTotaleTasseContributiPagamenti").innerText = totaleTasseContributi.toLocaleString('it-IT');
+                document.getElementById("detTotaleAccontiPagamenti").innerText = totaleAcconti.toLocaleString('it-IT');
+                document.getElementById("detTotaleComplessivoPagamenti").innerText = totaleComplessivo.toLocaleString('it-IT');
+
+                // Generazione Testo Dinamico per "Come si Calcolano"
+                let dettaglioCalcoliTesto = "";
+                if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    dettaglioCalcoliTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
+                    dettaglioCalcoliTesto += `Paghi inoltre i contributi fissi INPS ${cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani"} di <u>${contributiFissiSulAnno.toLocaleString('it-IT')}€</u> per quest'anno.<br><br>`;
+                    dettaglioCalcoliTesto += `Normalmente invece per un anno completo i contributi fissi sono di <u>${contributiFissiIpotetici.toLocaleString('it-IT')}€</u>.<br><br>`;
+                    if (contributiVariabili > 0) {
+                        const aliquotaVariabile = "24%"; // Sempre 24% senza decimali
+                        dettaglioCalcoliTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabile} sull'eccedenza di <u>18.415€</u>.`;
+                    } else {
+                        dettaglioCalcoliTesto += `Il tuo reddito netto non supera la soglia di 18.415€, quindi non paghi contributi variabili.`;
+                    }
+                } else if (cassaInps === "gs_inps") {
+                    dettaglioCalcoliTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
+                    dettaglioCalcoliTesto += `Quindi paghi il ${(aliquotaImposta * 100).toFixed(0)}% di imposta e il ${Math.round(26.07)}% di contributi INPS non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).<br><br>`;
+                    dettaglioCalcoliTesto += `<strong>${redditoLordo.toLocaleString('it-IT')}€ x ${(coefficienteRedditivita * 100).toFixed(0)}% = ${redditoNetto.toLocaleString('it-IT')}€ (reddito netto imponibile)</strong>`;
+                }
+
+                dettaglioCalcoli.innerHTML = dettaglioCalcoliTesto;
+
+                // Popola la sezione "Dettaglio pagamenti"
+                let dettaglioPagamentiTesto = "";
+                dettaglioPagamentiTesto += `In regime forfettario, il tuo reddito lordo di <strong>${redditoLordo.toLocaleString('it-IT')}€</strong> viene ridotto del coefficiente di redditività del <strong>${(coefficienteRedditivita * 100).toFixed(0)}%</strong>, risultando in un reddito netto imponibile di <strong>${redditoNetto.toLocaleString('it-IT')}€</strong>.<br><br>`;
+                dettaglioPagamentiTesto += `Su questo reddito netto, paghi un'imposta sostitutiva del <strong>${(aliquotaImposta * 100).toFixed(0)}%</strong>, pari a <strong>${impostaSostitutiva.toLocaleString('it-IT')}€</strong>.<br><br>`;
+                dettaglioPagamentiTesto += `Oltre all'imposta, paghi anche i contributi INPS:<br>`;
+                if (cassaInps === "gs_inps") {
+                    dettaglioPagamentiTesto += `- Gestione Separata INPS: <strong>${contributiInps.toLocaleString('it-IT')}€</strong>.<br><br>`;
+                } else {
+                    dettaglioPagamentiTesto += `- Contributi Fissi: <strong>${contributiFissi.toLocaleString('it-IT')}€</strong>.<br>`;
+                    if (contributiVariabili > 0) {
+                        dettaglioPagamentiTesto += `- Contributi Variabili: <strong>${contributiVariabili.toLocaleString('it-IT')}€</strong>.<br>`;
+                    }
+                    dettaglioPagamentiTesto += `<strong>Totale Contributi INPS: ${contributiInps.toLocaleString('it-IT')}€</strong>.<br><br>`;
+                }
+                dettaglioPagamentiTesto += `Quindi, le tasse e i contributi effettivi sul tuo reddito lordo di <strong>${redditoLordo.toLocaleString('it-IT')}€</strong> sono pari a <strong>${totaleTasseContributi.toLocaleString('it-IT')}€</strong>.<br>`;
+                dettaglioPagamentiTesto += `Oltre a questo, devi versare gli acconti per il prossimo anno, pari a <strong>${totaleAcconti.toLocaleString('it-IT')}€</strong>.<br>`;
+                dettaglioPagamentiTesto += `In totale, dovrai versare complessivamente <strong>${totaleComplessivo.toLocaleString('it-IT')}€</strong>.`;
+
+                // Inserisci il testo dinamico
+                const detAnnoPagamenti = document.getElementById("detAnnoPagamenti").innerText;
+                const detRedditoLordoPagamenti = document.getElementById("detRedditoLordoPagamenti").innerText;
+                dettaglioPagamenti.innerHTML = dettaglioPagamentiTesto;
 
                 // Mostra le sezioni dei risultati e delle schede
                 document.getElementById("risultati-container").style.display = "block";
@@ -824,10 +839,10 @@
                 const totaleContributiInps = document.getElementById("totaleContributiInpsOutput").innerText;
                 const contributiFissiIpotetici = document.getElementById("contributiFissiIpoteticiOutput").innerText;
                 const accontoInps = document.getElementById("accontoInpsOutput").innerText;
-                const scadenze = [];
 
                 // Raccogli le scadenze
                 const scadenzeRows = document.querySelectorAll("#scadenza-pagamenti-tab table tr");
+                const scadenze = [];
                 scadenzeRows.forEach(row => {
                     const cells = row.querySelectorAll("td");
                     if (cells.length === 3) {
