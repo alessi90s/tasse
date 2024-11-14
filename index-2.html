@@ -713,8 +713,10 @@
                     dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
                     dettaglioTesto += `Quindi paghi il ${(aliquotaImposta * 100).toFixed(0)}% di imposta e il ${Math.round(26.07)}% di contributi INPS non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).<br><br>`;
                     dettaglioTesto += `<strong>30.000€ x 78% = 23.400€ (reddito netto imponibile)</strong>`;
-                    dettaglioTesto += `<p class="highlight-yellow">Nota bene: ...</p>`;
-                    dettaglioTesto += `<p class="highlight-blue">Nota bene: ...</p>`;
+                    dettaglioTesto += `<strong>Nota bene:</strong>`;
+                    dettaglioTesto += `<ul><li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>`;
+                    dettaglioTesto += `<li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li></ul>`;
+                
                 }
 
                 dettaglioCalcoli.innerHTML = dettaglioTesto;
