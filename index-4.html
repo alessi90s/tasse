@@ -530,8 +530,17 @@
                 </p>
             </div>
             <div class="tab-content" id="scadenza-pagamenti-tab">
-                <!-- Contenuto della scheda "Scadenza pagamenti" -->
-                <!-- Puoi aggiungere il contenuto qui se necessario -->
+                <h2>Scadenza Pagamenti</h2>
+                <div class="table-container">
+                    <table>
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo Totale (€)</th>
+                            <th>Dettaglio</th>
+                        </tr>
+                        <!-- Le righe delle scadenze verranno popolate dinamicamente -->
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -547,7 +556,6 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <script>
-        // Il codice JavaScript completo
         document.addEventListener('DOMContentLoaded', function() {
             const cassaInpsSelect = document.getElementById("cassaInps");
             const opzioniContainer = document.getElementById("opzioniCommercianteArtigiano");
@@ -641,21 +649,21 @@
                 let contributiVariabili = 0;
                 let contributiInps = 0;
                 let accontoInps = 0;
-                const sogliaReddito = 18415; // Soglia per i contributi variabili
+                const sogliaReddito = 18540; // Soglia per i contributi variabili aggiornata per il 2023
 
                 let aliquotaVariabile = 0;
-                let aliquotaVariabileDisplay = "24%"; // Default display value
+                let aliquotaVariabileDisplay = "24%"; // Valore di default per la visualizzazione
 
                 if (cassaInps === "gs_inps") {
                     // Gestione Separata INPS
-                    const aliquotaGsInps = 26 / 100; // Aliquota
+                    const aliquotaGsInps = 26.23 / 100; // Aliquota aggiornata per il 2023
                     contributiInps = Math.round(redditoNetto * aliquotaGsInps);
                     accontoInps = Math.round(contributiInps * 0.80);
                 } else if (cassaInps === "inps_commercianti") {
                     // INPS Commercianti
-                    const contributiFissiAnnui = 4515; // Arrotondato
-                    aliquotaVariabile = 24 / 100; // Aliquota
-                    aliquotaVariabileDisplay = "24%"; // Visualizzata senza decimali
+                    const contributiFissiAnnui = 4136.44; // Importo per il 2023
+                    aliquotaVariabile = 24.09 / 100; // Aliquota aggiornata
+                    aliquotaVariabileDisplay = "24.09%";
 
                     // Applicazione della riduzione del 35% se selezionata
                     const riduzione = riduzioneContributi ? 0.65 : 1;
@@ -671,9 +679,9 @@
                     accontoInps = Math.round(contributiVariabili * 0.80);
                 } else if (cassaInps === "inps_artigiani") {
                     // INPS Artigiani
-                    const contributiFissiAnnui = 4427; // Arrotondato
-                    aliquotaVariabile = 24 / 100; // Aliquota
-                    aliquotaVariabileDisplay = "24%"; // Visualizzata senza decimali
+                    const contributiFissiAnnui = 3993.86; // Importo per il 2023
+                    aliquotaVariabile = 24.09 / 100; // Aliquota aggiornata
+                    aliquotaVariabileDisplay = "24.09%";
 
                     // Applicazione della riduzione del 35% se selezionata
                     const riduzione = riduzioneContributi ? 0.65 : 1;
@@ -692,9 +700,9 @@
                 // Calcolo dei Contributi Fissi Ipotetici (su anno completo)
                 let contributiFissiIpotetici = 0;
                 if (cassaInps === "inps_commercianti") {
-                    contributiFissiIpotetici = riduzioneContributi ? Math.round(4515 * 0.65) : 4515;
+                    contributiFissiIpotetici = riduzioneContributi ? Math.round(4136.44 * 0.65) : 4136.44;
                 } else if (cassaInps === "inps_artigiani") {
-                    contributiFissiIpotetici = riduzioneContributi ? Math.round(4427 * 0.65) : 4427;
+                    contributiFissiIpotetici = riduzioneContributi ? Math.round(3993.86 * 0.65) : 3993.86;
                 }
 
                 // Calcolo delle Scadenze delle Rate Fisse
@@ -723,14 +731,17 @@
                                 const giorniTotali = Math.ceil((rate.periodo.end - rate.periodo.start) / (1000 * 60 * 60 * 24)) + 1;
                                 const giorniAttivi = Math.ceil((rate.periodo.end - apertura) / (1000 * 60 * 60 * 24)) + 1;
                                 const proporzione = giorniAttivi / giorniTotali;
-                                importo = Math.round(((cassaInps === "inps_commercianti" ? 4515 : 4427) / 4) * proporzione);
+                                const contributiFissiAnnui = cassaInps === "inps_commercianti" ? 4136.44 : 3993.86;
+                                importo = Math.round((contributiFissiAnnui / 4) * proporzione);
                             } else {
                                 // Apertura prima del periodo di copertura: pagamento intero della rata
-                                importo = Math.round((cassaInps === "inps_commercianti" ? 4515 : 4427) / 4);
+                                const contributiFissiAnnui = cassaInps === "inps_commercianti" ? 4136.44 : 3993.86;
+                                importo = Math.round(contributiFissiAnnui / 4);
                             }
                         } else {
                             // Nessuna apertura data: pagamento intero della rata
-                            importo = Math.round((cassaInps === "inps_commercianti" ? 4515 : 4427) / 4);
+                            const contributiFissiAnnui = cassaInps === "inps_commercianti" ? 4136.44 : 3993.86;
+                            importo = Math.round(contributiFissiAnnui / 4);
                         }
 
                         // Applicazione della riduzione del 35% solo se il checkbox è selezionato
@@ -821,11 +832,11 @@
                 if (cassaInps === "gs_inps") {
                     document.getElementById("detContributiInpsTitoloPagamenti").innerText = "Gestione Separata";
                     document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
-                    document.getElementById("detAliquotaContributivaPagamenti").innerText = "26%";
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = "26.23%";
                     document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                 } else {
                     let aliquotaVariabileEffettiva = aliquotaVariabile * (riduzioneContributi ? 0.65 : 1) * 100;
-                    aliquotaVariabileDisplay = Math.round(aliquotaVariabileEffettiva) + "%";
+                    aliquotaVariabileDisplay = aliquotaVariabileEffettiva.toFixed(2) + "%";
                     document.getElementById("detContributiInpsTitoloPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
                     document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
                     document.getElementById("detAliquotaContributivaPagamenti").innerText = aliquotaVariabileDisplay;
