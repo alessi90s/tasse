@@ -954,7 +954,7 @@
                     // Ripristino della prima parte del testo
                     dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
                     dettaglioTesto += `Quindi paghi il <strong><span class="highlight-yellow"> ${(aliquotaImposta * 100).toFixed(0)}% di imposta e il ${Math.round(26)}% di contributi INPS </span></strong> non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).<br><br>`;
-                    dettaglioTesto += `<strong>${redditoLordo.toLocaleString('it-IT')}€ x ${(coefficienteRedditivita * 100).toFixed(0)}% = ${redditoNetto.toLocaleString('it-IT')}€ (reddito netto imponibile)</strong>`;
+                    dettaglioTesto += `${redditoLordo.toLocaleString('it-IT')}€ x ${(coefficienteRedditivita * 100).toFixed(0)}% = <strong>${redditoNetto.toLocaleString('it-IT')}€ (reddito netto imponibile)</strong>`;
                     dettaglioTesto += `<p><strong>Nota bene:</strong></p>`;
                     dettaglioTesto += `<ul><li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>`;
                     dettaglioTesto += `<li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li></ul>`;
