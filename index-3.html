@@ -369,9 +369,9 @@
                 </p>
                 <h3>Riepilogo dei Pagamenti:</h3>
                 <ul>
-                    <li>Totale tasse e contributi effettivi sul <strong id="detAnnoPagamenti"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong> (circa il 24% del tuo reddito lordo)</li>
-                    <li>Totale acconti per il 2025: <strong id="detTotaleAccontiPagamenti"></strong> (circa il 20% del tuo reddito lordo)</li>
-                    <li>Totale da versare complessivamente: <strong id="detTotaleComplessivoPagamenti"></strong> (circa il 44% del tuo reddito lordo)</li>
+                    <li>Totale tasse e contributi effettivi sul <strong id="detAnnoPagamenti"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong></li>
+                    <li>Totale acconti per il 2025: <strong id="detTotaleAccontiPagamenti"></strong></li>
+                    <li>Totale da versare complessivamente: <strong id="detTotaleComplessivoPagamenti"></strong></li>
                 </ul>
                 <p>
                     Nota: Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025) e non rappresentano un costo aggiuntivo.
@@ -521,16 +521,18 @@
                 const sogliaReddito = 18415; // Soglia per i contributi variabili
 
                 let aliquotaVariabile = 0;
+                let aliquotaVariabileDisplay = "24%"; // Default display value
 
                 if (cassaInps === "gs_inps") {
                     // Gestione Separata INPS
-                    const aliquotaGsInps = 26.07 / 100;
+                    const aliquotaGsInps = 26.23 / 100; // Aliquota precisa
                     contributiInps = Math.round(redditoNetto * aliquotaGsInps);
                     accontoInps = Math.round(contributiInps * 0.80);
                 } else if (cassaInps === "inps_commercianti") {
                     // INPS Commercianti
                     const contributiFissiAnnui = 4515; // Arrotondato
-                    aliquotaVariabile = 24 / 100; // 24% senza decimali
+                    aliquotaVariabile = 24.48 / 100; // Aliquota precisa
+                    aliquotaVariabileDisplay = "24%"; // Visualizzata senza decimali
 
                     // Applicazione della riduzione del 35% se selezionata
                     const contributiFissiRidotti = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
@@ -539,6 +541,10 @@
                     // Calcolo dei contributi variabili
                     if (redditoNetto > sogliaReddito) {
                         contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile);
+                        // Applicazione della riduzione del 35% se selezionata
+                        if (riduzioneContributi) {
+                            contributiVariabili = Math.round(contributiVariabili * 0.65);
+                        }
                     }
 
                     contributiInps = contributiFissi + contributiVariabili;
@@ -546,7 +552,8 @@
                 } else if (cassaInps === "inps_artigiani") {
                     // INPS Artigiani
                     const contributiFissiAnnui = 4427; // Arrotondato
-                    aliquotaVariabile = 24 / 100; // 24% senza decimali
+                    aliquotaVariabile = 24 / 100; // Aliquota precisa
+                    aliquotaVariabileDisplay = "24%"; // Visualizzata senza decimali
 
                     // Applicazione della riduzione del 35% se selezionata
                     const contributiFissiRidotti = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
@@ -555,6 +562,10 @@
                     // Calcolo dei contributi variabili
                     if (redditoNetto > sogliaReddito) {
                         contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile);
+                        // Applicazione della riduzione del 35% se selezionata
+                        if (riduzioneContributi) {
+                            contributiVariabili = Math.round(contributiVariabili * 0.65);
+                        }
                     }
 
                     contributiInps = contributiFissi + contributiVariabili;
@@ -704,6 +715,17 @@
                 // Popola la sezione "Come si Calcolano"
                 let dettaglioTesto = "";
                 if (cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
+                    // Ripristino della prima parte del testo
+                    dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
+                    dettaglioTesto += `Paghi inoltre i contributi fissi INPS ${cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani"} di <u>${contributiFissiSulAnno.toLocaleString('it-IT')}€</u> per quest'anno.<br><br>`;
+                    dettaglioTesto += `Normalmente invece per un anno completo i contributi fissi sono di <u>${contributiFissiIpotetici.toLocaleString('it-IT')}€</u>.<br><br>`;
+                    if (contributiVariabili > 0) {
+                        dettaglioTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabileDisplay} sull'eccedenza di <u>${(redditoNetto - sogliaReddito).toLocaleString('it-IT')}€</u>.`;
+                    } else {
+                        dettaglioTesto += `Il tuo reddito netto non supera la soglia di 18.415€, quindi non paghi contributi variabili.`;
+                    }
+
+                    // Esempio di calcolo
                     dettaglioTesto += `<h3>Esempio di calcolo:</h3>`;
                     dettaglioTesto += `<p>Per un incasso di ${redditoLordo.toLocaleString('it-IT')}€, il ${(coefficienteRedditivita * 100).toFixed(0)}% corrisponde a ${redditoNetto.toLocaleString('it-IT')}€. Su questo importo, dovrai pagare:</p>`;
                     
@@ -712,15 +734,15 @@
                     
                     // Calcolo dei contributi fissi e variabili
                     dettaglioTesto += `<li>Contributi INPS: `;
-                    if (contributiFissi > 0) {
-                        dettaglioTesto += `${contributiFissi.toLocaleString('it-IT')}€ di contributi fissi`;
+                    if (contributiFissiSulAnno > 0) {
+                        dettaglioTesto += `${contributiFissiSulAnno.toLocaleString('it-IT')}€ di contributi fissi`;
                         if (contributiVariabili > 0) {
-                            dettaglioTesto += ` e ${contributiVariabili.toLocaleString('it-IT')}€ di contributi variabili (${(aliquotaVariabile * 100).toFixed(0)}% sull'eccedenza).`;
+                            dettaglioTesto += ` e ${contributiVariabili.toLocaleString('it-IT')}€ di contributi variabili (${aliquotaVariabileDisplay} sull'eccedenza).`;
                         } else {
                             dettaglioTesto += `.`;
                         }
                     } else if (contributiVariabili > 0) {
-                        dettaglioTesto += `${(aliquotaVariabile * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${contributiVariabili.toLocaleString('it-IT')}€.`;
+                        dettaglioTesto += `${aliquotaVariabileDisplay} su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${contributiVariabili.toLocaleString('it-IT')}€.`;
                     } else {
                         dettaglioTesto += `nessun contributo da versare.`;
                     }
@@ -732,7 +754,7 @@
                     
                     // Acconti
                     const accontoImposta = impostaSostitutiva;
-                    const accontoInps = Math.round(contributiVariabili * 0.80); // AccontoInps già calcolato
+                    const accontoInps = Math.round(contributiVariabili * 0.80);
                     const totaleAcconti = accontoImposta + accontoInps;
                     dettaglioTesto += `<h3>Acconti:</h3>`;
                     dettaglioTesto += `<p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>`;
@@ -754,15 +776,21 @@
                     dettaglioTesto += `<p>Importo complessivo (saldo + acconti): ${totaleComplessivo.toLocaleString('it-IT')}€</p>`;
                     
                     dettaglioTesto += `<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>`;
-                    
                 } else if (cassaInps === "gs_inps") {
+                    // Ripristino della prima parte del testo
+                    dettaglioTesto += `In regime forfettario paghi l'imposta sostitutiva, che nel tuo caso è del ${(aliquotaImposta * 100).toFixed(0)}%.<br><br>`;
+                    dettaglioTesto += `Quindi paghi il <span class="highlight-yellow"> ${(aliquotaImposta * 100).toFixed(0)}% di imposta e il ${Math.round(26.23)}% di contributi INPS </span> non sul totale incassato (${redditoLordo.toLocaleString('it-IT')}€) ma sul tuo incassato per il coefficiente di redditività (${redditoNetto.toLocaleString('it-IT')}€).<br><br>`;
+                    dettaglioTesto += `<strong>${redditoLordo.toLocaleString('it-IT')}€ x ${(coefficienteRedditivita * 100).toFixed(0)}% = ${redditoNetto.toLocaleString('it-IT')}€ (reddito netto imponibile)</strong>`;
+                    dettaglioTesto += `<p><strong>Nota bene:</strong></p>`;
+                    dettaglioTesto += `<ul><li>Se nell'anno di riferimento hai versato dei contributi, questi vengono detratti dal tuo reddito netto.</li>`;
+                    dettaglioTesto += `<li>Se avevi versato gli acconti nell'anno precedente, questi vengono scalati dai saldi che devi versare quest'anno.</li></ul>`;
                     dettaglioTesto += `<h3>Esempio di calcolo:</h3>`;
                     dettaglioTesto += `<p>Per un incasso di ${redditoLordo.toLocaleString('it-IT')}€, il ${(coefficienteRedditivita * 100).toFixed(0)}% corrisponde a ${redditoNetto.toLocaleString('it-IT')}€. Su questo importo, dovrai pagare:</p>`;
                     
                     dettaglioTesto += `<ul>`;
                     dettaglioTesto += `<li>Imposta sostitutiva: ${(aliquotaImposta * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${impostaSostitutiva.toLocaleString('it-IT')}€.</li>`;
                     
-                    dettaglioTesto += `<li>Contributi INPS: 26.07% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${contributiInps.toLocaleString('it-IT')}€.</li>`;
+                    dettaglioTesto += `<li>Contributi INPS: 26% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${contributiInps.toLocaleString('it-IT')}€.</li>`;
                     
                     dettaglioTesto += `</ul>`;
                     
@@ -804,7 +832,7 @@
                 if (cassaInps === "gs_inps") {
                     document.getElementById("detContributiInpsTitoloPagamenti").innerText = "Gestione Separata";
                     document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
-                    document.getElementById("detAliquotaContributivaPagamenti").innerText = Math.round(26.07) + "%";
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = "26%";
                     document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                 } else {
                     document.getElementById("detContributiInpsTitoloPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
@@ -824,7 +852,7 @@
                     document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
                     document.getElementById("detPrimaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
                     document.getElementById("detSecondaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
-                    document.getElementById("detContributiInpsTipoPagamenti").innerText = cassaInps === "inps_commercianti" ? "Gestione Separata" : "Artigiani";
+                    document.getElementById("detContributiInpsTipoPagamenti").innerText = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
                 } else {
                     document.getElementById("detSaldoContributiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                     document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
