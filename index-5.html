@@ -916,7 +916,7 @@
                             dettaglioTesto += `.`;
                         }
                     } else if (contributiVariabili > 0) {
-                        dettaglioTesto += `${aliquotaVariabileDisplay} su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <span class="highlight-yellow">${contributiVariabili.toLocaleString('it-IT')}€</span>.`;
+                        dettaglioTesto += `${aliquotaVariabileDisplay} su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <strong><span class="highlight-yellow">${contributiVariabili.toLocaleString('it-IT')}€</span></strong>.`;
                     } else {
                         dettaglioTesto += `nessun contributo da versare.`;
                     }
@@ -924,7 +924,7 @@
                     dettaglioTesto += `</ul>`;
                     
                     const totaleSaldo = impostaSostitutiva + contributiInps;
-                    dettaglioTesto += `<p>Quindi, a livello di saldo, pagherai <span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi).</p>`;
+                    dettaglioTesto += `<p>Quindi, a livello di saldo, pagherai <strong><span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi).</p>`;
                     
                     // Acconti
                     const accontoImposta = impostaSostitutiva;
@@ -933,21 +933,21 @@
                     dettaglioTesto += `<h3>Acconti:</h3>`;
                     dettaglioTesto += `<p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>`;
                     dettaglioTesto += `<ul>`;
-                    dettaglioTesto += `<li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span>.</li>`;
+                    dettaglioTesto += `<li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <strong><span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span></strong>.</li>`;
                     if (accontoInps > 0) {
-                        dettaglioTesto += `<li>Contributi INPS: pagherai l’80% dell'importo dei contributi variabili come acconto, quindi <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span>.</li>`;
+                        dettaglioTesto += `<li>Contributi INPS: pagherai l’80% dell'importo dei contributi variabili come acconto, quindi <strong><span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span></strong>.</li>`;
                     }
                     dettaglioTesto += `</ul>`;
                     
                     const totaleComplessivo = totaleSaldo + totaleAcconti;
                     dettaglioTesto += `<h3>Totale complessivo:</h3>`;
-                    dettaglioTesto += `<p>Saldo totale: <span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
-                    dettaglioTesto += `<p>Acconti totali: <span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta`;
+                    dettaglioTesto += `<p>Saldo totale: <strong><span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span></strong>(di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
+                    dettaglioTesto += `<p>Acconti totali: <strong><span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta`;
                     if (accontoInps > 0) {
                         dettaglioTesto += ` e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi`;
                     }
                     dettaglioTesto += `)</p>`;
-                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): ${(totaleComplessivo).toLocaleString('it-IT')}€</p>`;
+                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): <strong>${(totaleComplessivo).toLocaleString('it-IT')}€</strong></p>`;
                     
                     dettaglioTesto += `<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>`;
                 } else if (cassaInps === "gs_inps") {
