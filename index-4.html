@@ -877,7 +877,54 @@
 
             // Funzione per scaricare il recap in un file PDF
             downloadButton.addEventListener("click", async function() {
-                // Puoi implementare qui la funzione per scaricare il PDF
+                const { jsPDF } = window.jspdf;
+
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                const options = {
+                    backgroundColor: '#fff',
+                    scale: 2,
+                };
+
+                // Funzione per convertire un elemento HTML in immagine
+                async function addPageToPDF(element, pdf, addPage = false) {
+                    const canvas = await html2canvas(element, options);
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    if (addPage) {
+                        pdf.addPage();
+                    }
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                }
+
+                // Nascondi le altre schede per catturare solo quella desiderata
+                function showOnlyTab(tabId) {
+                    tabContents.forEach(content => content.style.display = 'none');
+                    document.getElementById(tabId).style.display = 'block';
+                }
+
+                function resetTabDisplay() {
+                    tabContents.forEach(content => content.style.display = '');
+                }
+
+                // Cattura "Come si Calcolano"
+                showOnlyTab('come-si-calcolano-tab');
+                await addPageToPDF(document.getElementById('come-si-calcolano-tab'), pdf);
+                // Cattura "Dettaglio pagamenti"
+                showOnlyTab('dettaglio-pagamenti-tab');
+                await addPageToPDF(document.getElementById('dettaglio-pagamenti-tab'), pdf, true);
+                // Cattura "Risultati" e "Scadenza pagamenti"
+                document.getElementById('risultati-container').style.display = 'block';
+                showOnlyTab('scadenza-pagamenti-tab');
+                await addPageToPDF(document.getElementById('risultati-container'), pdf, true);
+                await addPageToPDF(document.getElementById('scadenza-pagamenti-tab'), pdf);
+
+                // Ripristina la visualizzazione originale
+                resetTabDisplay();
+
+                // Scarica il PDF
+                pdf.save('Recap_Regime_Forfettario.pdf');
             });
         });
     </script>
