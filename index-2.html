@@ -813,6 +813,9 @@
                         }
                     }
                 });
+                document.querySelectorAll('.detRedditoLordoDetPagamenti').forEach(elemento => {
+                  elemento.innerText = redditoLordoo;
+                });
 
                 // Compila il contenuto del file
                 const content = `
@@ -855,25 +858,7 @@ ${scadenze.join('\n')}
             });
         });
     </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        function copiaValoreClasse(classe) {
-            const elementi = document.querySelectorAll('.' + classe);
-            if (elementi.length > 0) {
-                const valore = elementi[0].innerText;
-                elementi.forEach(elem => {
-                    elem.innerText = valore;
-                });
-            }
-        }
 
-        document.getElementById("calcolatoreForm").addEventListener("submit", function(event) {
-            setTimeout(() => {
-                copiaValoreClasse('detRedditoLordoDetPagamenti');
-            }, 100);
-        });
-    });
-</script>
     
 </body>
 </html>
