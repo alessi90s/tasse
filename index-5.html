@@ -909,9 +909,9 @@
                     // Calcolo dei contributi fissi e variabili
                     dettaglioTesto += `<li>Contributi INPS: `;
                     if (contributiFissiSulAnno > 0) {
-                        dettaglioTesto += `<span class="highlight-yellow">${contributiFissiSulAnno.toLocaleString('it-IT')}€</span> di contributi fissi`;
+                        dettaglioTesto += `<strong><span class="highlight-yellow">${contributiFissiSulAnno.toLocaleString('it-IT')}€</span></strong> di contributi fissi`;
                         if (contributiVariabili > 0) {
-                            dettaglioTesto += ` e <span class="highlight-yellow">${contributiVariabili.toLocaleString('it-IT')}€</span> di contributi variabili (${aliquotaVariabileDisplay} sull'eccedenza).`;
+                            dettaglioTesto += ` e <strong><span class="highlight-yellow">${contributiVariabili.toLocaleString('it-IT')}€</span></strong> di contributi variabili (${aliquotaVariabileDisplay} sull'eccedenza).`;
                         } else {
                             dettaglioTesto += `.`;
                         }
