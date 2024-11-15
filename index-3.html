@@ -32,10 +32,14 @@
         }
         h2 {
             color: #333;
-            border-bottom: 1px solid #ccc;
             padding-bottom: 5px;
             margin-top: 30px;
             font-size: 1.5em;
+        }
+        /* Rimozione della linea sotto il titolo nelle sezioni specifiche */
+        #come-si-calcolano-tab h2,
+        #dettaglio-pagamenti-tab h2 {
+            border-bottom: none;
         }
         /* Stili del Form */
         .calcolatore-container {
@@ -188,12 +192,13 @@
             content: '';
             position: absolute;
             top: 0;
-            left: 50px;
+            left: 0;
             right: 0;
             bottom: 0;
             background-image: repeating-linear-gradient(
-                #c5c5c5 0,
-                #c5c5c5 1px,
+                to bottom,
+                rgba(197, 197, 197, 0.2) 0,
+                rgba(197, 197, 197, 0.2) 1px,
                 transparent 1px,
                 transparent 24px
             );
@@ -203,11 +208,15 @@
             content: '';
             position: absolute;
             top: 0;
-            left: 50px;
+            left: 0;
             bottom: 0;
-            width: 1px;
-            background-color: #c5c5c5;
+            width: 0;
+            background-color: transparent;
             z-index: 0;
+        }
+        /* Allineamento del testo alle righe */
+        #come-si-calcolano-tab * {
+            line-height: 25px;
         }
         /* Stile per il quaderno a quadretti */
         #dettaglio-pagamenti-tab {
@@ -222,8 +231,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: linear-gradient(to right, rgba(197, 197, 197, 0.5) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(197, 197, 197, 0.5) 1px, transparent 1px);
+            background-image: linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px);
             background-size: 25px 25px;
             z-index: 0;
         }
@@ -245,8 +254,8 @@
                 text-align: center;
             }
             /* Aggiustamenti per il quaderno a righe su mobile */
-            #come-si-calcolano-tab::after {
-                left: 20px;
+            #come-si-calcolano-tab * {
+                line-height: 20px;
             }
         }
     </style>
@@ -408,22 +417,22 @@
                     Reddito Netto (<strong id="detRedditoNettoInpsPagamenti"></strong>€) x Aliquota Contributiva (<strong id="detAliquotaContributivaPagamenti"></strong>) = <strong id="detContributiInpsCalcolatiPagamenti"></strong>€
                 </p>
                 <h3>Tasse da pagare:</h3>
-                <p class="highlight-yellow">
-                    Saldo imposta sostitutiva sul <strong id="detAnnoPagamenti"></strong> (<strong id="detSaldoImpostaPagamenti"></strong>€) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
+                <p>
+                    Saldo imposta sostitutiva sul <strong id="detAnnoPagamenti"></strong> (<span class="highlight-yellow"><strong id="detSaldoImpostaPagamenti"></strong>€</span>) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
                 </p>
-                <p class="highlight-blue">
-                    Acconto imposta sostitutiva per il <span id="annoAccontoImpostaDettaglio"></span> (<strong id="detAccontoImpostaPagamenti"></strong>€) da pagare in due rate:<br>
-                    Prima rata (<strong id="detPrimaRataImpostaPagamenti"></strong>€) entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.<br>
-                    Seconda rata (<strong id="detSecondaRataImpostaPagamenti"></strong>€) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
+                <p>
+                    Acconto imposta sostitutiva per il <span id="annoAccontoImpostaDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoImpostaPagamenti"></strong>€</span>) da pagare in due rate:<br>
+                    Prima rata (<span class="highlight-blue"><strong id="detPrimaRataImpostaPagamenti"></strong>€</span>) entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.<br>
+                    Seconda rata (<span class="highlight-blue"><strong id="detSecondaRataImpostaPagamenti"></strong>€</span>) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
                 </p>
                 <h3>Contributi previdenziali:</h3>
-                <p class="highlight-yellow">
-                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul <strong id="detAnnoPagamenti"></strong> (<strong id="detSaldoContributiPagamenti"></strong>€) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
+                <p>
+                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul <strong id="detAnnoPagamenti"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
                 </p>
-                <p class="highlight-blue">
-                    Acconto contributi INPS per il <span id="annoAccontoInpsDettaglio"></span> (<strong id="detAccontoContributiPagamenti"></strong>€) da pagare in due rate:<br>
-                    Prima rata (<strong id="detPrimaRataContributiPagamenti"></strong>€) entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.<br>
-                    Seconda rata (<strong id="detSecondaRataContributiPagamenti"></strong>€) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
+                <p>
+                    Acconto contributi INPS per il <span id="annoAccontoInpsDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoContributiPagamenti"></strong>€</span>) da pagare in due rate:<br>
+                    Prima rata (<span class="highlight-blue"><strong id="detPrimaRataContributiPagamenti"></strong>€</span>) entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.<br>
+                    Seconda rata (<span class="highlight-blue"><strong id="detSecondaRataContributiPagamenti"></strong>€</span>) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
                 </p>
                 <h3>Riepilogo dei Pagamenti:</h3>
                 <ul>
@@ -788,7 +797,7 @@
                     dettaglioTesto += `Normalmente invece per un anno completo i contributi fissi sono di <u>${contributiFissiIpotetici.toLocaleString('it-IT')}€</u>.<br><br>`;
                     if (contributiVariabili > 0) {
                         let aliquotaVariabileEffettiva = aliquotaVariabile * (riduzioneContributi ? 0.65 : 1) * 100;
-                        aliquotaVariabileDisplay = aliquotaVariabileEffettiva.toFixed(2) + "%";
+                        aliquotaVariabileDisplay = Math.round(aliquotaVariabileEffettiva) + "%";
                         dettaglioTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabileDisplay} sull'eccedenza di <u>${(redditoNetto - sogliaReddito).toLocaleString('it-IT')}€</u>.`;
                     } else {
                         dettaglioTesto += `Il tuo reddito netto non supera la soglia di 18.415€, quindi non paghi contributi variabili.`;
@@ -799,19 +808,19 @@
                     dettaglioTesto += `<p>Per un incasso di ${redditoLordo.toLocaleString('it-IT')}€, il ${(coefficienteRedditivita * 100).toFixed(0)}% corrisponde a ${redditoNetto.toLocaleString('it-IT')}€. Su questo importo, dovrai pagare:</p>`;
                     
                     dettaglioTesto += `<ul>`;
-                    dettaglioTesto += `<li>Imposta sostitutiva: ${(aliquotaImposta * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${impostaSostitutiva.toLocaleString('it-IT')}€.</li>`;
+                    dettaglioTesto += `<li>Imposta sostitutiva: ${(aliquotaImposta * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span>.</li>`;
                     
                     // Calcolo dei contributi fissi e variabili
                     dettaglioTesto += `<li>Contributi INPS: `;
                     if (contributiFissiSulAnno > 0) {
-                        dettaglioTesto += `${contributiFissiSulAnno.toLocaleString('it-IT')}€ di contributi fissi`;
+                        dettaglioTesto += `<span class="highlight-yellow">${contributiFissiSulAnno.toLocaleString('it-IT')}€</span> di contributi fissi`;
                         if (contributiVariabili > 0) {
-                            dettaglioTesto += ` e ${contributiVariabili.toLocaleString('it-IT')}€ di contributi variabili (${aliquotaVariabileDisplay} sull'eccedenza).`;
+                            dettaglioTesto += ` e <span class="highlight-yellow">${contributiVariabili.toLocaleString('it-IT')}€</span> di contributi variabili (${aliquotaVariabileDisplay} sull'eccedenza).`;
                         } else {
                             dettaglioTesto += `.`;
                         }
                     } else if (contributiVariabili > 0) {
-                        dettaglioTesto += `${aliquotaVariabileDisplay} su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${contributiVariabili.toLocaleString('it-IT')}€.`;
+                        dettaglioTesto += `${aliquotaVariabileDisplay} su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <span class="highlight-yellow">${contributiVariabili.toLocaleString('it-IT')}€</span>.`;
                     } else {
                         dettaglioTesto += `nessun contributo da versare.`;
                     }
@@ -819,7 +828,7 @@
                     dettaglioTesto += `</ul>`;
                     
                     const totaleSaldo = impostaSostitutiva + contributiInps;
-                    dettaglioTesto += `<p>Quindi, a livello di saldo, pagherai ${totaleSaldo.toLocaleString('it-IT')}€ (di cui ${impostaSostitutiva.toLocaleString('it-IT')}€ di imposta e ${contributiInps.toLocaleString('it-IT')}€ di contributi).</p>`;
+                    dettaglioTesto += `<p>Quindi, a livello di saldo, pagherai <span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi).</p>`;
                     
                     // Acconti
                     const accontoImposta = impostaSostitutiva;
@@ -828,21 +837,21 @@
                     dettaglioTesto += `<h3>Acconti:</h3>`;
                     dettaglioTesto += `<p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>`;
                     dettaglioTesto += `<ul>`;
-                    dettaglioTesto += `<li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori ${accontoImposta.toLocaleString('it-IT')}€.</li>`;
+                    dettaglioTesto += `<li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span>.</li>`;
                     if (accontoInps > 0) {
-                        dettaglioTesto += `<li>Contributi INPS: pagherai l’80% dell'importo dei contributi variabili come acconto, quindi ${accontoInps.toLocaleString('it-IT')}€.</li>`;
+                        dettaglioTesto += `<li>Contributi INPS: pagherai l’80% dell'importo dei contributi variabili come acconto, quindi <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span>.</li>`;
                     }
                     dettaglioTesto += `</ul>`;
                     
                     const totaleComplessivo = totaleSaldo + totaleAcconti;
                     dettaglioTesto += `<h3>Totale complessivo:</h3>`;
-                    dettaglioTesto += `<p>Saldo totale: ${totaleSaldo.toLocaleString('it-IT')}€ (di cui ${impostaSostitutiva.toLocaleString('it-IT')}€ di imposta e ${contributiInps.toLocaleString('it-IT')}€ di contributi)</p>`;
-                    dettaglioTesto += `<p>Acconti totali: ${totaleAcconti.toLocaleString('it-IT')}€ (di cui ${accontoImposta.toLocaleString('it-IT')}€ di imposta`;
+                    dettaglioTesto += `<p>Saldo totale: <span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
+                    dettaglioTesto += `<p>Acconti totali: <span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta`;
                     if (accontoInps > 0) {
-                        dettaglioTesto += ` e ${accontoInps.toLocaleString('it-IT')}€ di contributi`;
+                        dettaglioTesto += ` e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi`;
                     }
                     dettaglioTesto += `)</p>`;
-                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): ${totaleComplessivo.toLocaleString('it-IT')}€</p>`;
+                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): ${(totaleComplessivo).toLocaleString('it-IT')}€</p>`;
                     
                     dettaglioTesto += `<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>`;
                 } else if (cassaInps === "gs_inps") {
@@ -857,14 +866,14 @@
                     dettaglioTesto += `<p>Per un incasso di ${redditoLordo.toLocaleString('it-IT')}€, il ${(coefficienteRedditivita * 100).toFixed(0)}% corrisponde a ${redditoNetto.toLocaleString('it-IT')}€. Su questo importo, dovrai pagare:</p>`;
                     
                     dettaglioTesto += `<ul>`;
-                    dettaglioTesto += `<li>Imposta sostitutiva: ${(aliquotaImposta * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${impostaSostitutiva.toLocaleString('it-IT')}€.</li>`;
+                    dettaglioTesto += `<li>Imposta sostitutiva: ${(aliquotaImposta * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span>.</li>`;
                     
-                    dettaglioTesto += `<li>Contributi INPS: 26% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a ${contributiInps.toLocaleString('it-IT')}€.</li>`;
+                    dettaglioTesto += `<li>Contributi INPS: 26% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span>.</li>`;
                     
                     dettaglioTesto += `</ul>`;
                     
                     const totaleSaldo = impostaSostitutiva + contributiInps;
-                    dettaglioTesto += `<p>Quindi, a livello di saldo, pagherai ${totaleSaldo.toLocaleString('it-IT')}€ (di cui ${impostaSostitutiva.toLocaleString('it-IT')}€ di imposta e ${contributiInps.toLocaleString('it-IT')}€ di contributi).</p>`;
+                    dettaglioTesto += `<p>Quindi, a livello di saldo, pagherai <span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi).</p>`;
                     
                     // Acconti
                     const accontoImposta = impostaSostitutiva;
@@ -873,15 +882,15 @@
                     dettaglioTesto += `<h3>Acconti:</h3>`;
                     dettaglioTesto += `<p>Oltre al saldo, dovrai versare anche gli acconti per l’anno successivo:</p>`;
                     dettaglioTesto += `<ul>`;
-                    dettaglioTesto += `<li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori ${accontoImposta.toLocaleString('it-IT')}€.</li>`;
-                    dettaglioTesto += `<li>Contributi INPS: pagherai l’80% dell'importo del saldo come acconto, quindi ${accontoInps.toLocaleString('it-IT')}€.</li>`;
+                    dettaglioTesto += `<li>Imposta sostitutiva: pagherai il 100% dell'importo del saldo come acconto, quindi ulteriori <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span>.</li>`;
+                    dettaglioTesto += `<li>Contributi INPS: pagherai l’80% dell'importo del saldo come acconto, quindi <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span>.</li>`;
                     dettaglioTesto += `</ul>`;
                     
                     const totaleComplessivo = totaleSaldo + totaleAcconti;
                     dettaglioTesto += `<h3>Totale complessivo:</h3>`;
-                    dettaglioTesto += `<p>Saldo totale: ${totaleSaldo.toLocaleString('it-IT')}€ (di cui ${impostaSostitutiva.toLocaleString('it-IT')}€ di imposta e ${contributiInps.toLocaleString('it-IT')}€ di contributi)</p>`;
-                    dettaglioTesto += `<p>Acconti totali: ${totaleAcconti.toLocaleString('it-IT')}€ (di cui ${accontoImposta.toLocaleString('it-IT')}€ di imposta e ${accontoInps.toLocaleString('it-IT')}€ di contributi)</p>`;
-                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): ${totaleComplessivo.toLocaleString('it-IT')}€</p>`;
+                    dettaglioTesto += `<p>Saldo totale: <span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
+                    dettaglioTesto += `<p>Acconti totali: <span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
+                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): ${(totaleComplessivo).toLocaleString('it-IT')}€</p>`;
                     
                     dettaglioTesto += `<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>`;
                 }
@@ -905,9 +914,10 @@
                     document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                 } else {
                     let aliquotaVariabileEffettiva = aliquotaVariabile * (riduzioneContributi ? 0.65 : 1) * 100;
+                    aliquotaVariabileDisplay = Math.round(aliquotaVariabileEffettiva) + "%";
                     document.getElementById("detContributiInpsTitoloPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
                     document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
-                    document.getElementById("detAliquotaContributivaPagamenti").innerText = aliquotaVariabileEffettiva.toFixed(2) + "%";
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = aliquotaVariabileDisplay;
                     document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
                 }
 
@@ -937,9 +947,9 @@
                 const totaleComplessivo = totaleTasseContributi + totaleAcconti;
 
                 // Calcolo delle percentuali rispetto al reddito lordo
-                const percentualeTotaleTasseContributi = ((totaleTasseContributi / redditoLordo) * 100).toFixed(2) + "%";
-                const percentualeTotaleAcconti = ((totaleAcconti / redditoLordo) * 100).toFixed(2) + "%";
-                const percentualeTotaleComplessivo = ((totaleComplessivo / redditoLordo) * 100).toFixed(2) + "%";
+                const percentualeTotaleTasseContributi = ((totaleTasseContributi / redditoLordo) * 100).toFixed(0) + "%";
+                const percentualeTotaleAcconti = ((totaleAcconti / redditoLordo) * 100).toFixed(0) + "%";
+                const percentualeTotaleComplessivo = ((totaleComplessivo / redditoLordo) * 100).toFixed(0) + "%";
 
                 document.getElementById("detTotaleTasseContributiPagamenti").innerText = totaleTasseContributi.toLocaleString('it-IT');
                 document.getElementById("detTotaleAccontiPagamenti").innerText = totaleAcconti.toLocaleString('it-IT');
