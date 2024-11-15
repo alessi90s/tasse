@@ -195,6 +195,7 @@
             left: 0;
             right: 0;
             bottom: 0;
+            pointer-events: none;
             background-image: repeating-linear-gradient(
                 to bottom,
                 rgba(197, 197, 197, 0.2) 0,
@@ -231,6 +232,7 @@
             left: 0;
             right: 0;
             bottom: 0;
+            pointer-events: none;
             background-image: linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
                               linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px);
             background-size: 25px 25px;
@@ -582,7 +584,7 @@
     <!-- Inclusione delle librerie jsPDF e html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
+  
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cassaInpsSelect = document.getElementById("cassaInps");
