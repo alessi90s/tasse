@@ -602,7 +602,7 @@
             // Impostazioni Predefinite
             document.getElementById("annoReddito").value = "2024";
             document.getElementById("aliquotaImposta").value = "0.05";
-            document.getElementById("coefficienteRedditivita").value = "78"; // Cambiato a 78% per allinearsi all'esempio
+            document.getElementById("coefficienteRedditivita").value = "78"; // Cambia questo valore se necessario
 
             // Mostra/Nascondi le opzioni aggiuntive per Commercianti e Artigiani
             cassaInpsSelect.addEventListener("change", function() {
@@ -686,13 +686,13 @@
 
                 if (cassaInps === "gs_inps") {
                     // Gestione Separata INPS
-                    const aliquotaGsInps = 26.23 / 100; // Aliquota precisa
+                    const aliquotaGsInps = 26 / 100; // Aliquota
                     contributiInps = Math.round(redditoNetto * aliquotaGsInps);
                     accontoInps = Math.round(contributiInps * 0.80);
                 } else if (cassaInps === "inps_commercianti") {
                     // INPS Commercianti
                     const contributiFissiAnnui = 4515; // Arrotondato
-                    aliquotaVariabile = 24.48 / 100; // Aliquota precisa
+                    aliquotaVariabile = 24 / 100; // Aliquota
                     aliquotaVariabileDisplay = "24%"; // Visualizzata senza decimali
 
                     // Applicazione della riduzione del 35% se selezionata
@@ -710,7 +710,7 @@
                 } else if (cassaInps === "inps_artigiani") {
                     // INPS Artigiani
                     const contributiFissiAnnui = 4427; // Arrotondato
-                    aliquotaVariabile = 24 / 100; // Aliquota precisa
+                    aliquotaVariabile = 24 / 100; // Aliquota
                     aliquotaVariabileDisplay = "24%"; // Visualizzata senza decimali
 
                     // Applicazione della riduzione del 35% se selezionata
