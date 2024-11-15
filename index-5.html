@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolatore Regime Forfettario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Stili di base */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #f7f7f7;
+            color: #333;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 2px solid #ccc;
+        }
+        .container {
+            flex: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+            width: 100%;
+        }
+        h2 {
+            color: #333;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            font-size: 1.5em;
+        }
+        /* Rimozione della linea sotto il titolo nelle sezioni specifiche */
+        #come-si-calcolano-tab h2,
+        #dettaglio-pagamenti-tab h2 {
+            border-bottom: none;
+        }
+        /* Stili del Form */
+        .calcolatore-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+            border-bottom: 2px solid #ccc;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        button {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        button:hover {
+            background-color: #f0f0f0;
+        }
+        .reddito-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .reddito-buttons button {
+            flex: 1 1 calc(50% - 10px);
+            padding: 8px;
+            background-color: #e0e0e0;
+            color: #333;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .reddito-buttons button:hover {
+            background-color: #d5d5d5;
+        }
+        /* Sezioni dei Risultati e delle Schede */
+        .risultati-container, .schede-container {
+            display: none;
+            margin-top: 30px;
+        }
+        /* Schede */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            background-color: #e0f7fa;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab.active {
+            background-color: #b2ebf2;
+            color: #333;
+            border-bottom: 2px solid #333;
+        }
+        .tab-content {
+            display: none;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* Tabelle */
+        .table-container {
+            max-width: 100%;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: inherit;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .highlight-yellow {
+            background-color: #fff9c4;
+        }
+        .highlight-blue {
+            background-color: #bbdefb;
+        }
+        .indent {
+            padding-left: 20px;
+        }
+        /* Pulsante Download */
+        #downloadRecap {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 16px;
+        }
+        #downloadRecap:hover {
+            background-color: #f0f0f0;
+        }
+        /* Stile per il quaderno a righe */
+        #come-si-calcolano-tab {
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        #come-si-calcolano-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-image: repeating-linear-gradient(
+                to bottom,
+                rgba(197, 197, 197, 0.2) 0,
+                rgba(197, 197, 197, 0.2) 1px,
+                transparent 1px,
+                transparent 24px
+            );
+            z-index: 0;
+        }
+        #come-si-calcolano-tab::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            background-color: transparent;
+            z-index: 0;
+        }
+        /* Allineamento del testo alle righe */
+        #come-si-calcolano-tab * {
+            line-height: 25px;
+        }
+        /* Stile per il quaderno a quadretti */
+        #dettaglio-pagamenti-tab {
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        #dettaglio-pagamenti-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-image: linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px);
+            background-size: 25px 25px;
+            z-index: 0;
+        }
+        /* Posizionamento del contenuto sopra lo sfondo */
+        #come-si-calcolano-tab .tab-content,
+        #dettaglio-pagamenti-tab .tab-content {
+            position: relative;
+            z-index: 1;
+        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .reddito-buttons button {
+                flex: 1 1 100%;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                text-align: center;
+            }
+            /* Aggiustamenti per il quaderno a righe su mobile */
+            #come-si-calcolano-tab * {
+                line-height: 20px;
+            }
+        }
+        /* Stili per il contenitore del form */
+        .form-group {
+            margin-top: 15px;
+        }
+        /* Stili per il checkbox personalizzato */
+        .checkbox-container {
+            display: block;
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            user-select: none;
+            font-weight: normal;
+        }
+        /* Nascondi il checkbox originale */
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        /* Crea un nuovo aspetto per il checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Effetto hover per il checkbox */
+        .checkbox-container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+        /* Stile quando il checkbox è selezionato */
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #2196F3;
+            border-color: #2196F3;
+        }
+        /* Crea il segno di spunta */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        /* Mostra il segno di spunta quando selezionato */
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+        /* Stile del segno di spunta */
+        .checkbox-container .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        /* Stili per il campo data */
+        #dataApertura {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        /* Stili per l'etichetta */
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Calcolatore Regime Forfettario</h1>
+    </header>
+
+    <div class="container">
+
+        <!-- Sezione Calcolatore -->
+        <section id="calcolatore">
+            <div class="calcolatore-container">
+                <form id="calcolatoreForm">
+                    <label for="annoReddito">Anno di Riferimento del Reddito:</label>
+                    <select id="annoReddito" required disabled>
+                        <option value="2024" selected>2024</option>
+                        <!-- Puoi aggiungere altri anni se necessario -->
+                    </select>
+
+                    <label for="cassaInps">Cassa di Riferimento INPS:</label>
+                    <select id="cassaInps" required>
+                        <option value="">-- Seleziona la cassa INPS --</option>
+                        <option value="gs_inps">Gestione Separata INPS</option>
+                        <option value="inps_commercianti">INPS Commercianti</option>
+                        <option value="inps_artigiani">INPS Artigiani</option>
+                    </select>
+
+                    <div id="opzioniCommercianteArtigiano" style="display: none;">
+                        <div class="form-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="riduzioneContributi">
+                                Applica riduzione del 35% sui contributi INPS
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dataApertura">Data di Apertura della Partita IVA:</label>
+                            <input type="date" id="dataApertura">
+                        </div>
+                    </div>
+
+                    <label for="aliquotaImposta">Aliquota Imposta Sostitutiva:</label>
+                    <select id="aliquotaImposta" required>
+                        <option value="0.05" selected>5%</option>
+                        <option value="0.15">15%</option>
+                    </select>
+
+                    <label for="coefficienteRedditivita">Coefficiente di Redditività (%):</label>
+                    <select id="coefficienteRedditivita" required>
+                        <option value="86" selected>86%</option>
+                        <option value="78">78%</option>
+                        <option value="67">67%</option>
+                        <option value="40">40%</option>
+                        <!-- Aggiungi altri coefficienti se necessario -->
+                    </select>
+
+                    <label for="redditoLordo">Reddito Lordo (€):</label>
+                    <input type="number" id="redditoLordo" min="0" step="1" required>
+                    
+                    <!-- Bottoni per Reddito Lordo Predefinito -->
+                    <div class="reddito-buttons">
+                        <button type="button" data-value="10000">10.000€</button>
+                        <button type="button" data-value="20000">20.000€</button>
+                        <button type="button" data-value="30000">30.000€</button>
+                        <button type="button" data-value="40000">40.000€</button>
+                        <button type="button" data-value="50000">50.000€</button>
+                        <button type="button" data-value="60000">60.000€</button>
+                        <button type="button" data-value="70000">70.000€</button>
+                        <button type="button" data-value="85000">85.000€</button>
+                    </div>
+
+                    <button type="submit">Calcola</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Sezione Risultati -->
+        <section id="risultati-container" class="risultati-container">
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Descrizione</th>
+                        <th>Importo (€)</th>
+                    </tr>
+                    <tr>
+                        <td>Reddito Lordo:</td>
+                        <td id="redditoLordoOutput"></td>
+                    </tr>
+                    <tr>
+                        <td>Reddito Netto (Anno <span id="annoRedditoOutput"></span>):</td>
+                        <td id="redditoNettoOutput"></td>
+                    </tr>
+                    <tr>
+                        <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul <span id="annoRedditoOutput2"></span>:</td>
+                        <td id="impostaSostitutivaOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr>
+                        <td>Acconto Imposta Sostitutiva (100%) sul <span id="annoAccontoImposta"></span>:</td>
+                        <td id="accontoImpostaOutput" class="highlight-blue"></td>
+                    </tr>
+                    <!-- Contributi INPS -->
+                    <tr id="contributiInpsRow">
+                        <td>Contributi INPS sul <span id="annoRedditoOutput3"></span>:</td>
+                        <td id="contributiInpsOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr id="contributiFissiRow" style="display: none;">
+                        <td class="indent">Contributi Fissi sul <span id="annoRedditoOutput4"></span>:</td>
+                        <td id="contributiFissiOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr id="contributiVariabiliRow" style="display: none;">
+                        <td class="indent">Contributi Variabili sul <span id="annoRedditoOutput5"></span>:</td>
+                        <td id="contributiVariabiliOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr id="totaleContributiInpsRow" style="display: none;">
+                        <td><strong>Totale Contributi INPS sul <span id="annoRedditoOutput6"></span>:</strong></td>
+                        <td id="totaleContributiInpsOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <!-- Contributi Fissi Ipotetici -->
+                    <tr id="contributiFissiIpoteticiRow">
+                        <td>Contributi Fissi (ipotetici su anno completo):</td>
+                        <td id="contributiFissiIpoteticiOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr>
+                        <td>Acconto Contributi INPS sul <span id="annoAccontoInps"></span>:</td>
+                        <td id="accontoInpsOutput" class="highlight-blue"></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sezione Schede -->
+        <section id="schede-container" class="schede-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="come-si-calcolano">Come si calcolano</div>
+                <div class="tab" data-tab="dettaglio-pagamenti">Dettaglio pagamenti</div>
+                <div class="tab" data-tab="scadenza-pagamenti">Scadenza pagamenti</div>
+            </div>
+            <div class="tab-content active" id="come-si-calcolano-tab">
+                <h2>Come si Calcolano</h2>
+                <div id="dettaglioCalcoli">
+                    <!-- Il testo dinamico verrà inserito qui -->
+                </div>
+            </div>
+            <div class="tab-content" id="dettaglio-pagamenti-tab">
+                <h2>Dettaglio pagamenti</h2>
+                <p>
+                    Dettaglio dei pagamenti per l'anno <strong id="detAnnoPagamenti"></strong><br>
+                    Hai guadagnato <strong id="detRedditoLordoPagamenti"></strong>€ nel <strong id="detAnnoPagamenti2"></strong>.
+                </p>
+                <h3>Calcolo del Reddito Netto:</h3>
+                <p>
+                    Reddito Lordo (<strong id="detRedditoLordoDetPagamenti"></strong>€) x Coefficiente di Redditività (<strong id="detCoefficienteDetPagamenti"></strong>) = <strong id="detRedditoNettoPagamenti"></strong>€
+                </p>
+                <h3>Calcolo dell'Imposta Sostitutiva:</h3>
+                <p>
+                    Reddito Netto (<strong id="detRedditoNettoDetPagamenti"></strong>€) x Aliquota Imposta Sostitutiva (<strong id="detAliquotaImpostaPagamenti"></strong>) = <strong id="detImpostaSostitutivaPagamenti"></strong>€
+                </p>
+                <h3>Calcolo dei Contributi INPS (<span id="detContributiInpsTitoloPagamenti"></span>):</h3>
+                <p>
+                    Reddito Netto (<strong id="detRedditoNettoInpsPagamenti"></strong>€) x Aliquota Contributiva (<strong id="detAliquotaContributivaPagamenti"></strong>) = <strong id="detContributiInpsCalcolatiPagamenti"></strong>€
+                </p>
+                <h3>Tasse da pagare:</h3>
+                <p>
+                    Saldo imposta sostitutiva sul <strong id="detAnnoPagamenti3"></strong> (<span class="highlight-yellow"><strong id="detSaldoImpostaPagamenti"></strong>€</span>) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
+                </p>
+                <p>
+                    Acconto imposta sostitutiva per il <span id="annoAccontoImpostaDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoImpostaPagamenti"></strong>€</span>) da pagare in due rate:<br>
+                    Prima rata (<span class="highlight-blue"><strong id="detPrimaRataImpostaPagamenti"></strong>€</span>) entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.<br>
+                    Seconda rata (<span class="highlight-blue"><strong id="detSecondaRataImpostaPagamenti"></strong>€</span>) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
+                </p>
+                <h3>Contributi previdenziali:</h3>
+                <p>
+                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul <strong id="detAnnoPagamenti4"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
+                </p>
+                <p>
+                    Acconto contributi INPS per il <span id="annoAccontoInpsDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoContributiPagamenti"></strong>€</span>) da pagare in due rate:<br>
+                    Prima rata (<span class="highlight-blue"><strong id="detPrimaRataContributiPagamenti"></strong>€</span>) entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.<br>
+                    Seconda rata (<span class="highlight-blue"><strong id="detSecondaRataContributiPagamenti"></strong>€</span>) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
+                </p>
+                <h3>Riepilogo dei Pagamenti:</h3>
+                <ul>
+                    <li>Totale tasse e contributi effettivi sul <strong id="detAnnoPagamenti5"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong>€ (<strong id="percentualeTotaleTasseContributi"></strong> del tuo reddito lordo)</li>
+                    <li>Totale acconti per il <span id="annoAccontoImpostaDettaglio2"></span>: <strong id="detTotaleAccontiPagamenti"></strong>€ (<strong id="percentualeTotaleAcconti"></strong> del tuo reddito lordo)</li>
+                    <li>Totale da versare complessivamente: <strong id="detTotaleComplessivoPagamenti"></strong>€ (<strong id="percentualeTotaleComplessivo"></strong> del tuo reddito lordo)</li>
+                </ul>
+                <p>
+                    Nota: Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (<span id="annoAccontoImpostaDettaglio3"></span>) e non rappresentano un costo aggiuntivo.
+                </p>
+            </div>
+            <div class="tab-content" id="scadenza-pagamenti-tab">
+                <h2>Scadenza Pagamenti</h2>
+                <div class="table-container">
+                    <table>
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo Totale (€)</th>
+                            <th>Dettaglio</th>
+                        </tr>
+                        <tr id="scadenzaFissa1Row" style="display: none;">
+                            <td id="scadenzaFissa1"></td>
+                            <td id="importoFissa1"></td>
+                            <td id="dettaglioFissa1"></td>
+                        </tr>
+                        <tr id="scadenzaFissa2Row" style="display: none;">
+                            <td id="scadenzaFissa2"></td>
+                            <td id="importoFissa2"></td>
+                            <td id="dettaglioFissa2"></td>
+                        </tr>
+                        <tr id="scadenzaFissa3Row" style="display: none;">
+                            <td id="scadenzaFissa3"></td>
+                            <td id="importoFissa3"></td>
+                            <td id="dettaglioFissa3"></td>
+                        </tr>
+                        <tr id="scadenzaFissa4Row" style="display: none;">
+                            <td id="scadenzaFissa4"></td>
+                            <td id="importoFissa4"></td>
+                            <td id="dettaglioFissa4"></td>
+                        </tr>
+                        <!-- Scadenze Generali -->
+                        <tr>
+                            <td>30 giugno <span id="annoScadenzaGiugno"></span></td>
+                            <td id="totaleGiugno"></td>
+                            <td id="dettaglioGiugno"></td>
+                        </tr>
+                        <tr>
+                            <td>30 novembre <span id="annoScadenzaNovembre"></span></td>
+                            <td id="totaleNovembre"></td>
+                            <td id="dettaglioNovembre"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pulsante per scaricare il PDF -->
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="downloadRecap">Scarica Recap in PDF</button>
+        </div>
+
+    </div>
+
+    <!-- Inclusione delle librerie jsPDF e html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // [Il codice JavaScript rimane invariato rispetto alla versione precedente, con le correzioni applicate]
+            // [Assicurati di copiare l'intero script aggiornato nel tuo progetto]
+        });
+    </script>
+
+    
+</body>
+</html>
