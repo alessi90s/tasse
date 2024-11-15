@@ -187,27 +187,27 @@
         #come-si-calcolano-tab::before {
             content: '';
             position: absolute;
-            top: 40px;
-            left: 0;
+            top: 0;
+            left: 50px;
             right: 0;
-            height: calc(100% - 40px);
+            bottom: 0;
             background-image: repeating-linear-gradient(
-                to bottom,
-                transparent,
-                transparent 23px,
-                #c5c5c5 24px
+                #c5c5c5 0,
+                #c5c5c5 1px,
+                transparent 1px,
+                transparent 24px
             );
-            z-index: -1;
+            z-index: 0;
         }
         #come-si-calcolano-tab::after {
             content: '';
             position: absolute;
             top: 0;
-            left: 40px;
+            left: 50px;
             bottom: 0;
             width: 1px;
             background-color: #c5c5c5;
-            z-index: -1;
+            z-index: 0;
         }
         /* Stile per il quaderno a quadretti */
         #dettaglio-pagamenti-tab {
@@ -225,7 +225,13 @@
             background-image: linear-gradient(to right, rgba(197, 197, 197, 0.5) 1px, transparent 1px),
                               linear-gradient(to bottom, rgba(197, 197, 197, 0.5) 1px, transparent 1px);
             background-size: 25px 25px;
-            z-index: -1;
+            z-index: 0;
+        }
+        /* Posizionamento del contenuto sopra lo sfondo */
+        #come-si-calcolano-tab .tab-content,
+        #dettaglio-pagamenti-tab .tab-content {
+            position: relative;
+            z-index: 1;
         }
         /* Responsive Design */
         @media (max-width: 600px) {
@@ -367,7 +373,6 @@
                         <td id="accontoInpsOutput" class="highlight-blue"></td>
                     </tr>
                 </table>
-                <button id="downloadRecap">Scarica Recap</button>
             </div>
         </section>
 
@@ -475,7 +480,16 @@
             </div>
         </section>
 
+        <!-- Pulsante per scaricare il PDF -->
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="downloadRecap">Scarica Recap in PDF</button>
+        </div>
+
     </div>
+
+    <!-- Inclusione delle librerie jsPDF e html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -940,78 +954,56 @@
                 document.getElementById("schede-container").style.display = "block";
             });
 
-            // Funzione per scaricare il recap in un file TXT
-            downloadButton.addEventListener("click", function() {
-                // Recupera i valori di output
-                const annoReddito = document.getElementById("annoReddito").value;
-                const cassaInps = document.getElementById("cassaInps").value;
-                const riduzioneContributi = document.getElementById("riduzioneContributi").checked ? "Sì" : "No";
-                const dataApertura = document.getElementById("dataApertura").value || "N/A";
-                const aliquotaImposta = document.getElementById("aliquotaImpostaOutput").innerText;
-                const redditoLordo = document.getElementById("redditoLordoOutput").innerText;
-                const redditoNetto = document.getElementById("redditoNettoOutput").innerText;
-                const impostaSostitutiva = document.getElementById("impostaSostitutivaOutput").innerText;
-                const accontoImposta = document.getElementById("accontoImpostaOutput").innerText;
-                const contributiInps = document.getElementById("contributiInpsOutput").innerText;
-                const contributiFissi = document.getElementById("contributiFissiOutput").innerText;
-                const contributiVariabili = document.getElementById("contributiVariabiliOutput").innerText;
-                const totaleContributiInps = document.getElementById("totaleContributiInpsOutput").innerText;
-                const contributiFissiIpotetici = document.getElementById("contributiFissiIpoteticiOutput").innerText;
-                const accontoInps = document.getElementById("accontoInpsOutput").innerText;
+            // Funzione per scaricare il recap in un file PDF
+            downloadButton.addEventListener("click", async function() {
+                const { jsPDF } = window.jspdf;
 
-                // Raccogli le scadenze
-                const scadenzeRows = document.querySelectorAll("#scadenza-pagamenti-tab table tr");
-                const scadenze = [];
-                scadenzeRows.forEach(row => {
-                    const cells = row.querySelectorAll("td");
-                    if (cells.length === 3) {
-                        const date = cells[0].innerText;
-                        const amount = cells[1].innerText;
-                        const detail = cells[2].innerText;
-                        if (date && amount && detail) {
-                            scadenze.push(`- ${date}: ${amount}€ (${detail})`);
-                        }
+                const pdf = new jsPDF('p', 'pt', 'a4');
+                const options = {
+                    backgroundColor: '#fff',
+                    scale: 2,
+                };
+
+                // Funzione per convertire un elemento HTML in immagine
+                async function addPageToPDF(element, pdf, addPage = false) {
+                    const canvas = await html2canvas(element, options);
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = pdf.getImageProperties(imgData);
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    if (addPage) {
+                        pdf.addPage();
                     }
-                });
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                }
 
-                // Compila il contenuto del file
-                const content = `
-Recap Calcolatore Regime Forfettario
+                // Nascondi le altre schede per catturare solo quella desiderata
+                function showOnlyTab(tabId) {
+                    tabContents.forEach(content => content.style.display = 'none');
+                    document.getElementById(tabId).style.display = 'block';
+                }
 
-Dati Inseriti:
-- Anno di Riferimento del Reddito: ${annoReddito}
-- Cassa INPS: ${cassaInps === "gs_inps" ? "Gestione Separata INPS" : (cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani")}
-- Applica riduzione del 35% sui contributi INPS: ${riduzioneContributi}
-- Data di Apertura della Partita IVA: ${dataApertura}
-- Aliquota Imposta Sostitutiva: ${aliquotaImposta}
-- Reddito Lordo: ${redditoLordo}€
+                function resetTabDisplay() {
+                    tabContents.forEach(content => content.style.display = '');
+                }
 
-Risultati:
-- Reddito Netto (Anno ${annoReddito}): ${redditoNetto}€
-- Imposta Sostitutiva (${aliquotaImposta}) sul ${annoReddito}: ${impostaSostitutiva}€
-- Acconto Imposta Sostitutiva (100%) sul ${parseInt(annoReddito) + 1}: ${accontoImposta}€
-- Contributi INPS sul ${annoReddito}: ${contributiInps}€
-    - Contributi Fissi sul ${annoReddito}: ${contributiFissi}€
-    - Contributi Variabili sul ${annoReddito}: ${contributiVariabili}€
-    - Totale Contributi INPS sul ${annoReddito}: ${totaleContributiInps}€
-${cassaInps !== "gs_inps" ? `- Contributi Fissi (ipotetici su anno completo): ${contributiFissiIpotetici}€\n` : ''}
-- Acconto Contributi INPS sul ${parseInt(annoReddito) + 1}: ${accontoInps}€
+                // Cattura "Come si Calcolano"
+                showOnlyTab('come-si-calcolano-tab');
+                await addPageToPDF(document.getElementById('come-si-calcolano-tab'), pdf);
+                // Cattura "Dettaglio pagamenti"
+                showOnlyTab('dettaglio-pagamenti-tab');
+                await addPageToPDF(document.getElementById('dettaglio-pagamenti-tab'), pdf, true);
+                // Cattura "Risultati" e "Scadenza pagamenti"
+                document.getElementById('risultati-container').style.display = 'block';
+                showOnlyTab('scadenza-pagamenti-tab');
+                await addPageToPDF(document.getElementById('risultati-container'), pdf, true);
+                await addPageToPDF(document.getElementById('scadenza-pagamenti-tab'), pdf);
 
-Scadenze dei Pagamenti:
-${scadenze.join('\n')}
-`;
+                // Ripristina la visualizzazione originale
+                resetTabDisplay();
 
-                // Crea un blob con il contenuto
-                const blob = new Blob([content], { type: 'text/plain' });
-
-                // Crea un link per il download
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `Recap_Regime_Forfettario_${annoReddito}.txt`;
-                link.click();
-
-                // Libera l'URL
-                URL.revokeObjectURL(link.href);
+                // Scarica il PDF
+                pdf.save('Recap_Regime_Forfettario.pdf');
             });
         });
     </script>
