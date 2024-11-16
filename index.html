@@ -355,7 +355,7 @@
         </div>
     
     <header>
-        <h1>Calcolatore Regime Forfettario 2024</h1>
+        <h1>Calcolatore Regime <span class="highlight-yellow">Forfettario</span> 2024</h1>
     </header>
 
     <div class="container">
@@ -366,13 +366,13 @@
         <section id="calcolatore">
             <div class="calcolatore-container">
                 <form id="calcolatoreForm">
-                    <label for="annoReddito">Anno di Riferimento del Reddito:</label>
+                    <label for="annoReddito"><span class="highlight-yellow">Anno</span> di Riferimento del Reddito:</label>
                     <select id="annoReddito" required disabled>
                         <option value="2024" selected>2024</option>
                         <!-- Puoi aggiungere altri anni se necessario -->
                     </select>
 
-                    <label for="cassaInps">Cassa di Riferimento INPS:</label>
+                    <label for="cassaInps"><span class="highlight-yellow">Cassa</span> di Riferimento INPS:</label>
                     <select id="cassaInps" required>
                         <option value="">-- Seleziona la cassa INPS --</option>
                         <option value="gs_inps">Gestione Separata INPS</option>
@@ -395,13 +395,13 @@
                         </div>
                     </div>
 
-                    <label for="aliquotaImposta">Aliquota Imposta Sostitutiva:</label>
+                    <label for="aliquotaImposta"><span class="highlight-yellow">Aliquota</span> Imposta Sostitutiva:</label>
                     <select id="aliquotaImposta" required>
                         <option value="0.05" selected>5%</option>
                         <option value="0.15">15%</option>
                     </select>
 
-                    <label for="coefficienteRedditivita">Coefficiente di Redditività (%):</label>
+                    <label for="coefficienteRedditivita"><span class="highlight-yellow">Coefficiente</span> di Redditività (%):</label>
                     <select id="coefficienteRedditivita" required>
                         <option value="86" selected>86%</option>
                         <option value="78">78%</option>
@@ -410,7 +410,7 @@
                         <!-- Aggiungi altri coefficienti se necessario -->
                     </select>
 
-                    <label for="redditoLordo">Reddito Lordo (€):</label>
+                    <label for="redditoLordo">Reddito Lordo (quanto hai <span class="highlight-yellow">incassato</span> nel 2024?)(€):</label>
                     <input type="number" id="redditoLordo" min="0" step="1" required>
                     
                     <!-- Bottoni per Reddito Lordo Predefinito -->
