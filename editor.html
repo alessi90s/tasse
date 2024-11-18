@@ -37,9 +37,15 @@
             return;
         }
 
-        const spaces = ' '.repeat(numSpaces);
+        const spacesToAdd = ' '.repeat(numSpaces);
         const lines = textInput.value.split('\n');
-        const newText = lines.map(line => spaces + line.trimStart()).join('\n');
+        const newText = lines.map(line => {
+            // Trova gli spazi iniziali esistenti
+            const existingSpacesMatch = line.match(/^(\s*)/);
+            const existingSpaces = existingSpacesMatch ? existingSpacesMatch[1] : '';
+            // Aggiungi i nuovi spazi agli spazi esistenti
+            return existingSpaces + spacesToAdd + line.slice(existingSpaces.length);
+        }).join('\n');
         textInput.value = newText;
     });
 </script>
