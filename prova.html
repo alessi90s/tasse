@@ -19,36 +19,49 @@
 
 <script>
     const textInput = document.getElementById('textInput');
+    let previousText = '';
 
     textInput.addEventListener('input', function(e) {
+        const currentText = textInput.value;
+
+        // Dividi il testo precedente e corrente in linee
+        const previousLines = previousText.split('\n');
+        const currentLines = currentText.split('\n');
+
         // Ottieni la posizione del cursore
         const cursorPosition = textInput.selectionStart;
 
-        // Ottieni il testo fino alla posizione del cursore
-        const textBeforeCursor = textInput.value.substring(0, cursorPosition);
+        // Trova l'indice della linea corrente
+        const textBeforeCursor = currentText.substring(0, cursorPosition);
+        const lineIndex = textBeforeCursor.split('\n').length - 1;
 
-        // Trova l'inizio della riga corrente
-        const lastNewlineIndex = textBeforeCursor.lastIndexOf('\n');
-        const currentLineStart = lastNewlineIndex + 1;
+        // Ottieni il contenuto precedente e corrente della linea
+        const previousLine = previousLines[lineIndex] || '';
+        const currentLine = currentLines[lineIndex] || '';
 
-        // Ottieni la linea corrente
-        const currentLine = textInput.value.substring(currentLineStart, cursorPosition);
+        // Trova gli spazi iniziali della linea precedente e corrente
+        const previousLeadingSpaces = (previousLine.match(/^(\s*)/) || ['',''])[1];
+        const currentLeadingSpaces = (currentLine.match(/^(\s*)/) || ['',''])[1];
 
-        // Trova gli spazi iniziali della linea corrente
-        const lineMatch = currentLine.match(/^(\s*)/);
-        if (lineMatch) {
-            const leadingSpaces = lineMatch[1];
+        // Calcola la differenza negli spazi iniziali
+        const diffSpaces = currentLeadingSpaces.length - previousLeadingSpaces.length;
 
-            // Dividi il testo in linee
-            const lines = textInput.value.split('\n');
+        if (diffSpaces !== 0) {
+            // Regola gli spazi iniziali di tutte le altre linee
+            for (let i = 0; i < currentLines.length; i++) {
+                if (i !== lineIndex) {
+                    const line = currentLines[i];
+                    const lineLeadingSpaces = (line.match(/^(\s*)/) || ['',''])[1];
+                    let newLeadingSpacesLength = lineLeadingSpaces.length + diffSpaces;
+                    if (newLeadingSpacesLength < 0) newLeadingSpacesLength = 0;
+                    const newLeadingSpaces = ' '.repeat(newLeadingSpacesLength);
+                    currentLines[i] = newLeadingSpaces + line.trimStart();
+                }
+            }
 
-            // Applica gli stessi spazi iniziali a tutte le linee
-            const newText = lines.map(line => leadingSpaces + line.trimStart()).join('\n');
-
-            // Calcola la differenza di lunghezza
-            const lengthDifference = newText.length - textInput.value.length;
-
-            // Aggiorna il testo nell'area di testo
+            // Aggiorna il contenuto dell'area di testo
+            const newText = currentLines.join('\n');
+            const lengthDifference = newText.length - currentText.length;
             textInput.value = newText;
 
             // Riposiziona il cursore
@@ -56,6 +69,9 @@
             textInput.selectionStart = newCursorPosition;
             textInput.selectionEnd = newCursorPosition;
         }
+
+        // Aggiorna il testo precedente
+        previousText = textInput.value;
     });
 </script>
 
