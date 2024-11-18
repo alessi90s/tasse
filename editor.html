@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor di testo con aggiunta di spazi</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 300px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        #controls {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Editor di testo con aggiunta di spazi</h2>
+<div id="controls">
+    <label for="numSpaces">Numero di spazi da aggiungere all'inizio di ogni riga:</label>
+    <input type="number" id="numSpaces" min="0" value="0">
+    <button id="applyButton">Applica</button>
+</div>
+<textarea id="textInput"></textarea>
+
+<script>
+    const textInput = document.getElementById('textInput');
+    const numSpacesInput = document.getElementById('numSpaces');
+    const applyButton = document.getElementById('applyButton');
+
+    applyButton.addEventListener('click', function() {
+        const numSpaces = parseInt(numSpacesInput.value, 10);
+        if (isNaN(numSpaces) || numSpaces < 0) {
+            alert('Per favore, inserisci un numero valido di spazi (0 o superiore).');
+            return;
+        }
+
+        const spaces = ' '.repeat(numSpaces);
+        const lines = textInput.value.split('\n');
+        const newText = lines.map(line => spaces + line.trimStart()).join('\n');
+        textInput.value = newText;
+    });
+</script>
+
+</body>
+</html>
