@@ -794,7 +794,7 @@
                 }
 
                 // Popola la tabella dei risultati
-                document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT');
+                document.getElementById("redditoLordoOutput").innerText = redditoLordo+€.toLocaleString('it-IT');
                 document.getElementById("annoRedditoOutput").innerText = annoReddito;
                 document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT');
                 document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100).toFixed(0) + "%";
@@ -809,7 +809,7 @@
                 document.getElementById("annoRedditoOutput5").innerText = annoReddito;
                 document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT');
                 document.getElementById("annoRedditoOutput6").innerText = annoReddito;
-                document.getElementById("totaleContributiInpsOutput").innerText = (Number(contributiFissiSulAnno) + Number(contributiVariabili)).toLocaleString('it-IT');
+                document.getElementById("totaleContributiInpsOutput").innerText = (Number(contributiFissiSulAnno) + Number(contributiVariabili))+€.toLocaleString('it-IT');
                 document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT');
                 document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
                 document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT');
