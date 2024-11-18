@@ -1060,21 +1060,23 @@
                 document.getElementById("schede-container").style.display = "block";
             });
             // Funzione per scaricare il recap in un file PDF
+            // Funzione per scaricare il recap in un file PDF
             downloadButton.addEventListener("click", async function() {
                 const { jsPDF } = window.jspdf;
             
-                // Imposta il formato della pagina A4 in punti (595.28 x 841.89)
+                // Dimensioni di una pagina A4 in punti (595.28 x 841.89)
                 const pdf = new jsPDF({
                     orientation: 'p',
                     unit: 'pt',
-                    format: 'a4',
-                    compressPdf: true // Abilita la compressione PDF
+                    format: [595.28, 841.89],
+                    compressPdf: true
                 });
             
                 const options = {
-                    backgroundColor: '#ffffff', // Imposta lo sfondo bianco
-                    scale: 2, // Aumenta la scala per migliorare la risoluzione
+                    backgroundColor: null, // Usa lo sfondo dell'elemento
+                    scale: 2,
                     useCORS: true,
+                    allowTaint: true
                 };
             
                 // Funzione per convertire un elemento HTML in immagine
@@ -1083,15 +1085,22 @@
                         console.error('Elemento non trovato per addPageToPDF.');
                         return;
                     }
+            
+                    // Imposta dimensioni fisse all'elemento
+                    element.style.width = '595.28pt';
+                    element.style.height = '841.89pt';
+            
                     const canvas = await html2canvas(element, options);
-                    const imgData = canvas.toDataURL('image/jpeg', 0.85);
-                    const imgProps = pdf.getImageProperties(imgData);
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
                     if (addPage) {
                         pdf.addPage();
                     }
-                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 595.28, 841.89);
+            
+                    // Ripristina le dimensioni originali
+                    element.style.width = '';
+                    element.style.height = '';
                 }
             
                 // Nascondi le altre schede per catturare solo quella desiderata
@@ -1109,29 +1118,44 @@
                     tabContents.forEach(content => content.style.display = '');
                 }
             
+                // Definisci le classi CSS per i background
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .lined-background {
+                        background-image: repeating-linear-gradient(
+                            to bottom,
+                            rgba(197, 197, 197, 0.2) 0,
+                            rgba(197, 197, 197, 0.2) 1px,
+                            transparent 1px,
+                            transparent 24px
+                        );
+                        background-size: 100% 25px;
+                    }
+                    .grid-background {
+                        background-image: linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
+                            linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px);
+                        background-size: 25px 25px;
+                    }
+                `;
+                document.head.appendChild(style);
+            
                 // Cattura la prima pagina con background a righe
                 showOnlyTab('come-si-calcolano-tab');
                 const firstPageElement = document.getElementById('come-si-calcolano-tab');
-                firstPageElement.style.backgroundImage = `repeating-linear-gradient(
-                    to bottom,
-                    rgba(197, 197, 197, 0.2) 0,
-                    rgba(197, 197, 197, 0.2) 1px,
-                    transparent 1px,
-                    transparent 24px
-                )`;
+                firstPageElement.classList.add('lined-background');
                 await addPageToPDF(firstPageElement, pdf);
+            
+                // Rimuovi la classe per non influenzare l'interfaccia utente
+                firstPageElement.classList.remove('lined-background');
             
                 // Cattura la seconda pagina con background a quadretti
                 showOnlyTab('dettaglio-pagamenti-tab');
                 const secondPageElement = document.getElementById('dettaglio-pagamenti-tab');
-                secondPageElement.style.backgroundImage = `linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px)`;
-                secondPageElement.style.backgroundSize = '25px 25px';
-                secondPageElement.style.backgroundPosition = 'left top';
-                secondPageElement.style.backgroundRepeat = 'repeat';
-                secondPageElement.style.width = '100%';
-                secondPageElement.style.height = '100%';
+                secondPageElement.classList.add('grid-background');
                 await addPageToPDF(secondPageElement, pdf, true);
+            
+                // Rimuovi la classe
+                secondPageElement.classList.remove('grid-background');
             
                 // Cattura la terza pagina (bianca)
                 resetTabDisplay(); // Mostra tutti i contenuti per la terza pagina
@@ -1145,15 +1169,8 @@
                 await addPageToPDF(risultatiContainer, pdf, true);
                 await addPageToPDF(document.getElementById('scadenza-pagamenti-tab'), pdf);
             
-                // Ripristina la visualizzazione originale e rimuovi gli stili temporanei
+                // Ripristina la visualizzazione originale
                 resetTabDisplay();
-                firstPageElement.style.backgroundImage = '';
-                secondPageElement.style.backgroundImage = '';
-                secondPageElement.style.backgroundSize = '';
-                secondPageElement.style.backgroundPosition = '';
-                secondPageElement.style.backgroundRepeat = '';
-                secondPageElement.style.width = '';
-                secondPageElement.style.height = '';
             
                 // Scarica il PDF (compatibile con dispositivi mobili)
                 const pdfBlob = pdf.output('blob');
@@ -1165,8 +1182,7 @@
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
-            });
-               
+            });   
         });    
     </script>
 
