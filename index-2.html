@@ -1059,11 +1059,11 @@
                 document.getElementById("risultati-container").style.display = "block";
                 document.getElementById("schede-container").style.display = "block";
             });
-
             // Funzione per scaricare il recap in un file PDF
             downloadButton.addEventListener("click", async function() {
                 const { jsPDF } = window.jspdf;
             
+                // Imposta il formato della pagina A4 in punti (595.28 x 841.89)
                 const pdf = new jsPDF({
                     orientation: 'p',
                     unit: 'pt',
@@ -1074,12 +1074,17 @@
                 const options = {
                     backgroundColor: '#ffffff', // Imposta lo sfondo bianco
                     scale: 2, // Aumenta la scala per migliorare la risoluzione
+                    useCORS: true,
                 };
             
                 // Funzione per convertire un elemento HTML in immagine
                 async function addPageToPDF(element, pdf, addPage = false) {
+                    if (!element) {
+                        console.error('Elemento non trovato per addPageToPDF.');
+                        return;
+                    }
                     const canvas = await html2canvas(element, options);
-                    const imgData = canvas.toDataURL('image/jpeg', 0.85); // Usa JPEG e imposta la qualità
+                    const imgData = canvas.toDataURL('image/jpeg', 0.85);
                     const imgProps = pdf.getImageProperties(imgData);
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
@@ -1092,31 +1097,76 @@
                 // Nascondi le altre schede per catturare solo quella desiderata
                 function showOnlyTab(tabId) {
                     tabContents.forEach(content => content.style.display = 'none');
-                    document.getElementById(tabId).style.display = 'block';
+                    const tabElement = document.getElementById(tabId);
+                    if (tabElement) {
+                        tabElement.style.display = 'block';
+                    } else {
+                        console.error(`Elemento con ID ${tabId} non trovato.`);
+                    }
                 }
             
                 function resetTabDisplay() {
                     tabContents.forEach(content => content.style.display = '');
                 }
             
-                // Cattura "Come si Calcolano"
+                // Cattura la prima pagina con background a righe
                 showOnlyTab('come-si-calcolano-tab');
-                await addPageToPDF(document.getElementById('come-si-calcolano-tab'), pdf);
-                // Cattura "Dettaglio pagamenti"
+                const firstPageElement = document.getElementById('come-si-calcolano-tab');
+                firstPageElement.style.backgroundImage = `repeating-linear-gradient(
+                    to bottom,
+                    rgba(197, 197, 197, 0.2) 0,
+                    rgba(197, 197, 197, 0.2) 1px,
+                    transparent 1px,
+                    transparent 24px
+                )`;
+                await addPageToPDF(firstPageElement, pdf);
+            
+                // Cattura la seconda pagina con background a quadretti
                 showOnlyTab('dettaglio-pagamenti-tab');
-                await addPageToPDF(document.getElementById('dettaglio-pagamenti-tab'), pdf, true);
-                // Cattura "Risultati" e "Scadenza pagamenti"
-                document.getElementById('risultati-container').style.display = 'block';
+                const secondPageElement = document.getElementById('dettaglio-pagamenti-tab');
+                secondPageElement.style.backgroundImage = `linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px)`;
+                secondPageElement.style.backgroundSize = '25px 25px';
+                secondPageElement.style.backgroundPosition = 'left top';
+                secondPageElement.style.backgroundRepeat = 'repeat';
+                secondPageElement.style.width = '100%';
+                secondPageElement.style.height = '100%';
+                await addPageToPDF(secondPageElement, pdf, true);
+            
+                // Cattura la terza pagina (bianca)
+                resetTabDisplay(); // Mostra tutti i contenuti per la terza pagina
+                const risultatiContainer = document.getElementById('risultati-container');
+                if (risultatiContainer) {
+                    risultatiContainer.style.display = 'block';
+                } else {
+                    console.error('Elemento risultati-container non trovato.');
+                }
                 showOnlyTab('scadenza-pagamenti-tab');
-                await addPageToPDF(document.getElementById('risultati-container'), pdf, true);
+                await addPageToPDF(risultatiContainer, pdf, true);
                 await addPageToPDF(document.getElementById('scadenza-pagamenti-tab'), pdf);
             
-                // Ripristina la visualizzazione originale
+                // Ripristina la visualizzazione originale e rimuovi gli stili temporanei
                 resetTabDisplay();
+                firstPageElement.style.backgroundImage = '';
+                secondPageElement.style.backgroundImage = '';
+                secondPageElement.style.backgroundSize = '';
+                secondPageElement.style.backgroundPosition = '';
+                secondPageElement.style.backgroundRepeat = '';
+                secondPageElement.style.width = '';
+                secondPageElement.style.height = '';
             
-                // Scarica il PDF
-                pdf.save('Recap_Regime_Forfettario.pdf');
-            });            
+                // Scarica il PDF (compatibile con dispositivi mobili)
+                const pdfBlob = pdf.output('blob');
+                const blobUrl = URL.createObjectURL(pdfBlob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = 'Recap_Regime_Forfettario.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            });
+               
         });    
     </script>
 
