@@ -1062,6 +1062,7 @@
             // Funzione per scaricare il recap in un file PDF
             // Funzione per scaricare il recap in un file PDF
             // Funzione per scaricare il recap in un file PDF
+            // Funzione per scaricare il recap in un file PDF
             downloadButton.addEventListener("click", async function() {
                 const { jsPDF } = window.jspdf;
             
@@ -1122,28 +1123,34 @@
                 showOnlyTab('come-si-calcolano-tab');
                 const firstPageElement = document.getElementById('come-si-calcolano-tab');
             
-                // Applica lo stile inline per il background a righe
-                firstPageElement.style.backgroundImage = 'repeating-linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 0px, rgba(197, 197, 197, 0.2) 1px, transparent 1px, transparent 25px)';
+                // Crea il Data URI per lo sfondo a righe
+                const linedBackgroundDataURI = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='25'><line x1='0' y1='25' x2='100%' y2='25' stroke='rgba(197,197,197,0.2)' stroke-width='1'/></svg>");
+                firstPageElement.style.backgroundImage = `url('${linedBackgroundDataURI}')`;
+                firstPageElement.style.backgroundRepeat = 'repeat-y';
                 firstPageElement.style.backgroundSize = '100% 25px';
             
                 await addPageToPDF(firstPageElement, pdf);
             
                 // Rimuovi gli stili per non influenzare l'interfaccia utente
                 firstPageElement.style.backgroundImage = '';
+                firstPageElement.style.backgroundRepeat = '';
                 firstPageElement.style.backgroundSize = '';
             
                 // Cattura la seconda pagina con background a quadretti
                 showOnlyTab('dettaglio-pagamenti-tab');
                 const secondPageElement = document.getElementById('dettaglio-pagamenti-tab');
             
-                // Applica lo stile inline per il background a quadretti
-                secondPageElement.style.backgroundImage = 'linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px)';
+                // Crea il Data URI per lo sfondo a quadretti
+                const squaredBackgroundDataURI = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='25' height='25'><line x1='25' y1='0' x2='25' y2='25' stroke='rgba(197,197,197,0.2)' stroke-width='1'/><line x1='0' y1='25' x2='25' y2='25' stroke='rgba(197,197,197,0.2)' stroke-width='1'/></svg>");
+                secondPageElement.style.backgroundImage = `url('${squaredBackgroundDataURI}')`;
+                secondPageElement.style.backgroundRepeat = 'repeat';
                 secondPageElement.style.backgroundSize = '25px 25px';
             
                 await addPageToPDF(secondPageElement, pdf, true);
             
-                // Rimuovi gli stili per non influenzare l'interfaccia utente
+                // Rimuovi gli stili
                 secondPageElement.style.backgroundImage = '';
+                secondPageElement.style.backgroundRepeat = '';
                 secondPageElement.style.backgroundSize = '';
             
                 // Cattura la terza pagina (bianca)
@@ -1172,7 +1179,7 @@
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
             });
-                        
+                                    
         });    
     </script>
 
