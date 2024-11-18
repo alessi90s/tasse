@@ -1072,14 +1072,14 @@
                 });
             
                 const options = {
-                    backgroundColor: '#fff',
-                    scale: 1, // Riduci la scala a 1 per diminuire la risoluzione
+                    backgroundColor: '#ffffff', // Imposta lo sfondo bianco
+                    scale: 2, // Aumenta la scala per migliorare la risoluzione
                 };
             
                 // Funzione per convertire un elemento HTML in immagine
                 async function addPageToPDF(element, pdf, addPage = false) {
                     const canvas = await html2canvas(element, options);
-                    const imgData = canvas.toDataURL('image/jpeg', 0.75); // Usa JPEG e imposta la qualità
+                    const imgData = canvas.toDataURL('image/jpeg', 0.85); // Usa JPEG e imposta la qualità
                     const imgProps = pdf.getImageProperties(imgData);
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
@@ -1116,7 +1116,7 @@
             
                 // Scarica il PDF
                 pdf.save('Recap_Regime_Forfettario.pdf');
-            });
+            });            
         });    
     </script>
 
