@@ -344,6 +344,26 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
+
+        .styled-underline {
+    text-decoration: none;
+    position: relative;
+    font-weight: bold;
+}
+
+.styled-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 2px;
+    width: 100%;
+    background-color: #3498db;
+    border-radius: 2px;
+    z-index: -1;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    transform: skew(-5deg);
+}
     </style>
 </head>
 <body>
@@ -355,7 +375,7 @@
         </div>
     
     <header>
-        <h1>Calcolatore Regime <span class="highlight-yellow"><u>Forfettario</u></span> 2024</h1>
+        <h1>Calcolatore Regime <span class="highlight-yellow"><u class="styled-underline">Forfettario</u></span> 2024</h1>
     </header>
 
     <div class="container">
@@ -796,23 +816,23 @@
                 // Popola la tabella dei risultati
                 document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
                 document.getElementById("annoRedditoOutput").innerText = annoReddito;
-                document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT');
+                document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
                 document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta * 100).toFixed(0) + "%";
                 document.getElementById("annoRedditoOutput2").innerText = annoReddito;
-                document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT');
+                document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT') + "€";
                 document.getElementById("annoAccontoImposta").innerText = annoReddito + 1;
-                document.getElementById("accontoImpostaOutput").innerText = accontoImposta.toLocaleString('it-IT');
+                document.getElementById("accontoImpostaOutput").innerText = accontoImposta.toLocaleString('it-IT') + "€";
                 document.getElementById("annoRedditoOutput3").innerText = annoReddito;
-                document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT');
+                document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
                 document.getElementById("annoRedditoOutput4").innerText = annoReddito;
-                document.getElementById("contributiFissiOutput").innerText = contributiFissiSulAnno.toLocaleString('it-IT');
+                document.getElementById("contributiFissiOutput").innerText = contributiFissiSulAnno.toLocaleString('it-IT') + "€";
                 document.getElementById("annoRedditoOutput5").innerText = annoReddito;
-                document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT');
+                document.getElementById("contributiVariabiliOutput").innerText = contributiVariabili.toLocaleString('it-IT') + "€";
                 document.getElementById("annoRedditoOutput6").innerText = annoReddito;
-                document.getElementById("totaleContributiInpsOutput").innerText = (Number(contributiFissiSulAnno) + Number(contributiVariabili)).toLocaleString('it-IT');
-                document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT');
+                document.getElementById("totaleContributiInpsOutput").innerText = (Number(contributiFissiSulAnno) + Number(contributiVariabili)).toLocaleString('it-IT') + "€";
+                document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT') + "€";
                 document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
-                document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT');
+                document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
 
                 // Gestione della visualizzazione delle righe
                 if (cassaInps === "gs_inps") {
