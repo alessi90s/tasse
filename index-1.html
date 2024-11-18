@@ -1013,7 +1013,7 @@
                     let aliquotaVariabileEffettiva = aliquotaVariabile * (riduzioneContributi ? 0.65 : 1) * 100;
                     aliquotaVariabileDisplay = Math.round(aliquotaVariabileEffettiva) + "%";
                     document.getElementById("detContributiInpsTitoloPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
-                    document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                    document.getElementById("detRedditoNettoInpsPagamenti").innerText = (redditoNetto - sogliaReddito).toLocaleString('it-IT');
                     document.getElementById("detAliquotaContributivaPagamenti").innerText = aliquotaVariabileDisplay;
                     document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiVariabili.toLocaleString('it-IT');
                 }
