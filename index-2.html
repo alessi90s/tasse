@@ -1059,11 +1059,10 @@
                 document.getElementById("risultati-container").style.display = "block";
                 document.getElementById("schede-container").style.display = "block";
             });
-            // Funzione per scaricare il recap in un file PDF
+            
             downloadButton.addEventListener("click", async function() {
                 const { jsPDF } = window.jspdf;
             
-                // Dimensioni di una pagina A4 in punti (595.28 x 841.89)
                 const pdfWidth = 595.28;
                 const pdfHeight = 841.89;
             
@@ -1075,14 +1074,18 @@
                 });
             
                 const options = {
-                    backgroundColor: null, // Usa lo sfondo dell'elemento
+                    backgroundColor: '#FFFFFF', // Imposta lo sfondo bianco
                     scale: 2,
                     useCORS: true,
-                    allowTaint: true
+                    allowTaint: true,
+                    logging: true,
+                    removeContainer: true,
+                    // **Aggiungi questa opzione per catturare gli pseudo-elementi**
+                    pseudoElements: true
                 };
             
                 // Funzione per convertire un elemento HTML in immagine
-                async function addPageToPDF(element, pdf, addPage = false, drawBackground = null) {
+                async function addPageToPDF(element, pdf, addPage = false) {
                     if (!element) {
                         console.error('Elemento non trovato per addPageToPDF.');
                         return;
@@ -1091,6 +1094,12 @@
                     // Imposta dimensioni fisse all'elemento
                     element.style.width = pdfWidth + 'pt';
                     element.style.height = pdfHeight + 'pt';
+                    element.style.maxWidth = pdfWidth + 'pt';
+                    element.style.maxHeight = pdfHeight + 'pt';
+                    element.style.margin = '0';
+                    element.style.padding = '0';
+                    element.style.boxSizing = 'border-box';
+                    element.style.overflow = 'hidden';
             
                     const canvas = await html2canvas(element, options);
             
@@ -1099,47 +1108,17 @@
                         pdf.addPage();
                     }
             
-                    // Disegna il background se necessario
-                    if (typeof drawBackground === 'function') {
-                        drawBackground(pdf);
-                    }
-            
                     pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
             
                     // Ripristina le dimensioni originali
                     element.style.width = '';
                     element.style.height = '';
-                }
-            
-                // Funzione per disegnare le righe sulla prima pagina
-                function drawLines(pdf) {
-                    pdf.setLineWidth(0.5);
-                    pdf.setDrawColor(197, 197, 197, 0.2);
-            
-                    const lineHeight = 25;
-                    for (let y = lineHeight; y < pdf.internal.pageSize.getHeight(); y += lineHeight) {
-                        pdf.line(0, y, pdf.internal.pageSize.getWidth(), y);
-                    }
-                }
-            
-                // Funzione per disegnare i quadretti sulla seconda pagina
-                function drawGrid(pdf) {
-                    pdf.setLineWidth(0.5);
-                    pdf.setDrawColor(197, 197, 197, 0.2);
-            
-                    const gridSize = 25;
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-            
-                    // Linee orizzontali
-                    for (let y = gridSize; y < pageHeight; y += gridSize) {
-                        pdf.line(0, y, pageWidth, y);
-                    }
-            
-                    // Linee verticali
-                    for (let x = gridSize; x < pageWidth; x += gridSize) {
-                        pdf.line(x, 0, x, pageHeight);
-                    }
+                    element.style.maxWidth = '';
+                    element.style.maxHeight = '';
+                    element.style.margin = '';
+                    element.style.padding = '';
+                    element.style.boxSizing = '';
+                    element.style.overflow = '';
                 }
             
                 // Nascondi le altre schede per catturare solo quella desiderata
@@ -1157,15 +1136,45 @@
                     tabContents.forEach(content => content.style.display = '');
                 }
             
-                // Cattura la prima pagina con le righe disegnate
+                // Cattura la prima pagina (quaderno a righe)
                 showOnlyTab('come-si-calcolano-tab');
                 const firstPageElement = document.getElementById('come-si-calcolano-tab');
-                await addPageToPDF(firstPageElement, pdf, false, drawLines);
             
-                // Cattura la seconda pagina con i quadretti disegnati
+                // Applica stili per assicurare che l'elemento venga catturato correttamente
+                firstPageElement.style.position = 'relative';
+                firstPageElement.style.margin = '0';
+                firstPageElement.style.padding = '0';
+                firstPageElement.style.boxSizing = 'border-box';
+                firstPageElement.style.overflow = 'hidden';
+            
+                await addPageToPDF(firstPageElement, pdf);
+            
+                // Ripristina gli stili originali
+                firstPageElement.style.position = '';
+                firstPageElement.style.margin = '';
+                firstPageElement.style.padding = '';
+                firstPageElement.style.boxSizing = '';
+                firstPageElement.style.overflow = '';
+            
+                // Cattura la seconda pagina
                 showOnlyTab('dettaglio-pagamenti-tab');
                 const secondPageElement = document.getElementById('dettaglio-pagamenti-tab');
-                await addPageToPDF(secondPageElement, pdf, true, drawGrid);
+            
+                // Applica stili per la seconda pagina
+                secondPageElement.style.position = 'relative';
+                secondPageElement.style.margin = '0';
+                secondPageElement.style.padding = '0';
+                secondPageElement.style.boxSizing = 'border-box';
+                secondPageElement.style.overflow = 'hidden';
+            
+                await addPageToPDF(secondPageElement, pdf, true);
+            
+                // Ripristina gli stili
+                secondPageElement.style.position = '';
+                secondPageElement.style.margin = '';
+                secondPageElement.style.padding = '';
+                secondPageElement.style.boxSizing = '';
+                secondPageElement.style.overflow = '';
             
                 // Cattura la terza pagina (bianca)
                 resetTabDisplay();
@@ -1193,8 +1202,7 @@
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
             });
-                
-               
+                    
         });    
     </script>
 
