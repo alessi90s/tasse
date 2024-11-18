@@ -942,7 +942,7 @@
                     
                     const totaleComplessivo = totaleSaldo + totaleAcconti;
                     dettaglioTesto += `<h3>Totale complessivo:</h3>`;
-                    dettaglioTesto += `<p>Saldo totale: <strong><span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span></strong>(di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
+                    dettaglioTesto += `<p>Saldo totale: <strong><span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span></strong>(di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiFissiSulAnno + contributiVariabili}€</span> di contributi)</p>`;
                     dettaglioTesto += `<p>Acconti totali: <strong><span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta`;
                     if (accontoInps > 0) {
                         dettaglioTesto += ` e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi`;
