@@ -176,8 +176,7 @@
         .indent {
             padding-left: 20px;
         }
-
-         .highlight-blues {
+.highlight-blues {
       position: relative;
       display: inline-block;
       font-size: 24px;
@@ -188,28 +187,14 @@
     .highlight-blues::before {
       content: '';
       position: absolute;
-      top: 50%;
+      top: 0;
       left: 0;
       width: 100%;
-      height: 80%;
-      background: yellow;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50"><path d="M0 30 Q50 5, 100 30 T200 30 L200 50 L0 50 Z" fill="rgba(255,255,150,0.8)" /></svg>') no-repeat center;
+      background-size: cover;
       z-index: -1;
-      transform: rotate(-1deg);
-      border-radius: 4px;
-      opacity: 0.9;
     }
-
-    .highlight-blues::after {
-      content: '';
-      position: absolute;
-      top: 70%;
-      left: 5%;
-      width: 90%;
-      height: 2px;
-      background: rgba(255, 255, 0, 0.6);
-      z-index: -1;
-      transform: rotate(-1deg);
-          }
        /* Pulsante Download */
 #downloadRecap {
     background-color: #fff;
