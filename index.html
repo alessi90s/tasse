@@ -1035,7 +1035,7 @@
                     dettaglioTesto += `<h3>Totale complessivo:</h3>`;
                     dettaglioTesto += `<p>Saldo totale: <strong><span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
                     dettaglioTesto += `<p>Acconti totali: <strong><span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
-                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): <strong>${(totaleComplessivo).toLocaleString('it-IT')}€</strong></p>`;
+                    dettaglioTesto += `<p>Importo complessivo (saldo + acconti): <strong><u>${(totaleComplessivo).toLocaleString('it-IT')}€</u></strong></p>`;
                     
                     dettaglioTesto += `<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>`;
                 }
