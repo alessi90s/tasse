@@ -944,7 +944,7 @@
                         aliquotaVariabileDisplay = Math.round(aliquotaVariabileEffettiva) + "%";
                         dettaglioTesto += `Dal momento che il tuo reddito netto supera la soglia di 18.415€, paghi anche i contributi variabili del ${aliquotaVariabileDisplay} sull'eccedenza di <u>${(redditoNetto - sogliaReddito).toLocaleString('it-IT')}€</u>.`;
                     } else {
-                        dettaglioTesto += `Il tuo reddito netto non supera la soglia di 18.415€, quindi non paghi contributi variabili.`;
+                        dettaglioTesto += `Oltre la soglia di reddito netto (reddito lordo x coefficiente di redditività) -> 18.415€ pagherai anche i contributi variabili, che in questo caso non sono dovuti.`;
                     }
 
                     // Esempio di calcolo
