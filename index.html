@@ -571,7 +571,7 @@
                 </p>
                 <h3>Contributi previdenziali:</h3>
                 <p>
-                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul <strong id="detAnnoPagamenti4"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.
+                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul 2024 <strong id="detAnnoPagamenti4"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.
                 </p>
                 <p>
                     Acconto contributi INPS per il <span id="annoAccontoInpsDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoContributiPagamenti"></strong>€</span>) da pagare in due rate:<br>
@@ -1073,7 +1073,7 @@
                 document.getElementById("detSecondaRataImpostaPagamenti").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
 
                 if (cassaInps !== "gs_inps") {
-                    document.getElementById("detSaldoContributiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
+                    document.getElementById("detSaldoContributiPagamenti").innerText = (Number(contributiFissiSulAnno + Number(contributiVariabili)).toLocaleString('it-IT');
                     document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
                     document.getElementById("detPrimaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
                     document.getElementById("detSecondaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
