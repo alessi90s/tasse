@@ -64,16 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const accontoImposta = impostaSostitutiva;
 
         // Calcolo dei Contributi ENPAP (10% del reddito netto)
-        let contributiInps = Math.round(reditoNetto * 0.10);
+        let contributiInps = Math.round(redditoNetto * 0.10);
         let accontoInps = Math.round(contributiInps * 0.80);
-
-        // Contributi Fissi Ipotetici per ENPAP (non necessari in questa versione)
-        // Se desideri comunque mostrare un contributo fisso, puoi impostarlo qui
-        const contributiFissiIpotetici = 0; // O qualsiasi altro valore se necessario
-
-        // Calcolo delle Scadenze delle Rate Fisse (se applicabile)
-        // In questo caso, semplifichiamo e assumiamo rate fisse senza considerare dataApertura
-        let contributiFissiSulAnno = contributiInps; // In questo caso, non ci sono contributi fissi
 
         // Popola la tabella dei risultati
         document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
@@ -87,12 +79,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("annoRedditoOutput3").innerText = annoReddito;
         document.getElementById("contributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput4").innerText = annoReddito;
-        document.getElementById("contributiFissiOutput").innerText = contributiFissiSulAnno.toLocaleString('it-IT') + "€";
+        document.getElementById("contributiFissiOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput5").innerText = annoReddito;
         document.getElementById("contributiVariabiliOutput").innerText = ""; // Non applicabile per ENPAP
         document.getElementById("annoRedditoOutput6").innerText = annoReddito;
         document.getElementById("totaleContributiInpsOutput").innerText = contributiInps.toLocaleString('it-IT') + "€";
-        document.getElementById("contributiFissiIpoteticiOutput").innerText = contributiFissiIpotetici.toLocaleString('it-IT') + "€";
+        document.getElementById("contributiFissiIpoteticiOutput").innerText = "0€"; // Non applicabile
         document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
         document.getElementById("accontoInpsOutput").innerText = accontoInps.toLocaleString('it-IT') + "€";
 
@@ -126,12 +118,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("dettaglioNovembre").innerText = dettaglioNovembre + "€";
 
         // Mostra le scadenze delle rate fisse per ENPAP
-        const rateScadenze = [
+        const rateScadenzeENPAP = [
             { id: "1", scadenza: `16 maggio ${annoReddito}`, dettaglio: "Contributi ENPAP - Prima rata" },
             { id: "2", scadenza: `20 agosto ${annoReddito}`, dettaglio: "Contributi ENPAP - Seconda rata" }
         ];
 
-        rateScadenze.forEach(rate => {
+        rateScadenzeENPAP.forEach(rate => {
             document.getElementById("scadenzaFissa" + rate.id).innerText = rate.scadenza;
             document.getElementById("importoFissa" + rate.id).innerText = (contributiInps / 2).toLocaleString('it-IT');
             document.getElementById("dettaglioFissa" + rate.id).innerText = rate.dettaglio;
@@ -146,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         dettaglioTesto += `<ul>`;
         dettaglioTesto += `<li>Imposta sostitutiva: ${(aliquotaImposta * 100).toFixed(0)}% su ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <strong><span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span></strong>.</li>`;
-        dettaglioTesto += `<li>Contributi ENPAP: 10% di ${redditoNetto.toLocaleString('it-IT')}€, che equivale a <strong><span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span></strong>.</li>`;
+        dettaglioTesto += `<li>Contributi ENPAP: 10% di ${redditoNetto.toLocaleString('it-IT')}€, che equivalgono a <strong><span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span></strong>.</li>`;
         dettaglioTesto += `</ul>`;
         
         const totaleSaldo = impostaSostitutiva + contributiInps;
@@ -160,10 +152,11 @@ document.addEventListener('DOMContentLoaded', function() {
         dettaglioTesto += `<li>Contributi ENPAP: pagherai l’80% dell'importo dei contributi come acconto, quindi <strong><span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span></strong>.</li>`;
         dettaglioTesto += `</ul>`;
         
+        const totaleAcconti = accontoImposta + accontoInps;
         const totaleComplessivo = totaleSaldo + totaleAcconti;
         dettaglioTesto += `<h3>Totale complessivo:</h3>`;
         dettaglioTesto += `<p>Saldo totale: <strong><span class="highlight-yellow">${totaleSaldo.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-yellow">${impostaSostitutiva.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-yellow">${contributiInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
-        dettaglioTesto += `<p>Acconti totali: <strong><span class="highlight-blue">${accontoAcconti.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
+        dettaglioTesto += `<p>Acconti totali: <strong><span class="highlight-blue">${totaleAcconti.toLocaleString('it-IT')}€</span></strong> (di cui <span class="highlight-blue">${accontoImposta.toLocaleString('it-IT')}€</span> di imposta e <span class="highlight-blue">${accontoInps.toLocaleString('it-IT')}€</span> di contributi)</p>`;
         dettaglioTesto += `<p>Importo complessivo (saldo + acconti): <strong>${totaleComplessivo.toLocaleString('it-IT')}€</strong></p>`;
         
         dettaglioTesto += `<p>Questi importi sono indicativi e, in sede di dichiarazione dei redditi, verranno calcolati con precisione.</p>`;
