@@ -172,5 +172,167 @@ function calculateEnpap(reditoNetto, riduzioneContributi) {
 
 // Funzione per scaricare il PDF (invariata)
 downloadButton.addEventListener("click", async function() {
-    // ... (logica esistente per il download del PDF)
+                const { jsPDF } = window.jspdf;
+            
+                const pdfWidth = 595.28;
+                const pdfHeight = 841.89;
+            
+                const pdf = new jsPDF({
+                    orientation: 'p',
+                    unit: 'pt',
+                    format: [pdfWidth, pdfHeight],
+                    compressPdf: true
+                });
+            
+                const options = {
+                    backgroundColor: '#FFFFFF', // Imposta lo sfondo bianco
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: true,
+                    removeContainer: true
+                };
+            
+                // Funzione per convertire un elemento HTML in immagine e aggiungerlo al PDF
+                async function addPageToPDF(element, pdf, addPage = false, drawBackground = null) {
+                    if (!element) {
+                        console.error('Elemento non trovato per addPageToPDF.');
+                        return;
+                    }
+            
+                    // Applica stili per assicurare il rendering corretto
+                    element.style.width = pdfWidth + 'pt';
+                    element.style.height = pdfHeight + 'pt';
+                    element.style.maxWidth = pdfWidth + 'pt';
+                    element.style.maxHeight = pdfHeight + 'pt';
+                    element.style.margin = '0';
+                    element.style.boxSizing = 'border-box';
+                    element.style.overflow = 'hidden';
+            
+                    const canvas = await html2canvas(element, options);
+            
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    if (addPage) {
+                        pdf.addPage();
+                    }
+            
+                    // Disegna il background se necessario
+                    if (typeof drawBackground === 'function') {
+                        drawBackground(pdf);
+                    }
+            
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+            
+                    // Ripristina gli stili originali
+                    element.style.width = '';
+                    element.style.height = '';
+                    element.style.maxWidth = '';
+                    element.style.maxHeight = '';
+                    element.style.margin = '';
+                    element.style.boxSizing = '';
+                    element.style.overflow = '';
+                }
+            
+                // Funzione per disegnare le righe sulla prima pagina
+                function drawLines(pdf) {
+                    pdf.setLineWidth(0.5);
+                    pdf.setDrawColor(197, 197, 197, 0.2);
+            
+                    const lineHeight = 25;
+                    for (let y = lineHeight; y < pdfHeight; y += lineHeight) {
+                        pdf.line(40, y, pdfWidth - 40, y); // Aggiungi margini laterali di 40pt
+                    }
+                }
+            
+                // Funzione per disegnare i quadretti sulla seconda pagina
+                function drawGrid(pdf) {
+                    pdf.setLineWidth(0.5);
+                    pdf.setDrawColor(197, 197, 197, 0.2);
+            
+                    const gridSize = 25;
+            
+                    // Linee orizzontali
+                    for (let y = gridSize; y < pdfHeight; y += gridSize) {
+                        pdf.line(40, y, pdfWidth - 40, y); // Aggiungi margini laterali di 40pt
+                    }
+            
+                    // Linee verticali
+                    for (let x = 40 + gridSize; x < pdfWidth - 40; x += gridSize) {
+                        pdf.line(x, 0, x, pdfHeight);
+                    }
+                }
+            
+                // Funzioni per mostrare e ripristinare le schede
+                function showOnlyTab(tabId) {
+                    tabContents.forEach(content => content.style.display = 'none');
+                    const tabElement = document.getElementById(tabId);
+                    if (tabElement) {
+                        tabElement.style.display = 'block';
+                    } else {
+                        console.error(`Elemento con ID ${tabId} non trovato.`);
+                    }
+                }
+            
+                function resetTabDisplay() {
+                    tabContents.forEach(content => content.style.display = '');
+                }
+            
+                // Aggiungi padding agli elementi per i margini interni
+                function addPadding(element) {
+                    element.style.padding = '40pt'; // Aggiungi padding di 40pt
+                    element.style.boxSizing = 'border-box';
+                }
+            
+                function removePadding(element) {
+                    element.style.padding = '';
+                    element.style.boxSizing = '';
+                }
+            
+                // Cattura la prima pagina con le righe disegnate
+                showOnlyTab('come-si-calcolano-tab');
+                const firstPageElement = document.getElementById('come-si-calcolano-tab');
+                addPadding(firstPageElement);
+                await addPageToPDF(firstPageElement, pdf, false, drawLines);
+                removePadding(firstPageElement);
+            
+                // Cattura la seconda pagina con i quadretti disegnati
+                showOnlyTab('dettaglio-pagamenti-tab');
+                const secondPageElement = document.getElementById('dettaglio-pagamenti-tab');
+                addPadding(secondPageElement);
+                await addPageToPDF(secondPageElement, pdf, true, drawGrid);
+                removePadding(secondPageElement);
+            
+                // Cattura la terza e quarta pagina (senza background)
+                resetTabDisplay(); // Mostra tutti i contenuti per la terza pagina
+                const risultatiContainer = document.getElementById('risultati-container');
+                if (risultatiContainer) {
+                    risultatiContainer.style.display = 'block';
+                } else {
+                    console.error('Elemento risultati-container non trovato.');
+                }
+                showOnlyTab('scadenza-pagamenti-tab');
+                const thirdPageElement = risultatiContainer;
+                addPadding(thirdPageElement);
+                await addPageToPDF(thirdPageElement, pdf, true);
+                removePadding(thirdPageElement);
+            
+                const fourthPageElement = document.getElementById('scadenza-pagamenti-tab');
+                addPadding(fourthPageElement);
+                await addPageToPDF(fourthPageElement, pdf);
+                removePadding(fourthPageElement);
+            
+                // Ripristina la visualizzazione originale
+                resetTabDisplay();
+            
+                // Scarica il PDF (compatibile con dispositivi mobili)
+                const pdfBlob = pdf.output('blob');
+                const blobUrl = URL.createObjectURL(pdfBlob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = 'Recap_Regime_Forfettario.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            });
 });
