@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ad esempio, se ci sono opzioni specifiche per Commercianti o Artigiani
             // puoi nasconderle qui
         } else if (cassa === "inps_commercianti" || cassa === "inps_artigiani") {
-            opzioniContainer.style.display = "block";
+            opzioniContainer.style.display = "none";
         } else {
             opzioniContainer.style.display = "none";
             document.getElementById("riduzioneContributi").checked = false;
