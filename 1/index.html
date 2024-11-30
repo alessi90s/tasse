@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolatore Regime Forfettario</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* [Inserisci qui i tuoi stili CSS esistenti] */
+        /* ... */
+    </style>
+</head>
+<body>
+    <!-- Disclaimer -->
+    <div id="disclaimer">
+        <strong>Questo calcolatore è da usare solo per previsioni a grandi linee e non sostituisce un vero calcolo effettuato da un commercialista.</strong>
+    </div>
+
+    <header>
+        <h1>Calcolatore Regime <span class="highlight-yellow"><u class="styled-underline">Forfettario</u></span> 2024</h1>
+    </header>
+
+    <div class="container">
+        <!-- Sezione Calcolatore -->
+        <section id="calcolatore">
+            <div class="calcolatore-container">
+                <form id="calcolatoreForm">
+                    <label for="annoReddito"><span class="highlight-yellow">Anno</span> di Riferimento del Reddito:</label>
+                    <select id="annoReddito" required>
+                        <!-- Le opzioni verranno popolate da anno.js -->
+                    </select>
+
+                    <label for="cassaInps"><span class="highlight-yellow">Cassa</span> di Riferimento INPS:</label>
+                    <select id="cassaInps" required>
+                        <option value="">-- Seleziona la cassa INPS --</option>
+                        <option value="gs_inps">Gestione Separata INPS</option>
+                        <option value="inps_commercianti">INPS Commercianti</option>
+                        <option value="inps_artigiani">INPS Artigiani</option>
+                        <option value="inps_new">Nuova Cassa INPS</option> <!-- Nuova cassa aggiunta -->
+                    </select>
+
+                    <div id="opzioniCommercianteArtigiano" style="display: none;">
+                        <div class="form-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="riduzioneContributi">
+                                Applica riduzione del 35% sui contributi INPS
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dataApertura">Data di Apertura della Partita IVA:</label>
+                            <input type="date" id="dataApertura">
+                        </div>
+                    </div>
+
+                    <label for="aliquotaImposta"><span class="highlight-yellow">Aliquota</span> Imposta Sostitutiva:</label>
+                    <select id="aliquotaImposta" required>
+                        <option value="0.05" selected>5%</option>
+                        <option value="0.15">15%</option>
+                    </select>
+
+                    <label for="coefficienteRedditivita"><span class="highlight-yellow">Coefficiente</span> di Redditività (%):</label>
+                    <select id="coefficienteRedditivita" required>
+                        <option value="86" selected>86%</option>
+                        <option value="78">78%</option>
+                        <option value="67">67%</option>
+                        <option value="40">40%</option>
+                        <!-- Aggiungi altri coefficienti se necessario -->
+                    </select>
+
+                    <label for="redditoLordo">Reddito Lordo (quanto hai <span class="highlight-yellow">incassato €</span> nel 2024?):</label>
+                    <input type="number" id="redditoLordo" min="0" step="1" required>
+                    
+                    <!-- Bottoni per Reddito Lordo Predefinito -->
+                    <div class="reddito-buttons">
+                        <button type="button" data-value="15000">15.000€</button>
+                        <button type="button" data-value="30000">30.000€</button>
+                        <button type="button" data-value="45000">45.000€</button>
+                        <button type="button" data-value="60000">60.000€</button>
+                        <button type="button" data-value="85000">85.000€</button>
+                    </div>
+
+                    <button type="submit">Calcola</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Sezione Risultati -->
+        <section id="risultati-container" class="risultati-container">
+            <div class="table-container">
+                <table>
+                    <tr>
+                        <th>Descrizione</th>
+                        <th>Importo (€)</th>
+                    </tr>
+                    <tr>
+                        <td>Reddito Lordo:</td>
+                        <td id="redditoLordoOutput"></td>
+                    </tr>
+                    <tr>
+                        <td>Reddito Netto (Anno <span id="annoRedditoOutput"></span>):</td>
+                        <td id="redditoNettoOutput"></td>
+                    </tr>
+                    <tr>
+                        <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul <span id="annoRedditoOutput2"></span>:</td>
+                        <td id="impostaSostitutivaOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr>
+                        <td>Acconto Imposta Sostitutiva (100%) sul <span id="annoAccontoImposta"></span>:</td>
+                        <td id="accontoImpostaOutput" class="highlight-blue"></td>
+                    </tr>
+                    <!-- Contributi INPS -->
+                    <tr id="contributiInpsRow">
+                        <td>Contributi INPS sul <span id="annoRedditoOutput3"></span>:</td>
+                        <td id="contributiInpsOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr id="contributiFissiRow" style="display: none;">
+                        <td class="indent">Contributi Fissi sul <span id="annoRedditoOutput4"></span>:</td>
+                        <td id="contributiFissiOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr id="contributiVariabiliRow" style="display: none;">
+                        <td class="indent">Contributi Variabili sul <span id="annoRedditoOutput5"></span>:</td>
+                        <td id="contributiVariabiliOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <tr id="totaleContributiInpsRow" style="display: none;">
+                        <td><strong>Totale Contributi INPS sul <span id="annoRedditoOutput6"></span>:</strong></td>
+                        <td id="totaleContributiInpsOutput" class="highlight-yellow"></td>
+                    </tr>
+                    <!-- Contributi Fissi Ipotetici -->
+                    <tr id="contributiFissiIpoteticiRow">
+                        <td>Contributi Fissi (ipotetici su anno completo):</td>
+                        <td id="contributiFissiIpoteticiOutput" class="highlight-green"></td>
+                    </tr>
+                    <tr>
+                        <td>Acconto Contributi INPS sul <span id="annoAccontoInps"></span>:</td>
+                        <td id="accontoInpsOutput" class="highlight-blue"></td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sezione Schede -->
+        <section id="schede-container" class="schede-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="come-si-calcolano">Come si calcolano</div>
+                <div class="tab" data-tab="dettaglio-pagamenti">Dettaglio pagamenti</div>
+                <div class="tab" data-tab="scadenza-pagamenti">Scadenza pagamenti</div>
+            </div>
+            <div class="tab-content active" id="come-si-calcolano-tab">
+                <h2>Come si Calcolano</h2>
+                <div id="dettaglioCalcoli">
+                    <!-- Il testo dinamico verrà inserito qui -->
+                </div>
+            </div>
+            <div class="tab-content" id="dettaglio-pagamenti-tab">
+                <h2>Dettaglio pagamenti</h2>
+                <p>
+                    Dettaglio dei pagamenti per l'anno <strong id="detAnnoPagamenti"></strong><br>
+                    Hai guadagnato <strong id="detRedditoLordoPagamenti"></strong>€ nel 2024<strong id="detAnnoPagamenti2"></strong>.
+                </p>
+                <h3>Calcolo del Reddito Netto:</h3>
+                <p>
+                    Reddito Lordo (<strong id="detRedditoLordoDetPagamenti"></strong>€) x Coefficiente di Redditività (<strong id="detCoefficienteDetPagamenti"></strong>) = <strong id="detRedditoNettoPagamenti"></strong>€
+                </p>
+                <h3>Calcolo dell'Imposta Sostitutiva:</h3>
+                <p>
+                    Reddito Netto (<strong id="detRedditoNettoDetPagamenti"></strong>€) x Aliquota Imposta Sostitutiva (<strong id="detAliquotaImpostaPagamenti"></strong>) = <strong id="detImpostaSostitutivaPagamenti"></strong>€
+                </p>
+                <h3>Calcolo dei Contributi INPS (<span id="detContributiInpsTitoloPagamenti"></span>):</h3>
+                <p>
+                    Reddito Netto (<strong id="detRedditoNettoInpsPagamenti"></strong>€) x Aliquota Contributiva (<strong id="detAliquotaContributivaPagamenti"></strong>) = <strong id="detContributiInpsCalcolatiPagamenti"></strong>€
+                </p>
+                <h3>Tasse da pagare:</h3>
+                <p>
+                    Saldo imposta sostitutiva sul <strong id="detAnnoPagamenti3"></strong> (<span class="highlight-yellow"><strong id="detSaldoImpostaPagamenti"></strong>€</span>) da pagare entro il 30 giugno <span id="annoScadenzaGiugnoDettaglio"></span>.
+                </p>
+                <p>
+                    Acconto imposta sostitutiva per il <span id="annoAccontoImpostaDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoImpostaPagamenti"></strong>€</span>) da pagare in due rate:<br>
+                    Prima rata (<span class="highlight-blue"><strong id="detPrimaRataImpostaPagamenti"></strong>€</span>) entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.<br>
+                    Seconda rata (<span class="highlight-blue"><strong id="detSecondaRataImpostaPagamenti"></strong>€</span>) entro il 30 novembre <span id="annoScadenzaNovembreDettaglio"></span>.
+                </p>
+                <h3>Contributi previdenziali:</h3>
+                <p>
+                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul 2024 <strong id="detAnnoPagamenti4"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.
+                </p>
+                <p>
+                    Acconto contributi INPS per il <span id="annoAccontoInpsDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoContributiPagamenti"></strong>€</span>) da pagare in due rate:<br>
+                    Prima rata (<span class="highlight-blue"><strong id="detPrimaRataContributiPagamenti"></strong>€</span>) entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.<br>
+                    Seconda rata (<span class="highlight-blue"><strong id="detSecondaRataContributiPagamenti"></strong>€</span>) entro il 30 novembre 2025<span id="annoScadenzaNovembreDettaglio"></span>.
+                </p>
+                <h3>Riepilogo dei Pagamenti:</h3>
+                <ul>
+                    <li>Totale tasse e contributi effettivi sul 2024<strong id="detAnnoPagamenti5"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong>€ (<strong id="percentualeTotaleTasseContributi"></strong> del tuo reddito lordo)</li>
+                    <li>Totale acconti per il <span id="annoAccontoImpostaDettaglio2"></span>: <strong id="detTotaleAccontiPagamenti"></strong>€ (<strong id="percentualeTotaleAcconti"></strong> del tuo reddito lordo)</li>
+                    <li>Totale da versare complessivamente: <strong id="detTotaleComplessivoPagamenti"></strong>€ (<strong id="percentualeTotaleComplessivo"></strong> del tuo reddito lordo)</li>
+                </ul>
+                <p>
+                    Nota: Gli acconti sono un anticipo sulle tasse e contributi dell'anno successivo (2025<span id="annoAccontoImpostaDettaglio3"></span>) e non rappresentano un costo aggiuntivo.
+                </p>
+            </div>
+            <div class="tab-content" id="scadenza-pagamenti-tab">
+                <h2>Scadenza Pagamenti</h2>
+                <div class="table-container">
+                    <table>
+                        <tr>
+                            <th>Data Scadenza</th>
+                            <th>Importo Totale (€)</th>
+                            <th>Dettaglio</th>
+                        </tr>
+                        <tr id="scadenzaFissa1Row" style="display: none;">
+                            <td id="scadenzaFissa1"></td>
+                            <td id="importoFissa1" class="highlight-yellow"></td>
+                            <td id="dettaglioFissa1"></td>
+                        </tr>
+                        <tr id="scadenzaFissa2Row" style="display: none;">
+                            <td id="scadenzaFissa2"></td>
+                            <td id="importoFissa2" class="highlight-yellow"></td>
+                            <td id="dettaglioFissa2"></td>
+                        </tr>
+                        <tr id="scadenzaFissa3Row" style="display: none;">
+                            <td id="scadenzaFissa3"></td>
+                            <td id="importoFissa3" class="highlight-yellow"></td>
+                            <td id="dettaglioFissa3"></td>
+                        </tr>
+                        <tr id="scadenzaFissa4Row" style="display: none;">
+                            <td id="scadenzaFissa4"></td>
+                            <td id="importoFissa4" class="highlight-yellow"></td>
+                            <td id="dettaglioFissa4"></td>
+                        </tr>
+                        <!-- Scadenze Generali -->
+                        <tr>
+                            <td>30 giugno <span id="annoScadenzaGiugno"></span></td>
+                            <td id="totaleGiugno"></td>
+                            <td id="dettaglioGiugno"></td>
+                        </tr>
+                        <tr>
+                            <td>30 novembre <span id="annoScadenzaNovembre"></span></td>
+                            <td id="totaleNovembre"></td>
+                            <td id="dettaglioNovembre"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pulsante per scaricare il PDF -->
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="downloadRecap">Scarica riepilogo in <span class="highlight-yellow">PDF</span></button>
+        </div>
+
+    </div>
+
+    <!-- Inclusione delle librerie jsPDF e html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <!-- Inclusione dei file JS esterni -->
+    <script src="js/anno.js"></script>
+    <script src="js/cassa_gs_inps.js"></script>
+    <script src="js/cassa_inps_commercianti.js"></script>
+    <script src="js/cassa_inps_artigiani.js"></script>
+    <script src="js/cassa_new_cassa.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>
