@@ -1,0 +1,387 @@
+/* Stili di base */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+header {
+    color: #333;
+    text-align: center;
+}
+.container {
+    flex: 1;
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    width: 100%;
+}
+#disclaimer {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+h2 {
+    color: #333;
+    padding-bottom: 5px;
+    margin-top: 30px;
+    font-size: 1.5em;
+}
+/* Rimozione della linea sotto il titolo nelle sezioni specifiche */
+#come-si-calcolano-tab h2,
+#dettaglio-pagamenti-tab h2 {
+    border-bottom: none;
+}
+/* Stili del Form */
+.calcolatore-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 0 auto;
+    border-bottom: 2px solid #ccc;
+}
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+input, select, button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+button {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+}
+button:hover {
+    background-color: #f0f0f0;
+}
+.reddito-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.reddito-buttons button {
+    flex: 1 1 calc(50% - 10px);
+    padding: 8px;
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+.reddito-buttons button:hover {
+    background-color: #d5d5d5;
+}
+/* Sezioni dei Risultati e delle Schede */
+.risultati-container, .schede-container {
+    display: none;
+    margin-top: 30px;
+}
+/* Schede */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.tab {
+    flex: 1;
+    padding: 10px;
+    background-color: #e0f7fa;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+.tab.active {
+    background-color: #b2ebf2;
+    color: #333;
+    border-bottom: 2px solid #333;
+}
+.tab-content {
+    display: none;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.tab-content.active {
+    display: block;
+}
+/* Tabelle */
+.table-container {
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #fff;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: inherit;
+}
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 0.95em;
+}
+th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+.highlight-yellow {
+    background-color: #fff9c4;
+}
+.highlight-blue {
+    background-color: #bbdefb;
+}
+.highlight-green {
+    background-color: #acc29f;
+}
+.indent {
+    padding-left: 20px;
+}
+
+/* Pulsante Download */
+#downloadRecap {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    margin: 20px auto; /* Centro per schermi più piccoli */
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 16px;
+    display: block; /* Per centrare e adattare facilmente */
+    text-align: center;
+    max-width: 300px; /* Limita la larghezza su schermi più larghi */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Leggera ombra per stile */
+}
+
+/* Hover per desktop */
+#downloadRecap:hover {
+    background-color: #f0f0f0;
+}
+
+/* Stili Responsive */
+@media (max-width: 768px) {
+    #downloadRecap {
+        font-size: 14px; /* Testo leggermente più piccolo */
+        padding: 8px 16px; /* Riduce il padding */
+        width: 90%; /* Pulsante si adatta alla larghezza dello schermo */
+    }
+}
+
+@media (max-width: 480px) {
+    #downloadRecap {
+        font-size: 12px; /* Testo ancora più piccolo per schermi molto stretti */
+        padding: 8px 12px; /* Ancora più compatto */
+        width: 100%; /* Occupa tutta la larghezza */
+    }
+}
+
+/* Stile per il quaderno a righe */
+#come-si-calcolano-tab {
+    background-color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+#come-si-calcolano-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(197, 197, 197, 0.2) 0,
+        rgba(197, 197, 197, 0.2) 1px,
+        transparent 1px,
+        transparent 24px
+    );
+    z-index: 0;
+}
+#come-si-calcolano-tab::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    background-color: transparent;
+    z-index: 0;
+}
+/* Allineamento del testo alle righe */
+#come-si-calcolano-tab * {
+    line-height: 25px;
+}
+/* Stile per il quaderno a quadretti */
+#dettaglio-pagamenti-tab {
+    background-color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+#dettaglio-pagamenti-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: linear-gradient(to right, rgba(197, 197, 197, 0.2) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px);
+    background-size: 25px 25px;
+    z-index: 0;
+}
+/* Posizionamento del contenuto sopra lo sfondo */
+#come-si-calcolano-tab .tab-content,
+#dettaglio-pagamenti-tab .tab-content {
+    position: relative;
+    z-index: 1;
+}
+/* Responsive Design */
+@media (max-width: 600px) {
+    .reddito-buttons button {
+        flex: 1 1 100%;
+    }
+    .tabs {
+        flex-direction: column;
+    }
+    .tab {
+        text-align: center;
+    }
+    /* Aggiustamenti per il quaderno a righe su mobile */
+    #come-si-calcolano-tab * {
+        line-height: 20px;
+    }
+}
+/* Stili per il contenitore del form */
+.form-group {
+    margin-top: 15px;
+}
+/* Stili per il checkbox personalizzato */
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: normal;
+}
+/* Nascondi il checkbox originale */
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+/* Crea un nuovo aspetto per il checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* Effetto hover per il checkbox */
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+/* Stile quando il checkbox è selezionato */
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #2196F3;
+    border-color: #2196F3;
+}
+/* Crea il segno di spunta */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+/* Mostra il segno di spunta quando selezionato */
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+/* Stile del segno di spunta */
+.checkbox-container .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+/* Stili per il campo data */
+#dataApertura {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+/* Stili per l'etichetta */
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.styled-underline {
+    text-decoration: none;
+    position: relative;
+    font-weight: bold;
+}
+
+.styled-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    height: 2px;
+    width: 100%;
+    background-color: #000000;
+    border-radius: 2px;
+    z-index: -1;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+    transform: skew(-5deg);
+}
