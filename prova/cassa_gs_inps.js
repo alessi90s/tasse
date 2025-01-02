@@ -106,7 +106,48 @@ function cassa_gs_inps() {
             dettaglioCalcoli.innerHTML = dettaglioTesto;
 
             // Popola la sezione "Dettaglio pagamenti"
-            // Implementa secondo necessità o mantieni separato per ciascuna cassa
+            document.getElementById("detAnnoPagamenti").innerText = annoReddito;
+                document.getElementById("detRedditoLordoPagamenti").innerText = redditoLordo.toLocaleString('it-IT');
+                document.getElementById("detRedditoLordoDetPagamenti").innerText = redditoLordo.toLocaleString('it-IT');
+                document.getElementById("detCoefficienteDetPagamenti").innerText = (coefficienteRedditivita * 100).toFixed(0) + "%";
+                document.getElementById("detRedditoNettoPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                document.getElementById("detRedditoNettoDetPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                document.getElementById("detAliquotaImpostaPagamenti").innerText = (aliquotaImposta * 100).toFixed(0) + "%";
+                document.getElementById("detImpostaSostitutivaPagamenti").innerText = impostaSostitutiva.toLocaleString('it-IT');
+
+                if (cassaInps === "gs_inps") {
+                    document.getElementById("detContributiInpsTitoloPagamenti").innerText = "Gestione Separata";
+                    document.getElementById("detRedditoNettoInpsPagamenti").innerText = redditoNetto.toLocaleString('it-IT');
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = "26%";
+                    document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
+                } else {
+                    let aliquotaVariabileEffettiva = aliquotaVariabile * (riduzioneContributi ? 0.65 : 1) * 100;
+                    aliquotaVariabileDisplay = Math.round(aliquotaVariabileEffettiva) + "%";
+                    document.getElementById("detContributiInpsTitoloPagamenti").innerText = cassaInps === "inps_commercianti" ? "INPS Commercianti" : "INPS Artigiani";
+                    document.getElementById("detRedditoNettoInpsPagamenti").innerText = (redditoNetto - sogliaReddito).toLocaleString('it-IT');
+                    document.getElementById("detAliquotaContributivaPagamenti").innerText = aliquotaVariabileDisplay;
+                    document.getElementById("detContributiInpsCalcolatiPagamenti").innerText = contributiVariabili.toLocaleString('it-IT');
+                }
+
+                // Calcolo dei Saldi e Acconti
+                document.getElementById("detSaldoImpostaPagamenti").innerText = impostaSostitutiva.toLocaleString('it-IT');
+                document.getElementById("detAccontoImpostaPagamenti").innerText = accontoImposta.toLocaleString('it-IT');
+                document.getElementById("detPrimaRataImpostaPagamenti").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
+                document.getElementById("detSecondaRataImpostaPagamenti").innerText = Math.round(accontoImposta / 2).toLocaleString('it-IT');
+
+                if (cassaInps !== "gs_inps") {
+                    document.getElementById("detSaldoContributiPagamenti").innerText = (Number(contributiFissiSulAnno) + Number(contributiVariabili)).toLocaleString('it-IT');
+                    document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
+                    document.getElementById("detPrimaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detSecondaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detContributiInpsTipoPagamenti").innerText = cassaInps === "inps_commercianti" ? "Commercianti" : "Artigiani";
+                } else {
+                    document.getElementById("detSaldoContributiPagamenti").innerText = contributiInps.toLocaleString('it-IT');
+                    document.getElementById("detAccontoContributiPagamenti").innerText = Math.round(accontoInps).toLocaleString('it-IT');
+                    document.getElementById("detPrimaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detSecondaRataContributiPagamenti").innerText = Math.round(accontoInps / 2).toLocaleString('it-IT');
+                    document.getElementById("detContributiInpsTipoPagamenti").innerText = "Gestione Separata";
+                }
         }
     };
 }
