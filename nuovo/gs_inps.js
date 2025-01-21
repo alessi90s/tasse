@@ -1,6 +1,6 @@
 // gs_inps.js
 export function calcolaContributi({ redditoNetto, annoReddito }) {
-  // Definizione delle percentuali per l'anno di riferimento
+  // Percentuali per l'anno di riferimento
   const aliquoteContributi = {
     2023: 25.00, // 25% per il 2023
     2024: 26.23, // 26.23% per il 2024
