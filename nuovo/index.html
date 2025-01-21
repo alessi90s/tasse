@@ -42,12 +42,7 @@
       margin-top: 30px;
       font-size: 1.5em;
     }
-    /* Rimozione della linea sotto il titolo nelle sezioni specifiche */
-    #come-si-calcolano-tab h2,
-    #scadenza-pagamenti-tab h2 {
-      border-bottom: none;
-    }
-    /* Stili del Form */
+    /* Stili del form */
     .calcolatore-container {
       background-color: #fff;
       padding: 20px;
@@ -102,7 +97,7 @@
     .reddito-buttons button:hover {
       background-color: #d5d5d5;
     }
-    /* Campi nascosti per reddito anno precedente */
+    /* Campo per reddito dell'anno precedente */
     .hidden {
       display: none;
     }
@@ -214,8 +209,8 @@
       pointer-events: none;
       background-image: repeating-linear-gradient(
         to bottom,
-        rgba(197, 197, 197, 0.2) 0,
-        rgba(197, 197, 197, 0.2) 1px,
+        rgba(197,197,197,0.2) 0,
+        rgba(197,197,197,0.2) 1px,
         transparent 1px,
         transparent 24px
       );
@@ -231,7 +226,6 @@
       background-color: transparent;
       z-index: 0;
     }
-    /* Allineamento del testo alle righe */
     #come-si-calcolano-tab * {
       line-height: 25px;
     }
@@ -254,13 +248,11 @@
       background-size: 25px 25px;
       z-index: 0;
     }
-    /* Posizionamento sopra lo sfondo */
     #come-si-calcolano-tab .tab-content,
     #scadenza-pagamenti-tab .tab-content {
       position: relative;
       z-index: 1;
     }
-    /* Responsive */
     @media (max-width: 600px) {
       .reddito-buttons button {
         flex: 1 1 100%;
@@ -275,98 +267,13 @@
         line-height: 20px;
       }
     }
-    /* Checkbox personalizzato */
-    .checkbox-container {
-      display: block;
-      position: relative;
-      padding-left: 30px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      user-select: none;
-      font-weight: normal;
-    }
-    .checkbox-container input {
-      position: absolute;
-      opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-    .checkmark {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 20px;
-      width: 20px;
-      background-color: #eee;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .checkbox-container:hover input ~ .checkmark {
-      background-color: #ccc;
-    }
-    .checkbox-container input:checked ~ .checkmark {
-      background-color: #2196F3;
-      border-color: #2196F3;
-    }
-    .checkmark:after {
-      content: "";
-      position: absolute;
-      display: none;
-    }
-    .checkbox-container input:checked ~ .checkmark:after {
-      display: block;
-    }
-    .checkbox-container .checkmark:after {
-      left: 7px;
-      top: 3px;
-      width: 5px;
-      height: 10px;
-      border: solid white;
-      border-width: 0 2px 2px 0;
-      transform: rotate(45deg);
-    }
-    /* Campo data */
-    #dataApertura {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-    /* Etichette */
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    .styled-underline {
-      text-decoration: none;
-      position: relative;
-      font-weight: bold;
-    }
-    .styled-underline::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: -5px;
-      height: 2px;
-      width: 100%;
-      background-color: #000;
-      border-radius: 2px;
-      z-index: -1;
-      box-shadow: 0 2px 3px rgba(0,0,0,0.2);
-      transform: skew(-5deg);
-    }
   </style>
 </head>
 <body>
 
   <!-- Disclaimer -->
   <div id="disclaimer">
-    <strong>Questo calcolatore è da usare solo per previsioni a grandi linee e non sostituisce un vero calcolo effettuato da un commercialista.</strong>
+    <strong>Questo calcolatore è da usare solo per previsioni e non sostituisce un calcolo da un commercialista.</strong>
   </div>
 
   <header>
@@ -380,7 +287,7 @@
         <form id="calcolatoreForm">
           <label for="annoReddito"><span class="highlight-yellow">Anno</span> di Riferimento del Reddito:</label>
           <select id="annoReddito" required>
-            <!-- Seleziona l'anno: se diverso dal corrente (2024) verranno chiesti 2 redditi -->
+            <!-- L'utente seleziona l'anno per cui vuole effettuare il calcolo -->
             <option value="2023">2023</option>
             <option value="2024" selected>2024</option>
             <option value="2025">2025</option>
@@ -422,16 +329,23 @@
             <option value="40">40%</option>
           </select>
 
-          <!-- Gestione dei redditi: se anno selezionato != anno corrente (2024) -->
+          <!-- Checkbox per attivare l'inserimento del reddito dell'anno precedente -->
+          <div>
+            <label>
+              <input type="checkbox" id="usaRedditoPrecedente">
+              Inserisci reddito dell'anno precedente per calcolare gli acconti
+            </label>
+          </div>
+          <!-- Campo reddito anno precedente -->
           <div id="redditiMultipli" class="hidden">
-            <label for="redditoPrecedente">Reddito dell'anno precedente (2023):</label>
+            <label for="redditoPrecedente">Reddito dell'anno precedente:</label>
             <input type="number" id="redditoPrecedente" min="0" step="1">
           </div>
 
-          <label for="redditoLordo" id="labelRedditoLordo">Reddito dell'anno in corso (2024):</label>
+          <label for="redditoLordo" id="labelRedditoLordo">Reddito dell'anno di riferimento:</label>
           <input type="number" id="redditoLordo" min="0" step="1" required>
           
-          <!-- Bottoni per reddito lordo predefinito -->
+          <!-- Bottoni per impostare reddito -->
           <div class="reddito-buttons">
             <button type="button" data-value="15000">15.000€</button>
             <button type="button" data-value="30000">30.000€</button>
@@ -445,7 +359,7 @@
       </div>
     </section>
 
-    <!-- Sezione Risultati (rimane invariata) -->
+    <!-- Sezione Risultati -->
     <section id="risultati-container" class="risultati-container">
       <div class="table-container">
         <table>
@@ -461,18 +375,23 @@
             <td>Reddito Netto (Anno <span id="annoRedditoOutput"></span>):</td>
             <td id="redditoNettoOutput"></td>
           </tr>
+          <!-- Imposta Sostitutiva: verrà sottratto l'acconto già versato (se fornito) -->
           <tr>
-            <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul <span id="annoRedditoOutput2"></span>:</td>
+            <td>Imposta Sostitutiva (5%) sul <span id="annoRedditoOutput2"></span>:</td>
             <td id="impostaSostitutivaOutput" class="highlight-yellow"></td>
           </tr>
-          <tr>
-            <td>Acconto Imposta Sostitutiva (100%) sul <span id="annoAccontoImposta"></span>:</td>
-            <td id="accontoImpostaOutput" class="highlight-blue"></td>
+          <tr id="accontiImpostaRow" style="display:none;">
+            <td>Acconti Imposta già versati (anno precedente):</td>
+            <td id="accontiImpostaOutput" class="highlight-blue"></td>
           </tr>
           <!-- Contributi INPS -->
           <tr id="contributiInpsRow">
             <td>Contributi INPS sul <span id="annoRedditoOutput3"></span>:</td>
             <td id="contributiInpsOutput" class="highlight-yellow"></td>
+          </tr>
+          <tr id="accontiContributiRow" style="display:none;">
+            <td>Acconti Contributi già versati (anno precedente):</td>
+            <td id="accontiContributiOutput" class="highlight-blue"></td>
           </tr>
           <tr id="contributiFissiRow" style="display: none;">
             <td class="indent">Contributi Fissi sul <span id="annoRedditoOutput4"></span>:</td>
@@ -486,7 +405,6 @@
             <td><strong>Totale Contributi INPS sul <span id="annoRedditoOutput6"></span>:</strong></td>
             <td id="totaleContributiInpsOutput" class="highlight-yellow"></td>
           </tr>
-          <!-- Contributi Fissi Ipotetici -->
           <tr id="contributiFissiIpoteticiRow">
             <td>Contributi Fissi (ipotetici su anno completo):</td>
             <td id="contributiFissiIpoteticiOutput" class="highlight-green"></td>
@@ -499,7 +417,7 @@
       </div>
     </section>
 
-    <!-- Sezione Schede (rimane invariata) -->
+    <!-- Sezione Schede -->
     <section id="schede-container" class="schede-container">
       <div class="tabs">
         <div class="tab active" data-tab="come-si-calcolano">Come si Calcolano</div>
@@ -508,7 +426,7 @@
       <div class="tab-content active" id="come-si-calcolano-tab">
         <h2>Come si Calcolano</h2>
         <div id="dettaglioCalcoli">
-          <!-- Il testo dinamico verrà inserito qui -->
+          <!-- Testo dinamico verrà inserito qui -->
         </div>
       </div>
       <div class="tab-content" id="scadenza-pagamenti-tab">
@@ -562,7 +480,7 @@
     </div>
   </div>
 
-  <!-- Inclusione jsPDF e html2canvas -->
+  <!-- Inclusione di jsPDF e html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -573,6 +491,7 @@
       const annoRedditoSelect = document.getElementById("annoReddito");
       const redditiMultipliDiv = document.getElementById("redditiMultipli");
       const labelRedditoLordo = document.getElementById("labelRedditoLordo");
+      const usaRedditoPrecedenteCheckbox = document.getElementById("usaRedditoPrecedente");
 
       const cassaInpsSelect = document.getElementById("cassaInps");
       const opzioniContainer = document.getElementById("opzioniCommercianteArtigiano");
@@ -584,26 +503,24 @@
       const tabs = document.querySelectorAll(".tab");
       const tabContents = document.querySelectorAll(".tab-content");
 
-      // Inizializza la select dell'anno e altri valori
+      // Imposta i valori iniziali
       annoRedditoSelect.value = currentYear;
       document.getElementById("aliquotaImposta").value = "0.05";
       document.getElementById("coefficienteRedditivita").value = "78";
 
-      // Visualizza campo per reddito precedente se anno != currentYear
-      function aggiornaCampiRedditi() {
-        const annoSelezionato = parseInt(annoRedditoSelect.value);
-        if(annoSelezionato !== currentYear) {
+      // Mostra o nasconde il campo per il reddito dell'anno precedente in base al checkbox
+      function aggiornaCampiPrecedenti() {
+        if(usaRedditoPrecedenteCheckbox.checked) {
           redditiMultipliDiv.classList.remove("hidden");
-          labelRedditoLordo.innerText = "Reddito dell'anno in corso (" + annoSelezionato + "):";
         } else {
           redditiMultipliDiv.classList.add("hidden");
-          labelRedditoLordo.innerText = "Reddito Lordo:";
+          document.getElementById("redditoPrecedente").value = "";
         }
       }
-      annoRedditoSelect.addEventListener("change", aggiornaCampiRedditi);
-      aggiornaCampiRedditi();
+      usaRedditoPrecedenteCheckbox.addEventListener("change", aggiornaCampiPrecedenti);
+      aggiornaCampiPrecedenti();
 
-      // Mostra/Nascondi opzioni per Commercianti/Artigiani
+      // Gestione opzioni per Commercianti/Artigiani
       cassaInpsSelect.addEventListener("change", function() {
         const cassa = cassaInpsSelect.value;
         if(cassa === "inps_commercianti" || cassa === "inps_artigiani") {
@@ -615,7 +532,7 @@
         }
       });
 
-      // Imposta il valore del reddito lordo tramite i bottoni
+      // Imposta il valore del reddito tramite i bottoni
       redditoLordoButtons.forEach(button => {
         button.addEventListener("click", function() {
           document.getElementById("redditoLordo").value = this.getAttribute("data-value");
@@ -633,43 +550,44 @@
         });
       });
 
-      // Evento di submit
+      // Evento di submit del form
       form.addEventListener("submit", async function(event) {
         event.preventDefault();
 
-        // Recupera i valori
-        const annoReddito = parseInt(document.getElementById("annoReddito").value);
-        const cassaInps = document.getElementById("cassaInps").value;
+        const annoReddito = parseInt(annoRedditoSelect.value);
+        const cassaInps = cassaInpsSelect.value;
         const riduzioneContributi = document.getElementById("riduzioneContributi").checked;
         const dataApertura = document.getElementById("dataApertura").value;
         const aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
         const coefficienteRedditivita = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
-        let redditoLordo;
-        if(annoReddito !== currentYear) {
-          const redditoPrecedente = parseInt(document.getElementById("redditoPrecedente").value) || 0;
-          const redditoAnnoCorso = parseInt(document.getElementById("redditoLordo").value);
-          if(isNaN(redditoAnnoCorso) || redditoAnnoCorso <= 0) {
-            alert("Inserisci il reddito dell'anno in corso.");
-            return;
-          }
-          redditoLordo = redditoPrecedente + redditoAnnoCorso;
-        } else {
-          redditoLordo = parseInt(document.getElementById("redditoLordo").value);
-        }
         
+        // Recupero reddito dell'anno corrente (obbligatorio)
+        const redditoCorrente = parseInt(document.getElementById("redditoLordo").value);
+        if(isNaN(redditoCorrente) || redditoCorrente <= 0) {
+          alert("Inserisci il reddito dell'anno di riferimento.");
+          return;
+        }
+        // Se l'utente ha spuntato il checkbox, recupera anche il reddito precedente
+        let redditoPrecedente = 0;
+        if(usaRedditoPrecedenteCheckbox.checked) {
+          redditoPrecedente = parseInt(document.getElementById("redditoPrecedente").value) || 0;
+        }
+        // Il reddito totale usato per il calcolo è la somma dei due (se inserito)
+        const redditoLordo = redditoPrecedente + redditoCorrente;
+
         if(isNaN(annoReddito) || cassaInps === "" || isNaN(aliquotaImposta) || isNaN(coefficienteRedditivita) || isNaN(redditoLordo) || redditoLordo <= 0) {
           alert("Compila correttamente tutti i campi.");
           return;
         }
 
-        // Calcolo del Reddito Netto (sulla somma se inseriti due redditi)
+        // Calcola reddito netto (sulla somma dei redditi)
         const redditoNetto = Math.round(redditoLordo * coefficienteRedditivita);
 
-        // Calcolo Imposta Sostitutiva
+        // Calcola imposta sostitutiva e acconto dell'anno in corso (es. 2024)
         const impostaSostitutiva = Math.round(redditoNetto * aliquotaImposta);
         const accontoImposta = impostaSostitutiva;
 
-        // Calcola i contributi in base alla cassa
+        // Calcola i contributi per l'anno di riferimento usando il modulo corrispondente
         let contributi = {
           contributiFissi: 0,
           contributiVariabili: 0,
@@ -697,47 +615,62 @@
           return;
         }
 
-        /* Nuova funzionalità: se l'anno selezionato è 2024 (o in generale l'anno corrente)
-           e viene fornito anche un reddito del 2023, usiamo il modulo acconti.js per calcolare 
-           quanto degli acconti versati nel 2023 andranno a compensare il saldo del 2024.
-           Il file acconti.js contiene una funzione che riceve i dati del 2023 e restituisce 
-           un importo da sottrarre al saldo 2024. */
-        let accontoCompensazione = 0;
-        if(annoReddito === currentYear && document.getElementById("redditoPrecedente").value) {
-          const redditoPrecedente = parseInt(document.getElementById("redditoPrecedente").value) || 0;
+        /* CALCOLO DEGLI ACCONTI VERSATI NELL'ANNO PRECEDENTE
+           Se l'utente ha spuntato il checkbox e inserito il reddito dell'anno precedente,
+           calcoliamo gli acconti per il 2023.
+           La logica è simile al calcolo corrente:
+           - redditoNettoPrecedente = redditoPrecedente × coefficienteRedditivita
+           - accontoImpostaPrecedente = round(redditoNettoPrecedente × aliquotaImposta)
+           - Per i contributi, usiamo lo stesso modulo (passando come anno: annoReddito – 1).
+        */
+        let accontoImpostaPrecedente = 0;
+        let accontoContributiPrecedente = 0;
+        if(usaRedditoPrecedenteCheckbox.checked && redditoPrecedente > 0) {
+          const redditoNettoPrecedente = Math.round(redditoPrecedente * coefficienteRedditivita);
+          accontoImpostaPrecedente = Math.round(redditoNettoPrecedente * aliquotaImposta);
           try {
-            const moduleAcconti = await import("./acconti.js");
-            // La funzione calcolaAcconti riceve i redditi 2023 e 2024, l’aliquota e il coefficiente,
-            // e restituisce l’importo degli acconti già versati per il 2023 che devono essere compensati.
-            accontoCompensazione = moduleAcconti.calcolaAcconti({
-              redditoPrecedente,
-              redditoCorrente: redditoLordo - redditoPrecedente, // reddito 2024
-              coefficienteRedditivita,
-              aliquotaImposta
-            });
+            if(cassaInps === "gs_inps") {
+              const moduleContrib = await import("./gs_inps.js");
+              const contribPrecedente = moduleContrib.calcolaContributi({ redditoNetto: redditoNettoPrecedente, annoReddito: annoReddito - 1 });
+              accontoContributiPrecedente = contribPrecedente.accontoInps;
+            } else if(cassaInps === "inps_commercianti") {
+              const moduleContrib = await import("./inps_commercianti.js");
+              const contribPrecedente = moduleContrib.calcolaContributi({ redditoNetto: redditoNettoPrecedente, riduzioneContributi, dataApertura:"", annoReddito: annoReddito - 1 });
+              accontoContributiPrecedente = contribPrecedente.accontoInps;
+            } else if(cassaInps === "inps_artigiani") {
+              const moduleContrib = await import("./inps_artigiani.js");
+              const contribPrecedente = moduleContrib.calcolaContributi({ redditoNetto: redditoNettoPrecedente, riduzioneContributi, dataApertura:"", annoReddito: annoReddito - 1 });
+              accontoContributiPrecedente = contribPrecedente.accontoInps;
+            }
           } catch(err) {
-            console.error("Errore nel modulo acconti:", err);
+            console.error("Errore nel calcolo degli acconti dell'anno precedente:", err);
           }
         }
 
-        // Ora sottraiamo il valore di accontoCompensazione dal saldo che deve essere versato per il 2024.
-        // Ad esempio, se il saldo 2024 (somma di imposta sostitutiva e contributi) è calcolato
-        // come segue, lo riduciamo degli acconti già versati:
-        // Nota: adatta la logica secondo come vuoi aggregare i saldi.
-        const saldo2024 = impostaSostitutiva + contributi.contributiFissiSulAnno + contributi.contributiVariabili;
-        const saldo2024Ridotto = saldo2024 - accontoCompensazione;
+        // Calcola il saldo iniziale del 2024 (somma imposta sostitutiva e contributi)
+        const saldo2024_iniziale = impostaSostitutiva + contributi.contributiFissiSulAnno + contributi.contributiVariabili;
+        // Applica la compensazione: sottrai gli acconti già versati
+        const saldo2024_finale = saldo2024_iniziale - (accontoImpostaPrecedente + accontoContributiPrecedente);
 
-        // Popoliamo i dati dei risultati:
+        // Popola i risultati nella tabella
         document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput").innerText = annoReddito;
         document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
         document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta*100).toFixed(0) + "%";
         document.getElementById("annoRedditoOutput2").innerText = annoReddito;
-        document.getElementById("impostaSostitutivaOutput").innerText = impostaSostitutiva.toLocaleString('it-IT') + "€";
+        // Imposta sostitutiva ridotta degli acconti dell'anno precedente
+        document.getElementById("impostaSostitutivaOutput").innerText = (impostaSostitutiva - accontoImpostaPrecedente).toLocaleString('it-IT') + "€";
         document.getElementById("annoAccontoImposta").innerText = annoReddito + 1;
         document.getElementById("accontoImpostaOutput").innerText = accontoImposta.toLocaleString('it-IT') + "€";
+        if(accontoImpostaPrecedente > 0) {
+          document.getElementById("accontiImpostaRow").style.display = "table-row";
+          document.getElementById("accontiImpostaOutput").innerText = accontoImpostaPrecedente.toLocaleString('it-IT') + "€";
+        } else {
+          document.getElementById("accontiImpostaRow").style.display = "none";
+        }
+        // Contributi
         document.getElementById("annoRedditoOutput3").innerText = annoReddito;
-        document.getElementById("contributiInpsOutput").innerText = contributi.contributiInps.toLocaleString('it-IT') + "€";
+        document.getElementById("contributiInpsOutput").innerText = (contributi.contributiInps).toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput4").innerText = annoReddito;
         document.getElementById("contributiFissiOutput").innerText = contributi.contributiFissiSulAnno.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput5").innerText = annoReddito;
@@ -747,21 +680,24 @@
         document.getElementById("contributiFissiIpoteticiOutput").innerText = contributi.contributiFissiIpotetici.toLocaleString('it-IT') + "€";
         document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
         document.getElementById("accontoInpsOutput").innerText = contributi.accontoInps.toLocaleString('it-IT') + "€";
+        if(accontoContributiPrecedente > 0) {
+          document.getElementById("accontiContributiRow").style.display = "table-row";
+          document.getElementById("accontiContributiOutput").innerText = accontoContributiPrecedente.toLocaleString('it-IT') + "€";
+        } else {
+          document.getElementById("accontiContributiRow").style.display = "none";
+        }
 
-        // (Eventuale visualizzazione e aggiornamento di rate e scadenze...)
-        // In questo esempio non modifichiamo ulteriormente le scadenze.
-
-        // Popola la sezione "Come si Calcolano" (testo generico; puoi personalizzarlo)
+        // Aggiungi note esplicative nella sezione "Come si Calcolano"
         let dettaglioTesto = "";
         if(cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-          dettaglioTesto += `Per il 2024, il saldo (imposta + contributi) iniziale è di <strong>${saldo2024.toLocaleString('it-IT')}€</strong>.<br>`;
-          if(accontoCompensazione > 0) {
-            dettaglioTesto += `Dal momento che nel 2023 avevi versato acconti per il 2024 per un ammontare di <strong>${accontoCompensazione.toLocaleString('it-IT')}€</strong>, il saldo da versare per il 2024 si riduce a <strong>${saldo2024Ridotto.toLocaleString('it-IT')}€</strong>.<br><br>`;
+          dettaglioTesto += `Per il ${annoReddito}, il saldo iniziale (imposta + contributi) era di <strong>${saldo2024_iniziale.toLocaleString('it-IT')}€</strong>.<br>`;
+          if((accontoImpostaPrecedente + accontoContributiPrecedente) > 0) {
+            dettaglioTesto += `Poiché nel ${annoReddito-1} hai versato acconti per un ammontare di <strong>${(accontoImpostaPrecedente + accontoContributiPrecedente).toLocaleString('it-IT')}€</strong>, il saldo finale da versare per il ${annoReddito} è di <strong>${saldo2024_finale.toLocaleString('it-IT')}€</strong>.<br><br>`;
           }
-          dettaglioTesto += `Il calcolo viene effettuato sommando i redditi, calcolando il reddito netto e applicando le aliquote per imposta e contributi.`;
+          dettaglioTesto += `Il calcolo si basa sulla somma dei redditi inseriti (anno precedente + anno corrente), il coefficiente di redditivitá e le aliquote per imposta e contributi.`;
         }
         else if(cassaInps === "gs_inps") {
-          dettaglioTesto += `Per il 2024, il saldo (imposta sostitutiva + contributi) viene calcolato sul reddito netto usando le aliquote previste per la Gestione Separata.<br>`;
+          dettaglioTesto += `Per il ${annoReddito}, il saldo (imposta sostitutiva + contributi INPS) viene calcolato sul reddito netto, e gli acconti del ${annoReddito-1} vengono sottratti.<br>`;
         }
         dettaglioCalcoli.innerHTML = dettaglioTesto;
 
@@ -770,7 +706,7 @@
         document.getElementById("schede-container").style.display = "block";
       });
 
-      // Logica per il download del PDF (invariata)
+      // Download PDF (stessa logica degli esempi precedenti)
       downloadButton.addEventListener("click", async function() {
         const { jsPDF } = window.jspdf;
         const pdfWidth = 595.28;
@@ -883,7 +819,7 @@
         await addPageToPDF(thirdPageElement, pdf, true);
         removePadding(thirdPageElement);
 
-        // Quarta pagina: scadenze (ancora la scheda "scadenza pagamenti")
+        // Quarta pagina: scadenze (scheda "scadenza pagamenti")
         const fourthPageElement = document.getElementById('scadenza-pagamenti-tab');
         addPadding(fourthPageElement);
         await addPageToPDF(fourthPageElement, pdf);
