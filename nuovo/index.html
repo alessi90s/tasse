@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Calcolatore Regime Forfettario</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     /* Stili di base */
     body {
@@ -47,7 +47,7 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
       max-width: 500px;
       margin: 0 auto;
       border-bottom: 2px solid #ccc;
@@ -57,7 +57,9 @@
       margin-top: 10px;
       font-weight: bold;
     }
-    input, select, button {
+    input,
+    select,
+    button {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
@@ -97,12 +99,13 @@
     .reddito-buttons button:hover {
       background-color: #d5d5d5;
     }
-    /* Campo per reddito anno precedente */
+    /* Campo nascosto per reddito anno precedente */
     .hidden {
       display: none;
     }
     /* Sezioni dei Risultati e delle Schede */
-    .risultati-container, .schede-container {
+    .risultati-container,
+    .schede-container {
       display: none;
       margin-top: 30px;
     }
@@ -133,7 +136,7 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 4px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     }
     .tab-content.active {
       display: block;
@@ -152,7 +155,8 @@
       border-collapse: collapse;
       font-family: inherit;
     }
-    th, td {
+    th,
+    td {
       padding: 10px;
       border: 1px solid #ddd;
       text-align: left;
@@ -188,7 +192,7 @@
       display: block;
       text-align: center;
       max-width: 300px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
     #downloadRecap:hover {
       background-color: #f0f0f0;
@@ -200,7 +204,7 @@
       overflow: hidden;
     }
     #come-si-calcolano-tab::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -209,15 +213,15 @@
       pointer-events: none;
       background-image: repeating-linear-gradient(
         to bottom,
-        rgba(197,197,197,0.2) 0,
-        rgba(197,197,197,0.2) 1px,
+        rgba(197, 197, 197, 0.2) 0,
+        rgba(197, 197, 197, 0.2) 1px,
         transparent 1px,
         transparent 24px
       );
       z-index: 0;
     }
     #come-si-calcolano-tab::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -236,19 +240,22 @@
       overflow: hidden;
     }
     #scadenza-pagamenti-tab::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
       pointer-events: none;
-      background-image: linear-gradient(to right, rgba(197,197,197,0.2) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(197,197,197,0.2) 1px, transparent 1px);
+      background-image: linear-gradient(
+          to right,
+          rgba(197, 197, 197, 0.2) 1px,
+          transparent 1px
+        ),
+        linear-gradient(to bottom, rgba(197, 197, 197, 0.2) 1px, transparent 1px);
       background-size: 25px 25px;
       z-index: 0;
     }
-    #come-si-calcolano-tab .tab-content,
     #scadenza-pagamenti-tab .tab-content {
       position: relative;
       z-index: 1;
@@ -270,8 +277,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Disclaimer -->
   <div id="disclaimer">
     <strong>Questo calcolatore è da usare solo per previsioni e non sostituisce un calcolo da un commercialista.</strong>
   </div>
@@ -302,25 +307,28 @@
 
           <div id="opzioniCommercianteArtigiano" style="display: none;">
             <div class="form-group">
-              <label class="checkbox-container">
-                <input type="checkbox" id="riduzioneContributi">
+              <label>
+                <input type="checkbox" id="riduzioneContributi" />
                 Applica riduzione del 35% sui contributi INPS
-                <span class="checkmark"></span>
               </label>
             </div>
             <div class="form-group">
               <label for="dataApertura">Data di Apertura della Partita IVA:</label>
-              <input type="date" id="dataApertura">
+              <input type="date" id="dataApertura" />
             </div>
           </div>
 
-          <label for="aliquotaImposta"><span class="highlight-yellow">Aliquota</span> Imposta Sostitutiva:</label>
+          <label for="aliquotaImposta"
+            ><span class="highlight-yellow">Aliquota</span> Imposta Sostitutiva:</label
+          >
           <select id="aliquotaImposta" required>
             <option value="0.05" selected>5%</option>
             <option value="0.15">15%</option>
           </select>
 
-          <label for="coefficienteRedditivita"><span class="highlight-yellow">Coefficiente</span> di Redditività (%):</label>
+          <label for="coefficienteRedditivita"
+            ><span class="highlight-yellow">Coefficiente</span> di Redditività (%):</label
+          >
           <select id="coefficienteRedditivita" required>
             <option value="86" selected>86%</option>
             <option value="78">78%</option>
@@ -328,21 +336,21 @@
             <option value="40">40%</option>
           </select>
 
-          <!-- Checkbox per acconti anno precedente -->
+          <!-- Checkbox per reddito anno precedente -->
           <div>
             <label>
-              <input type="checkbox" id="usaRedditoPrecedente">
+              <input type="checkbox" id="usaRedditoPrecedente" />
               Inserisci reddito dell'anno precedente per calcolare gli acconti
             </label>
           </div>
           <div id="redditiMultipli" class="hidden">
             <label for="redditoPrecedente">Reddito dell'anno precedente:</label>
-            <input type="number" id="redditoPrecedente" min="0" step="1">
+            <input type="number" id="redditoPrecedente" min="0" step="1" />
           </div>
 
-          <label for="redditoLordo" id="labelRedditoLordo">Reddito dell'anno di riferimento:</label>
-          <input type="number" id="redditoLordo" min="0" step="1" required>
-          
+          <label for="redditoLordo">Reddito dell'anno di riferimento:</label>
+          <input type="number" id="redditoLordo" min="0" step="1" required />
+
           <!-- Bottoni per reddito lordo -->
           <div class="reddito-buttons">
             <button type="button" data-value="15000">15.000€</button>
@@ -374,10 +382,10 @@
             <td id="redditoNettoOutput"></td>
           </tr>
           <tr>
-            <td>Imposta Sostitutiva (5%) sul <span id="annoRedditoOutput2"></span>:</td>
+            <td>Imposta Sostitutiva (<span id="aliquotaImpostaOutput"></span>) sul <span id="annoRedditoOutput2"></span>:</td>
             <td id="impostaSostitutivaOutput" class="highlight-yellow"></td>
           </tr>
-          <tr id="accontiImpostaRow" style="display:none;">
+          <tr id="accontiImpostaRow" style="display: none">
             <td>Acconti Imposta già versati (anno precedente):</td>
             <td id="accontiImpostaOutput" class="highlight-blue"></td>
           </tr>
@@ -385,19 +393,19 @@
             <td>Contributi INPS sul <span id="annoRedditoOutput3"></span>:</td>
             <td id="contributiInpsOutput" class="highlight-yellow"></td>
           </tr>
-          <tr id="accontiContributiRow" style="display:none;">
+          <tr id="accontiContributiRow" style="display: none">
             <td>Acconti Contributi già versati (anno precedente):</td>
             <td id="accontiContributiOutput" class="highlight-blue"></td>
           </tr>
-          <tr id="contributiFissiRow" style="display: none;">
+          <tr id="contributiFissiRow" style="display: none">
             <td class="indent">Contributi Fissi sul <span id="annoRedditoOutput4"></span>:</td>
             <td id="contributiFissiOutput" class="highlight-yellow"></td>
           </tr>
-          <tr id="contributiVariabiliRow" style="display: none;">
+          <tr id="contributiVariabiliRow" style="display: none">
             <td class="indent">Contributi Variabili sul <span id="annoRedditoOutput5"></span>:</td>
             <td id="contributiVariabiliOutput" class="highlight-yellow"></td>
           </tr>
-          <tr id="totaleContributiInpsRow" style="display: none;">
+          <tr id="totaleContributiInpsRow" style="display: none">
             <td><strong>Totale Contributi INPS sul <span id="annoRedditoOutput6"></span>:</strong></td>
             <td id="totaleContributiInpsOutput" class="highlight-yellow"></td>
           </tr>
@@ -422,7 +430,7 @@
       <div class="tab-content active" id="come-si-calcolano-tab">
         <h2>Come si Calcolano</h2>
         <div id="dettaglioCalcoli">
-          <!-- Testo dinamico -->
+          <!-- testo dinamico -->
         </div>
       </div>
       <div class="tab-content" id="scadenza-pagamenti-tab">
@@ -434,22 +442,22 @@
               <th>Importo Totale (€)</th>
               <th>Dettaglio</th>
             </tr>
-            <tr id="scadenzaFissa1Row" style="display: none;">
+            <tr id="scadenzaFissa1Row" style="display: none">
               <td id="scadenzaFissa1"></td>
               <td id="importoFissa1" class="highlight-yellow"></td>
               <td id="dettaglioFissa1"></td>
             </tr>
-            <tr id="scadenzaFissa2Row" style="display: none;">
+            <tr id="scadenzaFissa2Row" style="display: none">
               <td id="scadenzaFissa2"></td>
               <td id="importoFissa2" class="highlight-yellow"></td>
               <td id="dettaglioFissa2"></td>
             </tr>
-            <tr id="scadenzaFissa3Row" style="display: none;">
+            <tr id="scadenzaFissa3Row" style="display: none">
               <td id="scadenzaFissa3"></td>
               <td id="importoFissa3" class="highlight-yellow"></td>
               <td id="dettaglioFissa3"></td>
             </tr>
-            <tr id="scadenzaFissa4Row" style="display: none;">
+            <tr id="scadenzaFissa4Row" style="display: none">
               <td id="scadenzaFissa4"></td>
               <td id="importoFissa4" class="highlight-yellow"></td>
               <td id="dettaglioFissa4"></td>
@@ -471,93 +479,249 @@
     </section>
 
     <!-- Pulsante Download PDF -->
-    <div style="text-align: center; margin-top: 20px;">
+    <div style="text-align: center; margin-top: 20px">
       <button id="downloadRecap">Scarica riepilogo in <span class="highlight-yellow">PDF</span></button>
     </div>
   </div>
 
-  <!-- Inclusione di jsPDF e html2canvas -->
-  <script type="module">
-    import html2canvas from "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+  <!-- Librerie jsPDF e html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-    /* Se preferisci, puoi togliere la riga sopra e usare la libreria caricata dallo <script src=...>,
-       ma in alcuni browser è utile importare. 
-       L'importante è che tutti i calcoli siano qui dentro a type="module". 
-    */
+  <!-- Script Unico (tutto in uno) -->
+  <script>
+    /***************************************
+     * Funzioni di Calcolo per ogni Cassa  *
+     ***************************************/
+    function calcolaContributiGS(redditoNetto, annoReddito) {
+      // Aliquote per anno
+      const aliquote = {
+        2023: 25.0,
+        2024: 26.23,
+        2025: 26.5
+      };
+      const aliquotaGs = aliquote[annoReddito] ? aliquote[annoReddito] / 100 : 26.23 / 100;
+      const contributiInps = Math.round(redditoNetto * aliquotaGs);
+      const accontoInps = Math.round(contributiInps * 0.8);
 
-    import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
+      return {
+        contributiFissi: 0,
+        contributiVariabili: 0,
+        contributiInps: contributiInps,
+        accontoInps: accontoInps,
+        contributiFissiIpotetici: 0,
+        contributiFissiSulAnno: contributiInps,
+        importiRate: {}
+      };
+    }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    function calcolaContributiCommercianti(redditoNetto, riduzioneContributi, dataApertura, annoReddito) {
+      const aliquote = {
+        2023: { fissi: 4300, variabile: 23.5 },
+        2024: { fissi: 4515, variabile: 24.48 },
+        2025: { fissi: 4700, variabile: 24.5 }
+      };
+      const config = aliquote[annoReddito] ? aliquote[annoReddito] : aliquote[2024];
+      const contributiFissiAnnui = config.fissi;
+      const aliquotaVariabile = config.variabile / 100;
+      const riduzione = riduzioneContributi ? 0.65 : 1;
+
+      let contributiFissi = Math.round(contributiFissiAnnui * riduzione);
+      let contributiVariabili = 0;
+      const sogliaReddito = 18415;
+      if (redditoNetto > sogliaReddito) {
+        contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile * riduzione);
+      }
+      const contributiInps = contributiFissi + contributiVariabili;
+      const accontoInps = Math.round(contributiVariabili * 0.8);
+
+      // Calcolo rate fisse in base a dataApertura
+      let contributiFissiSulAnno = 0;
+      let importiRate = {};
+      const rateScadenze = [
+        { id: "1", periodo: { start: new Date(annoReddito, 0, 1), end: new Date(annoReddito, 2, 31) } },
+        { id: "2", periodo: { start: new Date(annoReddito, 3, 1), end: new Date(annoReddito, 5, 30) } },
+        { id: "3", periodo: { start: new Date(annoReddito, 6, 1), end: new Date(annoReddito, 8, 30) } },
+        { id: "4", periodo: { start: new Date(annoReddito, 9, 1), end: new Date(annoReddito, 11, 31) } }
+      ];
+
+      if(dataApertura) {
+        const apertura = new Date(dataApertura);
+        rateScadenze.forEach(rate => {
+          let importo = 0;
+          if (apertura > rate.periodo.end) {
+            importo = 0;
+          } else if (apertura > rate.periodo.start && apertura <= rate.periodo.end) {
+            const giorniTotali = Math.ceil((rate.periodo.end - rate.periodo.start) / (1000*60*60*24))+1;
+            const giorniAttivi = Math.ceil((rate.periodo.end - apertura) / (1000*60*60*24))+1;
+            const proporzione = giorniAttivi / giorniTotali;
+            importo = Math.round((contributiFissiAnnui / 4) * proporzione);
+          } else {
+            importo = Math.round(contributiFissiAnnui / 4);
+          }
+          importo = riduzioneContributi ? Math.round(importo * 0.65) : importo;
+          importiRate[rate.id] = importo;
+          contributiFissiSulAnno += importo;
+        });
+      } else {
+        contributiFissiSulAnno = Math.round(contributiFissiAnnui / 4) * 4;
+      }
+
+      const contributiFissiIpotetici = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
+
+      return {
+        contributiFissi,
+        contributiVariabili,
+        contributiInps,
+        accontoInps,
+        contributiFissiIpotetici,
+        contributiFissiSulAnno,
+        importiRate
+      };
+    }
+
+    function calcolaContributiArtigiani(redditoNetto, riduzioneContributi, dataApertura, annoReddito) {
+      const aliquote = {
+        2023: { fissi: 4200, variabile: 23.0 },
+        2024: { fissi: 4427, variabile: 24.0 },
+        2025: { fissi: 4600, variabile: 24.0 }
+      };
+      const config = aliquote[annoReddito] ? aliquote[annoReddito] : aliquote[2024];
+      const contributiFissiAnnui = config.fissi;
+      const aliquotaVariabile = config.variabile / 100;
+      const riduzione = riduzioneContributi ? 0.65 : 1;
+
+      let contributiFissi = Math.round(contributiFissiAnnui * riduzione);
+      let contributiVariabili = 0;
+      const sogliaReddito = 18415;
+      if (redditoNetto > sogliaReddito) {
+        contributiVariabili = Math.round((redditoNetto - sogliaReddito) * aliquotaVariabile * riduzione);
+      }
+      const contributiInps = contributiFissi + contributiVariabili;
+      const accontoInps = Math.round(contributiVariabili * 0.8);
+
+      let contributiFissiSulAnno = 0;
+      let importiRate = {};
+      const rateScadenze = [
+        { id: "1", periodo: { start: new Date(annoReddito, 0, 1), end: new Date(annoReddito, 2, 31) } },
+        { id: "2", periodo: { start: new Date(annoReddito, 3, 1), end: new Date(annoReddito, 5, 30) } },
+        { id: "3", periodo: { start: new Date(annoReddito, 6, 1), end: new Date(annoReddito, 8, 30) } },
+        { id: "4", periodo: { start: new Date(annoReddito, 9, 1), end: new Date(annoReddito, 11, 31) } }
+      ];
+
+      if(dataApertura) {
+        const apertura = new Date(dataApertura);
+        rateScadenze.forEach(rate => {
+          let importo = 0;
+          if (apertura > rate.periodo.end) {
+            importo = 0;
+          } else if (apertura > rate.periodo.start && apertura <= rate.periodo.end) {
+            const giorniTotali = Math.ceil((rate.periodo.end - rate.periodo.start) / (1000*60*60*24))+1;
+            const giorniAttivi = Math.ceil((rate.periodo.end - apertura) / (1000*60*60*24))+1;
+            const proporzione = giorniAttivi / giorniTotali;
+            importo = Math.round((contributiFissiAnnui / 4) * proporzione);
+          } else {
+            importo = Math.round(contributiFissiAnnui / 4);
+          }
+          importo = riduzioneContributi ? Math.round(importo * 0.65) : importo;
+          importiRate[rate.id] = importo;
+          contributiFissiSulAnno += importo;
+        });
+      } else {
+        contributiFissiSulAnno = Math.round(contributiFissiAnnui / 4) * 4;
+      }
+
+      const contributiFissiIpotetici = riduzioneContributi ? Math.round(contributiFissiAnnui * 0.65) : contributiFissiAnnui;
+
+      return {
+        contributiFissi,
+        contributiVariabili,
+        contributiInps,
+        accontoInps,
+        contributiFissiIpotetici,
+        contributiFissiSulAnno,
+        importiRate
+      };
+    }
+
+    /***************************************
+     * Script Principale: logica unificata *
+     ***************************************/
+    document.addEventListener("DOMContentLoaded", function() {
       const currentYear = 2024;
       const annoRedditoSelect = document.getElementById("annoReddito");
-      const redditiMultipliDiv = document.getElementById("redditiMultipli");
-      const labelRedditoLordo = document.getElementById("labelRedditoLordo");
-      const usaRedditoPrecedenteCheckbox = document.getElementById("usaRedditoPrecedente");
+      const form = document.getElementById("calcolatoreForm");
 
       const cassaInpsSelect = document.getElementById("cassaInps");
-      const opzioniContainer = document.getElementById("opzioniCommercianteArtigiano");
-      const form = document.getElementById("calcolatoreForm");
-      const downloadButton = document.getElementById("downloadRecap");
-      const redditoLordoButtons = document.querySelectorAll('.reddito-buttons button');
-      const dettaglioCalcoli = document.getElementById("dettaglioCalcoli");
-      const contributiFissiIpoteticiRow = document.getElementById("contributiFissiIpoteticiRow");
+      const riduzioneContributiCheckbox = document.getElementById("riduzioneContributi");
+      const dataAperturaInput = document.getElementById("dataApertura");
+
+      const aliquotaImpostaSelect = document.getElementById("aliquotaImposta");
+      const coefficienteSelect = document.getElementById("coefficienteRedditivita");
+
+      const usaRedditoPrecedenteCheckbox = document.getElementById("usaRedditoPrecedente");
+      const redditiMultipliDiv = document.getElementById("redditiMultipli");
+      const redditoPrecedenteInput = document.getElementById("redditoPrecedente");
+      const redditoLordoInput = document.getElementById("redditoLordo");
 
       const tabs = document.querySelectorAll(".tab");
       const tabContents = document.querySelectorAll(".tab-content");
+      const downloadButton = document.getElementById("downloadRecap");
 
-      annoRedditoSelect.value = currentYear;
-      document.getElementById("aliquotaImposta").value = "0.05";
-      document.getElementById("coefficienteRedditivita").value = "78";
-
+      // Attiva/Disattiva la div del reddito precedente
       function aggiornaCampiPrecedenti() {
         if(usaRedditoPrecedenteCheckbox.checked) {
           redditiMultipliDiv.classList.remove("hidden");
         } else {
           redditiMultipliDiv.classList.add("hidden");
-          document.getElementById("redditoPrecedente").value = "";
+          redditoPrecedenteInput.value = "";
         }
       }
       usaRedditoPrecedenteCheckbox.addEventListener("change", aggiornaCampiPrecedenti);
       aggiornaCampiPrecedenti();
 
+      // Mostra/Nascondi opzioni Commercianti/Artigiani
       cassaInpsSelect.addEventListener("change", function() {
-        const cassa = cassaInpsSelect.value;
-        if(cassa === "inps_commercianti" || cassa === "inps_artigiani") {
-          opzioniContainer.style.display = "block";
+        if(cassaInpsSelect.value === "inps_commercianti" || cassaInpsSelect.value === "inps_artigiani") {
+          document.getElementById("opzioniCommercianteArtigiano").style.display = "block";
         } else {
-          opzioniContainer.style.display = "none";
-          document.getElementById("riduzioneContributi").checked = false;
-          document.getElementById("dataApertura").value = "";
+          document.getElementById("opzioniCommercianteArtigiano").style.display = "none";
+          riduzioneContributiCheckbox.checked = false;
+          dataAperturaInput.value = "";
         }
       });
 
-      redditoLordoButtons.forEach(button => {
-        button.addEventListener("click", function() {
-          document.getElementById("redditoLordo").value = this.getAttribute("data-value");
+      // Bottoni rapidi per reddito
+      const redditoLordoButtons = document.querySelectorAll(".reddito-buttons button");
+      redditoLordoButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+          redditoLordoInput.value = this.dataset.value;
         });
       });
 
+      // Gestione Schede
       tabs.forEach(tab => {
         tab.addEventListener("click", function() {
           tabs.forEach(t => t.classList.remove("active"));
           this.classList.add("active");
-          tabContents.forEach(content => content.classList.remove("active"));
-          const target = this.getAttribute("data-tab") + "-tab";
+          tabContents.forEach(cont => cont.classList.remove("active"));
+          const target = this.dataset.tab + "-tab";
           document.getElementById(target).classList.add("active");
         });
       });
 
-      form.addEventListener("submit", async function(event) {
-        event.preventDefault();
+      // Submit del form
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
 
         const annoReddito = parseInt(annoRedditoSelect.value);
-        const cassaInps = cassaInpsSelect.value;
-        const riduzioneContributi = document.getElementById("riduzioneContributi").checked;
-        const dataApertura = document.getElementById("dataApertura").value;
-        const aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
-        const coefficienteRedditivita = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
+        const cassaInps = cassaInpsSelect.value || "";
+        const riduzioneContributi = riduzioneContributiCheckbox.checked;
+        const dataApertura = dataAperturaInput.value;
+        const aliquotaImposta = parseFloat(aliquotaImpostaSelect.value);
+        const coefficiente = parseFloat(coefficienteSelect.value) / 100;
 
-        const redditoCorrente = parseInt(document.getElementById("redditoLordo").value);
+        const redditoCorrente = parseInt(redditoLordoInput.value);
         if(isNaN(redditoCorrente) || redditoCorrente <= 0) {
           alert("Inserisci il reddito dell'anno di riferimento.");
           return;
@@ -565,22 +729,21 @@
 
         let redditoPrecedente = 0;
         if(usaRedditoPrecedenteCheckbox.checked) {
-          redditoPrecedente = parseInt(document.getElementById("redditoPrecedente").value) || 0;
+          redditoPrecedente = parseInt(redditoPrecedenteInput.value) || 0;
         }
 
-        const redditoLordo = redditoPrecedente + redditoCorrente;
-        if(isNaN(annoReddito) || cassaInps === "" || isNaN(aliquotaImposta) || isNaN(coefficienteRedditivita) || isNaN(redditoLordo) || redditoLordo <= 0) {
-          alert("Compila correttamente tutti i campi.");
+        const redditoLordo = redditoCorrente + redditoPrecedente;
+        if(isNaN(annoReddito) || !cassaInps || isNaN(aliquotaImposta) || isNaN(coefficiente) || isNaN(redditoLordo) || redditoLordo <= 0) {
+          alert("Compila tutti i campi correttamente.");
           return;
         }
 
-        const redditoNetto = Math.round(redditoLordo * coefficienteRedditivita);
-
-        // Imposta sostitutiva e acconto
+        const redditoNetto = Math.round(redditoLordo * coefficiente);
+        // Calcolo imposta sostitutiva e acconto
         const impostaSostitutiva = Math.round(redditoNetto * aliquotaImposta);
         const accontoImposta = impostaSostitutiva;
 
-        // Carichiamo il modulo contributi in base alla cassa
+        // Calcolo contributi
         let contributi = {
           contributiFissi: 0,
           contributiVariabili: 0,
@@ -591,64 +754,51 @@
           importiRate: {}
         };
 
-        try {
-          if(cassaInps === "gs_inps") {
-            const moduleContrib = await import("./gs_inps.js");
-            contributi = moduleContrib.calcolaContributi({ redditoNetto, annoReddito });
-          } else if(cassaInps === "inps_commercianti") {
-            const moduleContrib = await import("./inps_commercianti.js");
-            contributi = moduleContrib.calcolaContributi({ redditoNetto, riduzioneContributi, dataApertura, annoReddito });
-          } else if(cassaInps === "inps_artigiani") {
-            const moduleContrib = await import("./inps_artigiani.js");
-            contributi = moduleContrib.calcolaContributi({ redditoNetto, riduzioneContributi, dataApertura, annoReddito });
-          }
-        } catch(err) {
-          console.error("Errore nel modulo contributi:", err);
-          alert("Errore nel calcolo dei contributi.");
+        // Switch in base a cassaInps
+        if(cassaInps === "gs_inps") {
+          contributi = calcolaContributiGS(redditoNetto, annoReddito);
+        } else if(cassaInps === "inps_commercianti") {
+          contributi = calcolaContributiCommercianti(redditoNetto, riduzioneContributi, dataApertura, annoReddito);
+        } else if(cassaInps === "inps_artigiani") {
+          contributi = calcolaContributiArtigiani(redditoNetto, riduzioneContributi, dataApertura, annoReddito);
+        } else {
+          // cassa non selezionata
+          alert("Seleziona la cassa INPS correttamente.");
           return;
         }
 
-        // Calcolo acconti dell'anno precedente (se presente)
+        // Calcolo acconti anno precedente
         let accontoImpostaPrecedente = 0;
         let accontoContributiPrecedente = 0;
         if(usaRedditoPrecedenteCheckbox.checked && redditoPrecedente > 0) {
-          const redditoNettoPrecedente = Math.round(redditoPrecedente * coefficienteRedditivita);
-          accontoImpostaPrecedente = Math.round(redditoNettoPrecedente * aliquotaImposta);
+          const redditoNettoPrec = Math.round(redditoPrecedente * coefficiente);
+          accontoImpostaPrecedente = Math.round(redditoNettoPrec * aliquotaImposta);
 
-          try {
-            if(cassaInps === "gs_inps") {
-              const moduleContrib = await import("./gs_inps.js");
-              const contribPrecedente = moduleContrib.calcolaContributi({ redditoNetto: redditoNettoPrecedente, annoReddito: annoReddito - 1 });
-              accontoContributiPrecedente = contribPrecedente.accontoInps;
-            } else if(cassaInps === "inps_commercianti") {
-              const moduleContrib = await import("./inps_commercianti.js");
-              const contribPrecedente = moduleContrib.calcolaContributi({ redditoNetto: redditoNettoPrecedente, riduzioneContributi, dataApertura:"", annoReddito: annoReddito - 1 });
-              accontoContributiPrecedente = contribPrecedente.accontoInps;
-            } else if(cassaInps === "inps_artigiani") {
-              const moduleContrib = await import("./inps_artigiani.js");
-              const contribPrecedente = moduleContrib.calcolaContributi({ redditoNetto: redditoNettoPrecedente, riduzioneContributi, dataApertura:"", annoReddito: annoReddito - 1 });
-              accontoContributiPrecedente = contribPrecedente.accontoInps;
-            }
-          } catch(err) {
-            console.error("Errore nel calcolo acconti dell'anno precedente:", err);
+          // Stessa cassa, annoReddito - 1
+          if(cassaInps === "gs_inps") {
+            const contribPrec = calcolaContributiGS(redditoNettoPrec, annoReddito - 1);
+            accontoContributiPrecedente = contribPrec.accontoInps;
+          } else if(cassaInps === "inps_commercianti") {
+            const contribPrec = calcolaContributiCommercianti(redditoNettoPrec, riduzioneContributi, "", annoReddito - 1);
+            accontoContributiPrecedente = contribPrec.accontoInps;
+          } else if(cassaInps === "inps_artigiani") {
+            const contribPrec = calcolaContributiArtigiani(redditoNettoPrec, riduzioneContributi, "", annoReddito - 1);
+            accontoContributiPrecedente = contribPrec.accontoInps;
           }
         }
 
-        // Saldo iniziale (somma imposta + contributi)
-        const saldo2024_iniziale = impostaSostitutiva + contributi.contributiFissiSulAnno + contributi.contributiVariabili;
-        // Sottraiamo i valori degli acconti
-        const saldo2024_finale = saldo2024_iniziale - (accontoImpostaPrecedente + accontoContributiPrecedente);
+        // Saldo 2024 iniziale
+        const saldoIniziale = impostaSostitutiva + (contributi.contributiFissiSulAnno + contributi.contributiVariabili);
+        // Sottrai acconti
+        const saldoFinale = saldoIniziale - (accontoImpostaPrecedente + accontoContributiPrecedente);
 
-        // Popoliamo la tabella
+        // Popola la tabella
         document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput").innerText = annoReddito;
         document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
         document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta*100).toFixed(0) + "%";
         document.getElementById("annoRedditoOutput2").innerText = annoReddito;
-        // Imposta sostitutiva meno acconti
         document.getElementById("impostaSostitutivaOutput").innerText = (impostaSostitutiva - accontoImpostaPrecedente).toLocaleString('it-IT') + "€";
-        document.getElementById("annoAccontoImposta").innerText = annoReddito + 1;
-        document.getElementById("accontoImpostaOutput").innerText = accontoImposta.toLocaleString('it-IT') + "€";
 
         if(accontoImpostaPrecedente > 0) {
           document.getElementById("accontiImpostaRow").style.display = "table-row";
@@ -657,8 +807,8 @@
           document.getElementById("accontiImpostaRow").style.display = "none";
         }
 
-        document.getElementById("annoRedditoOutput3").innerText = annoReddito;
         document.getElementById("contributiInpsOutput").innerText = contributi.contributiInps.toLocaleString('it-IT') + "€";
+        document.getElementById("annoRedditoOutput3").innerText = annoReddito;
         document.getElementById("annoRedditoOutput4").innerText = annoReddito;
         document.getElementById("contributiFissiOutput").innerText = contributi.contributiFissiSulAnno.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput5").innerText = annoReddito;
@@ -666,7 +816,7 @@
         document.getElementById("annoRedditoOutput6").innerText = annoReddito;
         document.getElementById("totaleContributiInpsOutput").innerText = (contributi.contributiFissiSulAnno + contributi.contributiVariabili).toLocaleString('it-IT') + "€";
         document.getElementById("contributiFissiIpoteticiOutput").innerText = contributi.contributiFissiIpotetici.toLocaleString('it-IT') + "€";
-        document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
+        document.getElementById("annoAccontoInps").innerText = annoReddito+1;
         document.getElementById("accontoInpsOutput").innerText = contributi.accontoInps.toLocaleString('it-IT') + "€";
 
         if(accontoContributiPrecedente > 0) {
@@ -676,61 +826,59 @@
           document.getElementById("accontiContributiRow").style.display = "none";
         }
 
-        let dettaglioTesto = "";
-        if(cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
-          dettaglioTesto += `Per il ${annoReddito}, il saldo iniziale (imposta + contributi) era di <strong>${saldo2024_iniziale.toLocaleString('it-IT')}€</strong>.<br>`;
-          if((accontoImpostaPrecedente + accontoContributiPrecedente) > 0) {
-            dettaglioTesto += `Poiché nel ${annoReddito-1} hai versato acconti per un ammontare di <strong>${(accontoImpostaPrecedente + accontoContributiPrecedente).toLocaleString('it-IT')}€</strong>, il saldo finale da versare si riduce a <strong>${saldo2024_finale.toLocaleString('it-IT')}€</strong>.<br><br>`;
-          }
-          dettaglioTesto += `Il calcolo si basa sui redditi inseriti, il coefficiente di redditivitá e le aliquote per imposta e contributi.`;
-        } else if(cassaInps === "gs_inps") {
-          dettaglioTesto += `Per il ${annoReddito}, il saldo (imposta sostitutiva + contributi) viene calcolato sul reddito netto. Gli acconti del ${annoReddito-1} vengono sottratti.<br>`;
-        }
-        document.getElementById("dettaglioCalcoli").innerHTML = dettaglioTesto;
-
-        // Mostra i risultati
+        // Mostra Sezioni Risultati
         document.getElementById("risultati-container").style.display = "block";
         document.getElementById("schede-container").style.display = "block";
+
+        // Scadenze (uguali al codice originale)
+        const annoScadenza = annoReddito+1;
+        document.getElementById("annoScadenzaGiugno").innerText = annoScadenza;
+        document.getElementById("annoScadenzaNovembre").innerText = annoScadenza;
+
+        let dettaglioTesto = "";
+        dettaglioTesto += `Saldo iniziale (imposta + contributi): <strong>${saldoIniziale.toLocaleString('it-IT')}€</strong><br>`;
+        if(accontoImpostaPrecedente + accontoContributiPrecedente > 0) {
+          dettaglioTesto += `Acconti anno precedente: <strong>${(accontoImpostaPrecedente + accontoContributiPrecedente).toLocaleString('it-IT')}€</strong><br>`;
+          dettaglioTesto += `Saldo finale da versare: <strong>${saldoFinale.toLocaleString('it-IT')}€</strong><br><br>`;
+        }
+        document.getElementById("dettaglioCalcoli").innerHTML = dettaglioTesto;
       });
 
-      // Funzione per scaricare il PDF
+      // Funzione per generare PDF
       async function addPageToPDF(element, pdf, addPage = false, drawBackground = null) {
-        if(!element) {
-          console.error('Elemento non trovato per addPageToPDF.');
-          return;
-        }
+        if(!element) return;
         const pdfWidth = 595.28;
         const pdfHeight = 841.89;
-        element.style.width = pdfWidth + 'pt';
-        element.style.height = pdfHeight + 'pt';
-        element.style.maxWidth = pdfWidth + 'pt';
-        element.style.maxHeight = pdfHeight + 'pt';
-        element.style.margin = '0';
-        element.style.boxSizing = 'border-box';
-        element.style.overflow = 'hidden';
+        element.style.width = pdfWidth + "pt";
+        element.style.height = pdfHeight + "pt";
+        element.style.maxWidth = pdfWidth + "pt";
+        element.style.maxHeight = pdfHeight + "pt";
+        element.style.margin = "0";
+        element.style.boxSizing = "border-box";
+        element.style.overflow = "hidden";
 
         const canvas = await html2canvas(element);
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
         if(addPage) pdf.addPage();
-        if(typeof drawBackground === 'function') drawBackground(pdf);
+        if(typeof drawBackground === "function") drawBackground(pdf);
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        element.style.width = '';
-        element.style.height = '';
-        element.style.maxWidth = '';
-        element.style.maxHeight = '';
-        element.style.margin = '';
-        element.style.boxSizing = '';
-        element.style.overflow = '';
+        element.style.width = "";
+        element.style.height = "";
+        element.style.maxWidth = "";
+        element.style.maxHeight = "";
+        element.style.margin = "";
+        element.style.boxSizing = "";
+        element.style.overflow = "";
       }
 
       function drawLines(pdf) {
         pdf.setLineWidth(0.5);
         pdf.setDrawColor(197,197,197,0.2);
-        const pdfHeight = 841.89;
         const pdfWidth = 595.28;
+        const pdfHeight = 841.89;
         const lineHeight = 25;
         for(let y=lineHeight; y<pdfHeight; y+=lineHeight) {
           pdf.line(40,y, pdfWidth-40, y);
@@ -740,85 +888,80 @@
       function drawGrid(pdf) {
         pdf.setLineWidth(0.5);
         pdf.setDrawColor(197,197,197,0.2);
-        const pdfHeight = 841.89;
         const pdfWidth = 595.28;
+        const pdfHeight = 841.89;
         const gridSize = 25;
         for(let y=gridSize; y<pdfHeight; y+=gridSize) {
           pdf.line(40,y, pdfWidth-40, y);
         }
         for(let x=40+gridSize; x<pdfWidth-40; x+=gridSize) {
-          pdf.line(x,0,x, pdfHeight);
+          pdf.line(x,0, x, pdfHeight);
         }
       }
 
       function showOnlyTab(tabId) {
-        tabContents.forEach(content => content.style.display = 'none');
-        const tabElement = document.getElementById(tabId);
-        if(tabElement) {
-          tabElement.style.display = 'block';
-        } else {
-          console.error(`Elemento con ID ${tabId} non trovato.`);
-        }
+        tabContents.forEach(cont => cont.style.display="none");
+        const tabEl = document.getElementById(tabId);
+        if(tabEl) tabEl.style.display="block";
       }
-
       function resetTabDisplay() {
-        tabContents.forEach(content => content.style.display = '');
+        tabContents.forEach(cont => cont.style.display="");
       }
-
-      function addPadding(element) {
-        element.style.padding = '40pt';
-        element.style.boxSizing = 'border-box';
+      function addPadding(el) {
+        el.style.padding="40pt";
+        el.style.boxSizing="border-box";
       }
-
-      function removePadding(element) {
-        element.style.padding = '';
-        element.style.boxSizing = '';
+      function removePadding(el) {
+        el.style.padding="";
+        el.style.boxSizing="";
       }
 
       downloadButton.addEventListener("click", async function() {
+        const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
-          orientation: 'p',
-          unit: 'pt',
+          orientation: "p",
+          unit: "pt",
           format: [595.28, 841.89],
           compressPdf: true
         });
 
-        // Prima pagina: "Come si Calcolano" (con righe)
-        showOnlyTab('come-si-calcolano-tab');
-        const firstPageElement = document.getElementById('come-si-calcolano-tab');
-        addPadding(firstPageElement);
-        await addPageToPDF(firstPageElement, pdf, false, drawLines);
-        removePadding(firstPageElement);
+        // 1a pagina: "Come si Calcolano" (con linee)
+        showOnlyTab("come-si-calcolano-tab");
+        const firstPage = document.getElementById("come-si-calcolano-tab");
+        addPadding(firstPage);
+        await addPageToPDF(firstPage, pdf, false, drawLines);
+        removePadding(firstPage);
 
-        // Seconda pagina: "Scadenza pagamenti" (con quadretti)
-        showOnlyTab('scadenza-pagamenti-tab');
-        const secondPageElement = document.getElementById('scadenza-pagamenti-tab');
-        addPadding(secondPageElement);
-        await addPageToPDF(secondPageElement, pdf, true, drawGrid);
-        removePadding(secondPageElement);
+        // 2a pagina: "Scadenza pagamenti" (quadretti)
+        showOnlyTab("scadenza-pagamenti-tab");
+        const secondPage = document.getElementById("scadenza-pagamenti-tab");
+        addPadding(secondPage);
+        await addPageToPDF(secondPage, pdf, true, drawGrid);
+        removePadding(secondPage);
 
-        // Terza pagina: risultati
+        // 3a pagina: risultati
         resetTabDisplay();
-        const risultatiContainer = document.getElementById('risultati-container');
-        if(risultatiContainer){ risultatiContainer.style.display = 'block'; }
-        else { console.error('Elemento risultati-container non trovato.'); }
-        showOnlyTab('risultati-container');
+        const risultatiContainer = document.getElementById("risultati-container");
+        if(risultatiContainer) {
+          risultatiContainer.style.display="block";
+        }
+        showOnlyTab("risultati-container");
         addPadding(risultatiContainer);
         await addPageToPDF(risultatiContainer, pdf, true);
         removePadding(risultatiContainer);
 
-        // Quarta pagina: scadenze
-        const scadenzaPagamenti = document.getElementById('scadenza-pagamenti-tab');
+        // 4a pagina: scadenze
+        const scadenzaPagamenti = document.getElementById("scadenza-pagamenti-tab");
         addPadding(scadenzaPagamenti);
         await addPageToPDF(scadenzaPagamenti, pdf);
         removePadding(scadenzaPagamenti);
-        resetTabDisplay();
 
-        const pdfBlob = pdf.output('blob');
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
+        resetTabDisplay();
+        const blob = pdf.output("blob");
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = 'Recap_Regime_Forfettario.pdf';
+        link.download = "Recap_Regime_Forfettario.pdf";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
