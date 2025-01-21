@@ -1,6 +1,5 @@
 // inps_artigiani.js
 export function calcolaContributi({ redditoNetto, riduzioneContributi, dataApertura, annoReddito }) {
-  // Definizione delle percentuali per l'anno di riferimento
   const aliquoteContributi = {
     2023: { contributiFissiAnnui: 4200, aliquotaVariabile: 23.00 },
     2024: { contributiFissiAnnui: 4427, aliquotaVariabile: 24.00 },
