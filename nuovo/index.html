@@ -42,7 +42,7 @@
       margin-top: 30px;
       font-size: 1.5em;
     }
-    /* Stili del form */
+    /* Stili del Form */
     .calcolatore-container {
       background-color: #fff;
       padding: 20px;
@@ -97,7 +97,7 @@
     .reddito-buttons button:hover {
       background-color: #d5d5d5;
     }
-    /* Campo per reddito dell'anno precedente */
+    /* Campo per reddito anno precedente */
     .hidden {
       display: none;
     }
@@ -287,7 +287,6 @@
         <form id="calcolatoreForm">
           <label for="annoReddito"><span class="highlight-yellow">Anno</span> di Riferimento del Reddito:</label>
           <select id="annoReddito" required>
-            <!-- L'utente seleziona l'anno per cui vuole effettuare il calcolo -->
             <option value="2023">2023</option>
             <option value="2024" selected>2024</option>
             <option value="2025">2025</option>
@@ -329,14 +328,13 @@
             <option value="40">40%</option>
           </select>
 
-          <!-- Checkbox per attivare l'inserimento del reddito dell'anno precedente -->
+          <!-- Checkbox per acconti anno precedente -->
           <div>
             <label>
               <input type="checkbox" id="usaRedditoPrecedente">
               Inserisci reddito dell'anno precedente per calcolare gli acconti
             </label>
           </div>
-          <!-- Campo reddito anno precedente -->
           <div id="redditiMultipli" class="hidden">
             <label for="redditoPrecedente">Reddito dell'anno precedente:</label>
             <input type="number" id="redditoPrecedente" min="0" step="1">
@@ -345,7 +343,7 @@
           <label for="redditoLordo" id="labelRedditoLordo">Reddito dell'anno di riferimento:</label>
           <input type="number" id="redditoLordo" min="0" step="1" required>
           
-          <!-- Bottoni per impostare reddito -->
+          <!-- Bottoni per reddito lordo -->
           <div class="reddito-buttons">
             <button type="button" data-value="15000">15.000€</button>
             <button type="button" data-value="30000">30.000€</button>
@@ -375,7 +373,6 @@
             <td>Reddito Netto (Anno <span id="annoRedditoOutput"></span>):</td>
             <td id="redditoNettoOutput"></td>
           </tr>
-          <!-- Imposta Sostitutiva: verrà sottratto l'acconto già versato (se fornito) -->
           <tr>
             <td>Imposta Sostitutiva (5%) sul <span id="annoRedditoOutput2"></span>:</td>
             <td id="impostaSostitutivaOutput" class="highlight-yellow"></td>
@@ -384,7 +381,6 @@
             <td>Acconti Imposta già versati (anno precedente):</td>
             <td id="accontiImpostaOutput" class="highlight-blue"></td>
           </tr>
-          <!-- Contributi INPS -->
           <tr id="contributiInpsRow">
             <td>Contributi INPS sul <span id="annoRedditoOutput3"></span>:</td>
             <td id="contributiInpsOutput" class="highlight-yellow"></td>
@@ -426,7 +422,7 @@
       <div class="tab-content active" id="come-si-calcolano-tab">
         <h2>Come si Calcolano</h2>
         <div id="dettaglioCalcoli">
-          <!-- Testo dinamico verrà inserito qui -->
+          <!-- Testo dinamico -->
         </div>
       </div>
       <div class="tab-content" id="scadenza-pagamenti-tab">
@@ -481,13 +477,18 @@
   </div>
 
   <!-- Inclusione di jsPDF e html2canvas -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script type="module">
+    import html2canvas from "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
 
-  <!-- Script principale -->
-  <script>
+    /* Se preferisci, puoi togliere la riga sopra e usare la libreria caricata dallo <script src=...>,
+       ma in alcuni browser è utile importare. 
+       L'importante è che tutti i calcoli siano qui dentro a type="module". 
+    */
+
+    import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js";
+
     document.addEventListener('DOMContentLoaded', function() {
-      const currentYear = 2024; // Anno corrente
+      const currentYear = 2024;
       const annoRedditoSelect = document.getElementById("annoReddito");
       const redditiMultipliDiv = document.getElementById("redditiMultipli");
       const labelRedditoLordo = document.getElementById("labelRedditoLordo");
@@ -500,15 +501,14 @@
       const redditoLordoButtons = document.querySelectorAll('.reddito-buttons button');
       const dettaglioCalcoli = document.getElementById("dettaglioCalcoli");
       const contributiFissiIpoteticiRow = document.getElementById("contributiFissiIpoteticiRow");
+
       const tabs = document.querySelectorAll(".tab");
       const tabContents = document.querySelectorAll(".tab-content");
 
-      // Imposta i valori iniziali
       annoRedditoSelect.value = currentYear;
       document.getElementById("aliquotaImposta").value = "0.05";
       document.getElementById("coefficienteRedditivita").value = "78";
 
-      // Mostra o nasconde il campo per il reddito dell'anno precedente in base al checkbox
       function aggiornaCampiPrecedenti() {
         if(usaRedditoPrecedenteCheckbox.checked) {
           redditiMultipliDiv.classList.remove("hidden");
@@ -520,7 +520,6 @@
       usaRedditoPrecedenteCheckbox.addEventListener("change", aggiornaCampiPrecedenti);
       aggiornaCampiPrecedenti();
 
-      // Gestione opzioni per Commercianti/Artigiani
       cassaInpsSelect.addEventListener("change", function() {
         const cassa = cassaInpsSelect.value;
         if(cassa === "inps_commercianti" || cassa === "inps_artigiani") {
@@ -532,14 +531,12 @@
         }
       });
 
-      // Imposta il valore del reddito tramite i bottoni
       redditoLordoButtons.forEach(button => {
         button.addEventListener("click", function() {
           document.getElementById("redditoLordo").value = this.getAttribute("data-value");
         });
       });
 
-      // Gestione delle schede
       tabs.forEach(tab => {
         tab.addEventListener("click", function() {
           tabs.forEach(t => t.classList.remove("active"));
@@ -550,7 +547,6 @@
         });
       });
 
-      // Evento di submit del form
       form.addEventListener("submit", async function(event) {
         event.preventDefault();
 
@@ -560,34 +556,31 @@
         const dataApertura = document.getElementById("dataApertura").value;
         const aliquotaImposta = parseFloat(document.getElementById("aliquotaImposta").value);
         const coefficienteRedditivita = parseFloat(document.getElementById("coefficienteRedditivita").value) / 100;
-        
-        // Recupero reddito dell'anno corrente (obbligatorio)
+
         const redditoCorrente = parseInt(document.getElementById("redditoLordo").value);
         if(isNaN(redditoCorrente) || redditoCorrente <= 0) {
           alert("Inserisci il reddito dell'anno di riferimento.");
           return;
         }
-        // Se l'utente ha spuntato il checkbox, recupera anche il reddito precedente
+
         let redditoPrecedente = 0;
         if(usaRedditoPrecedenteCheckbox.checked) {
           redditoPrecedente = parseInt(document.getElementById("redditoPrecedente").value) || 0;
         }
-        // Il reddito totale usato per il calcolo è la somma dei due (se inserito)
-        const redditoLordo = redditoPrecedente + redditoCorrente;
 
+        const redditoLordo = redditoPrecedente + redditoCorrente;
         if(isNaN(annoReddito) || cassaInps === "" || isNaN(aliquotaImposta) || isNaN(coefficienteRedditivita) || isNaN(redditoLordo) || redditoLordo <= 0) {
           alert("Compila correttamente tutti i campi.");
           return;
         }
 
-        // Calcola reddito netto (sulla somma dei redditi)
         const redditoNetto = Math.round(redditoLordo * coefficienteRedditivita);
 
-        // Calcola imposta sostitutiva e acconto dell'anno in corso (es. 2024)
+        // Imposta sostitutiva e acconto
         const impostaSostitutiva = Math.round(redditoNetto * aliquotaImposta);
         const accontoImposta = impostaSostitutiva;
 
-        // Calcola i contributi per l'anno di riferimento usando il modulo corrispondente
+        // Carichiamo il modulo contributi in base alla cassa
         let contributi = {
           contributiFissi: 0,
           contributiVariabili: 0,
@@ -615,19 +608,13 @@
           return;
         }
 
-        /* CALCOLO DEGLI ACCONTI VERSATI NELL'ANNO PRECEDENTE
-           Se l'utente ha spuntato il checkbox e inserito il reddito dell'anno precedente,
-           calcoliamo gli acconti per il 2023.
-           La logica è simile al calcolo corrente:
-           - redditoNettoPrecedente = redditoPrecedente × coefficienteRedditivita
-           - accontoImpostaPrecedente = round(redditoNettoPrecedente × aliquotaImposta)
-           - Per i contributi, usiamo lo stesso modulo (passando come anno: annoReddito – 1).
-        */
+        // Calcolo acconti dell'anno precedente (se presente)
         let accontoImpostaPrecedente = 0;
         let accontoContributiPrecedente = 0;
         if(usaRedditoPrecedenteCheckbox.checked && redditoPrecedente > 0) {
           const redditoNettoPrecedente = Math.round(redditoPrecedente * coefficienteRedditivita);
           accontoImpostaPrecedente = Math.round(redditoNettoPrecedente * aliquotaImposta);
+
           try {
             if(cassaInps === "gs_inps") {
               const moduleContrib = await import("./gs_inps.js");
@@ -643,34 +630,35 @@
               accontoContributiPrecedente = contribPrecedente.accontoInps;
             }
           } catch(err) {
-            console.error("Errore nel calcolo degli acconti dell'anno precedente:", err);
+            console.error("Errore nel calcolo acconti dell'anno precedente:", err);
           }
         }
 
-        // Calcola il saldo iniziale del 2024 (somma imposta sostitutiva e contributi)
+        // Saldo iniziale (somma imposta + contributi)
         const saldo2024_iniziale = impostaSostitutiva + contributi.contributiFissiSulAnno + contributi.contributiVariabili;
-        // Applica la compensazione: sottrai gli acconti già versati
+        // Sottraiamo i valori degli acconti
         const saldo2024_finale = saldo2024_iniziale - (accontoImpostaPrecedente + accontoContributiPrecedente);
 
-        // Popola i risultati nella tabella
+        // Popoliamo la tabella
         document.getElementById("redditoLordoOutput").innerText = redditoLordo.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput").innerText = annoReddito;
         document.getElementById("redditoNettoOutput").innerText = redditoNetto.toLocaleString('it-IT') + "€";
         document.getElementById("aliquotaImpostaOutput").innerText = (aliquotaImposta*100).toFixed(0) + "%";
         document.getElementById("annoRedditoOutput2").innerText = annoReddito;
-        // Imposta sostitutiva ridotta degli acconti dell'anno precedente
+        // Imposta sostitutiva meno acconti
         document.getElementById("impostaSostitutivaOutput").innerText = (impostaSostitutiva - accontoImpostaPrecedente).toLocaleString('it-IT') + "€";
         document.getElementById("annoAccontoImposta").innerText = annoReddito + 1;
         document.getElementById("accontoImpostaOutput").innerText = accontoImposta.toLocaleString('it-IT') + "€";
+
         if(accontoImpostaPrecedente > 0) {
           document.getElementById("accontiImpostaRow").style.display = "table-row";
           document.getElementById("accontiImpostaOutput").innerText = accontoImpostaPrecedente.toLocaleString('it-IT') + "€";
         } else {
           document.getElementById("accontiImpostaRow").style.display = "none";
         }
-        // Contributi
+
         document.getElementById("annoRedditoOutput3").innerText = annoReddito;
-        document.getElementById("contributiInpsOutput").innerText = (contributi.contributiInps).toLocaleString('it-IT') + "€";
+        document.getElementById("contributiInpsOutput").innerText = contributi.contributiInps.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput4").innerText = annoReddito;
         document.getElementById("contributiFissiOutput").innerText = contributi.contributiFissiSulAnno.toLocaleString('it-IT') + "€";
         document.getElementById("annoRedditoOutput5").innerText = annoReddito;
@@ -680,6 +668,7 @@
         document.getElementById("contributiFissiIpoteticiOutput").innerText = contributi.contributiFissiIpotetici.toLocaleString('it-IT') + "€";
         document.getElementById("annoAccontoInps").innerText = annoReddito + 1;
         document.getElementById("accontoInpsOutput").innerText = contributi.accontoInps.toLocaleString('it-IT') + "€";
+
         if(accontoContributiPrecedente > 0) {
           document.getElementById("accontiContributiRow").style.display = "table-row";
           document.getElementById("accontiContributiOutput").innerText = accontoContributiPrecedente.toLocaleString('it-IT') + "€";
@@ -687,112 +676,112 @@
           document.getElementById("accontiContributiRow").style.display = "none";
         }
 
-        // Aggiungi note esplicative nella sezione "Come si Calcolano"
         let dettaglioTesto = "";
         if(cassaInps === "inps_commercianti" || cassaInps === "inps_artigiani") {
           dettaglioTesto += `Per il ${annoReddito}, il saldo iniziale (imposta + contributi) era di <strong>${saldo2024_iniziale.toLocaleString('it-IT')}€</strong>.<br>`;
           if((accontoImpostaPrecedente + accontoContributiPrecedente) > 0) {
-            dettaglioTesto += `Poiché nel ${annoReddito-1} hai versato acconti per un ammontare di <strong>${(accontoImpostaPrecedente + accontoContributiPrecedente).toLocaleString('it-IT')}€</strong>, il saldo finale da versare per il ${annoReddito} è di <strong>${saldo2024_finale.toLocaleString('it-IT')}€</strong>.<br><br>`;
+            dettaglioTesto += `Poiché nel ${annoReddito-1} hai versato acconti per un ammontare di <strong>${(accontoImpostaPrecedente + accontoContributiPrecedente).toLocaleString('it-IT')}€</strong>, il saldo finale da versare si riduce a <strong>${saldo2024_finale.toLocaleString('it-IT')}€</strong>.<br><br>`;
           }
-          dettaglioTesto += `Il calcolo si basa sulla somma dei redditi inseriti (anno precedente + anno corrente), il coefficiente di redditivitá e le aliquote per imposta e contributi.`;
+          dettaglioTesto += `Il calcolo si basa sui redditi inseriti, il coefficiente di redditivitá e le aliquote per imposta e contributi.`;
+        } else if(cassaInps === "gs_inps") {
+          dettaglioTesto += `Per il ${annoReddito}, il saldo (imposta sostitutiva + contributi) viene calcolato sul reddito netto. Gli acconti del ${annoReddito-1} vengono sottratti.<br>`;
         }
-        else if(cassaInps === "gs_inps") {
-          dettaglioTesto += `Per il ${annoReddito}, il saldo (imposta sostitutiva + contributi INPS) viene calcolato sul reddito netto, e gli acconti del ${annoReddito-1} vengono sottratti.<br>`;
-        }
-        dettaglioCalcoli.innerHTML = dettaglioTesto;
+        document.getElementById("dettaglioCalcoli").innerHTML = dettaglioTesto;
 
-        // Mostra le sezioni dei risultati e delle schede
+        // Mostra i risultati
         document.getElementById("risultati-container").style.display = "block";
         document.getElementById("schede-container").style.display = "block";
       });
 
-      // Download PDF (stessa logica degli esempi precedenti)
-      downloadButton.addEventListener("click", async function() {
-        const { jsPDF } = window.jspdf;
+      // Funzione per scaricare il PDF
+      async function addPageToPDF(element, pdf, addPage = false, drawBackground = null) {
+        if(!element) {
+          console.error('Elemento non trovato per addPageToPDF.');
+          return;
+        }
         const pdfWidth = 595.28;
         const pdfHeight = 841.89;
+        element.style.width = pdfWidth + 'pt';
+        element.style.height = pdfHeight + 'pt';
+        element.style.maxWidth = pdfWidth + 'pt';
+        element.style.maxHeight = pdfHeight + 'pt';
+        element.style.margin = '0';
+        element.style.boxSizing = 'border-box';
+        element.style.overflow = 'hidden';
+
+        const canvas = await html2canvas(element);
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+        if(addPage) pdf.addPage();
+        if(typeof drawBackground === 'function') drawBackground(pdf);
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+        element.style.width = '';
+        element.style.height = '';
+        element.style.maxWidth = '';
+        element.style.maxHeight = '';
+        element.style.margin = '';
+        element.style.boxSizing = '';
+        element.style.overflow = '';
+      }
+
+      function drawLines(pdf) {
+        pdf.setLineWidth(0.5);
+        pdf.setDrawColor(197,197,197,0.2);
+        const pdfHeight = 841.89;
+        const pdfWidth = 595.28;
+        const lineHeight = 25;
+        for(let y=lineHeight; y<pdfHeight; y+=lineHeight) {
+          pdf.line(40,y, pdfWidth-40, y);
+        }
+      }
+
+      function drawGrid(pdf) {
+        pdf.setLineWidth(0.5);
+        pdf.setDrawColor(197,197,197,0.2);
+        const pdfHeight = 841.89;
+        const pdfWidth = 595.28;
+        const gridSize = 25;
+        for(let y=gridSize; y<pdfHeight; y+=gridSize) {
+          pdf.line(40,y, pdfWidth-40, y);
+        }
+        for(let x=40+gridSize; x<pdfWidth-40; x+=gridSize) {
+          pdf.line(x,0,x, pdfHeight);
+        }
+      }
+
+      function showOnlyTab(tabId) {
+        tabContents.forEach(content => content.style.display = 'none');
+        const tabElement = document.getElementById(tabId);
+        if(tabElement) {
+          tabElement.style.display = 'block';
+        } else {
+          console.error(`Elemento con ID ${tabId} non trovato.`);
+        }
+      }
+
+      function resetTabDisplay() {
+        tabContents.forEach(content => content.style.display = '');
+      }
+
+      function addPadding(element) {
+        element.style.padding = '40pt';
+        element.style.boxSizing = 'border-box';
+      }
+
+      function removePadding(element) {
+        element.style.padding = '';
+        element.style.boxSizing = '';
+      }
+
+      downloadButton.addEventListener("click", async function() {
         const pdf = new jsPDF({
           orientation: 'p',
           unit: 'pt',
-          format: [pdfWidth, pdfHeight],
+          format: [595.28, 841.89],
           compressPdf: true
         });
-        const options = {
-          backgroundColor: '#FFFFFF',
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          logging: true,
-          removeContainer: true
-        };
-
-        async function addPageToPDF(element, pdf, addPage = false, drawBackground = null) {
-          if (!element) {
-            console.error('Elemento non trovato per addPageToPDF.');
-            return;
-          }
-          element.style.width = pdfWidth + 'pt';
-          element.style.height = pdfHeight + 'pt';
-          element.style.maxWidth = pdfWidth + 'pt';
-          element.style.maxHeight = pdfHeight + 'pt';
-          element.style.margin = '0';
-          element.style.boxSizing = 'border-box';
-          element.style.overflow = 'hidden';
-          const canvas = await html2canvas(element, options);
-          const imgData = canvas.toDataURL('image/jpeg', 0.95);
-          if(addPage) { pdf.addPage(); }
-          if(typeof drawBackground === 'function') { drawBackground(pdf); }
-          pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-          element.style.width = '';
-          element.style.height = '';
-          element.style.maxWidth = '';
-          element.style.maxHeight = '';
-          element.style.margin = '';
-          element.style.boxSizing = '';
-          element.style.overflow = '';
-        }
-
-        function drawLines(pdf) {
-          pdf.setLineWidth(0.5);
-          pdf.setDrawColor(197,197,197,0.2);
-          const lineHeight = 25;
-          for(let y=lineHeight; y<pdfHeight; y+=lineHeight) {
-            pdf.line(40,y, pdfWidth-40, y);
-          }
-        }
-
-        function drawGrid(pdf) {
-          pdf.setLineWidth(0.5);
-          pdf.setDrawColor(197,197,197,0.2);
-          const gridSize = 25;
-          for(let y=gridSize; y<pdfHeight; y+=gridSize) {
-            pdf.line(40,y, pdfWidth-40, y);
-          }
-          for(let x=40+gridSize; x<pdfWidth-40; x+=gridSize) {
-            pdf.line(x,0, x, pdfHeight);
-          }
-        }
-
-        function showOnlyTab(tabId) {
-          tabContents.forEach(content => content.style.display = 'none');
-          const tabElement = document.getElementById(tabId);
-          if(tabElement) { tabElement.style.display = 'block'; }
-          else { console.error(`Elemento con ID ${tabId} non trovato.`); }
-        }
-
-        function resetTabDisplay() {
-          tabContents.forEach(content => content.style.display = '');
-        }
-
-        function addPadding(element) {
-          element.style.padding = '40pt';
-          element.style.boxSizing = 'border-box';
-        }
-
-        function removePadding(element) {
-          element.style.padding = '';
-          element.style.boxSizing = '';
-        }
 
         // Prima pagina: "Come si Calcolano" (con righe)
         showOnlyTab('come-si-calcolano-tab');
@@ -814,16 +803,15 @@
         if(risultatiContainer){ risultatiContainer.style.display = 'block'; }
         else { console.error('Elemento risultati-container non trovato.'); }
         showOnlyTab('risultati-container');
-        const thirdPageElement = risultatiContainer;
-        addPadding(thirdPageElement);
-        await addPageToPDF(thirdPageElement, pdf, true);
-        removePadding(thirdPageElement);
+        addPadding(risultatiContainer);
+        await addPageToPDF(risultatiContainer, pdf, true);
+        removePadding(risultatiContainer);
 
-        // Quarta pagina: scadenze (scheda "scadenza pagamenti")
-        const fourthPageElement = document.getElementById('scadenza-pagamenti-tab');
-        addPadding(fourthPageElement);
-        await addPageToPDF(fourthPageElement, pdf);
-        removePadding(fourthPageElement);
+        // Quarta pagina: scadenze
+        const scadenzaPagamenti = document.getElementById('scadenza-pagamenti-tab');
+        addPadding(scadenzaPagamenti);
+        await addPageToPDF(scadenzaPagamenti, pdf);
+        removePadding(scadenzaPagamenti);
         resetTabDisplay();
 
         const pdfBlob = pdf.output('blob');
@@ -838,6 +826,5 @@
       });
     });
   </script>
-
 </body>
 </html>
