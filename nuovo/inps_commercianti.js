@@ -1,6 +1,5 @@
 // inps_commercianti.js
 export function calcolaContributi({ redditoNetto, riduzioneContributi, dataApertura, annoReddito }) {
-  // Definizione delle percentuali per l'anno di riferimento
   const aliquoteContributi = {
     2023: { contributiFissiAnnui: 4300, aliquotaVariabile: 23.50 },
     2024: { contributiFissiAnnui: 4515, aliquotaVariabile: 24.48 },
