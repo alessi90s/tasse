@@ -177,12 +177,21 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // Aggiorna l'input del coefficiente quando si seleziona un valore dal menù a tendina
+      // Elementi relativi al coefficiente
       const coeffSelect = document.getElementById("coefficienteSelect");
       const coeffInput = document.getElementById("coefficiente");
+
+      // Se si seleziona un valore dal menù a tendina, aggiorna l'input
       coeffSelect.addEventListener("change", function(){
         if(this.value !== "") {
           coeffInput.value = this.value;
+        }
+      });
+
+      // Se l'utente digita nel campo numerico, resetta il menù a tendina
+      coeffInput.addEventListener("input", function(){
+        if(this.value !== "") {
+          coeffSelect.value = "";
         }
       });
 
