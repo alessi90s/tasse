@@ -2,26 +2,39 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Simulatore Gestione Separata INPS 2025</title>
+  <title>Calcolatore Regime Forfettario 2025 – Gestione Separata INPS</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 0 15px; }
-    h1 { text-align: center; margin-bottom: 20px; }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; line-height: 1.5; }
+    h1, h2, h3 { text-align: center; }
     label, select, input, button { display: block; width: 100%; margin: 10px 0; }
-    button { padding: 10px; font-size: 16px; }
-    .output, .explanation { margin-top: 20px; padding: 15px; border-radius: 8px; }
+    input, select { padding: 8px; font-size: 1rem; }
+    button { padding: 10px; font-size: 1.1rem; cursor: pointer; }
+    .output, .explanation { margin-top: 20px; padding: 15px; border-radius: 6px; }
     .output { background: #f4f4f4; }
     .explanation { background: #eef; }
     ul { margin: 5px 0 0 20px; }
+    hr { margin: 20px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #ddd; }
   </style>
 </head>
 <body>
 
-  <h1>Simulatore Gestione Separata INPS 2025</h1>
+  <h1>Calcolatore Regime Forfettario 2025</h1>
 
-  <label for="fatturato">Fatturato annuo (€):</label>
-  <input type="number" id="fatturato" placeholder="es. 30000" />
+  <!-- Form di Input -->
+  <label>Anno di Riferimento del Reddito:
+    <input type="text" value="2025" readonly>
+  </label>
 
-  <label for="coeff">Coefficiente di redditività (%):</label>
+  <label>Cassa di Riferimento INPS:
+    <select disabled>
+      <option>Gestione Separata INPS</option>
+    </select>
+  </label>
+
+  <label for="coeff">Coefficiente di Redditività (%):</label>
   <select id="coeff">
     <option value="78">78%</option>
     <option value="86">86%</option>
@@ -29,76 +42,122 @@
     <option value="67">67%</option>
   </select>
 
-  <label for="aliquota">Aliquota imposta sostitutiva:</label>
-  <select id="aliquota">
+  <label for="fatt">Fatturato lordo 2025 (€):</label>
+  <input type="number" id="fatt" placeholder="es. 30000" />
+
+  <label for="aliImp">Aliquota Imposta Sostitutiva:</label>
+  <select id="aliImp">
     <option value="5">5% (start-up)</option>
     <option value="15">15% (standard)</option>
   </select>
 
   <button onclick="calcola()">Calcola</button>
 
+  <!-- Sezione Risultati -->
   <div class="output" id="risultato"></div>
+
+  <!-- Spiegazioni -->
   <div class="explanation" id="spiegazione"></div>
 
   <script>
     function calcola() {
-      const fatt = parseFloat(document.getElementById("fatturato").value);
+      // Input
+      const fatt = parseFloat(document.getElementById("fatt").value);
       const coeff = parseFloat(document.getElementById("coeff").value) / 100;
-      const aliImp = parseFloat(document.getElementById("aliquota").value) / 100;
+      const aliImp = parseFloat(document.getElementById("aliImp").value) / 100;
       if (!fatt || fatt <= 0) { alert("Inserisci un fatturato valido."); return; }
 
-      // 1) Reddito imponibile
+      // 1) Reddito (Imponibile): fatturato × coefficiente
       const reddito = fatt * coeff;
 
-      // 2) Contributi Gestione Separata: 26,07% sul reddito imponibile
+      // 2) Contributi INPS Gestione Separata (26,07% sul reddito) 
       const aliContrib = 0.2607;
-      const contrib = reddito * aliContrib;
+      const contribTot = reddito * aliContrib;
 
-      // 3) Acconti contributi: 80% del totale, divisi in 2 quote uguali
-      const accontoTot = contrib * 0.8;
-      const acconto1_contrib = accontoTot / 2;
-      const acconto2_contrib = accontoTot / 2;
+      // 3) Ripartizione contributi: saldo 20% + acconti 80% (40% + 40%)
+      const saldo_contrib    = contribTot * 0.2;
+      const acconto1_contrib = contribTot * 0.4;
+      const acconto2_contrib = contribTot * 0.4;
 
-      // 4) Imposta sostitutiva flat sul reddito imponibile
-      const imposta = reddito * aliImp;
-      const acconto1_imp = imposta * 0.5;
-      const acconto2_imp = imposta * 0.5;
+      // 4) Imposta sostitutiva flat (5% o 15% sul reddito)
+      const impTot = reddito * aliImp;
+      const saldo_imp   = impTot;       // si paga tutto come “saldo”
+      const acconto1_imp = impTot * 0.5;
+      const acconto2_imp = impTot * 0.5;
 
-      // 5) Output
+      // 5) Output “Descrizione Importo (€)”
       document.getElementById("risultato").innerHTML = `
-        <p><strong>Reddito imponibile:</strong> € ${reddito.toFixed(2)}</p>
-        <p><strong>Contributi (26,07%):</strong> € ${contrib.toFixed(2)}</p>
-        <p><strong>Imposta sostitutiva (${(aliImp*100).toFixed(0)}%):</strong> € ${imposta.toFixed(2)}</p>
+        <h2>Descrizione</h2>
+        <table>
+          <tr><th>Descrizione</th><th>Importo (€)</th></tr>
+          <tr><td>Reddito Lordo</td><td>€ ${fatt.toFixed(2)}</td></tr>
+          <tr><td>Reddito Netto (2025)</td><td>€ ${reddito.toFixed(2)}</td></tr>
+          <tr><td>Contributi INPS (26,07% su imponibile)</td><td>€ ${contribTot.toFixed(2)}</td></tr>
+          <tr><td>Imposta sostitutiva (${(aliImp*100).toFixed(0)}%)</td><td>€ ${impTot.toFixed(2)}</td></tr>
+        </table>
         <hr>
-        <p><strong>Scadenze e versamenti 2026:</strong></p>
+        <h2>Dettaglio dei Pagamenti per Reddito 2025</h2>
+        <h3>Tasse da pagare</h3>
         <ul>
-          <li><em>30 giugno 2026</em>: 
+          <li><strong>30 giugno 2026</strong>:
             <ul>
-              <li>Saldo contributi (€${contrib.toFixed(2)})</li>
-              <li>1&ordm; acconto contributi (€${acconto1_contrib.toFixed(2)})</li>
-              <li>1&ordm; acconto imposta (€${acconto1_imp.toFixed(2)})</li>
+              <li>Saldo imposta sostitutiva (€${saldo_imp.toFixed(2)})</li>
+              <li>1° acconto imposta (50%) (€${acconto1_imp.toFixed(2)})</li>
             </ul>
           </li>
-          <li><em>30 novembre 2026</em>:
+          <li><strong>30 novembre 2026</strong>:
             <ul>
-              <li>2&ordm; acconto contributi (€${acconto2_contrib.toFixed(2)})</li>
-              <li>2&ordm; acconto imposta (€${acconto2_imp.toFixed(2)})</li>
+              <li>2° acconto imposta (50%) (€${acconto2_imp.toFixed(2)})</li>
             </ul>
           </li>
         </ul>
+        <h3>Contributi previdenziali</h3>
+        <ul>
+          <li><strong>30 giugno 2026</strong>:
+            <ul>
+              <li>Saldo contributi (20%) (€${saldo_contrib.toFixed(2)})</li>
+              <li>1° acconto contributi (40%) (€${acconto1_contrib.toFixed(2)})</li>
+            </ul>
+          </li>
+          <li><strong>30 novembre 2026</strong>:
+            <ul>
+              <li>2° acconto contributi (40%) (€${acconto2_contrib.toFixed(2)})</li>
+            </ul>
+          </li>
+        </ul>
+        <h3>Riepilogo dei Pagamenti</h3>
+        <ul>
+          <li>Totale imposta sostitutiva: €${impTot.toFixed(2)}</li>
+          <li>Totale contributi INPS: €${contribTot.toFixed(2)}</li>
+          <li>Totale da versare (saldo + acconti): €
+            ${(saldo_imp + acconto1_imp + acconto2_imp + saldo_contrib + acconto1_contrib + acconto2_contrib).toFixed(2)}
+          </li>
+        </ul>
+        <h2>Scadenza Pagamenti</h2>
+        <table>
+          <tr><th>Data</th><th>Importo totale (€)</th><th>Dettaglio</th></tr>
+          <tr><td>30 giugno 2026</td>
+              <td>€${(saldo_imp + acconto1_imp + saldo_contrib + acconto1_contrib).toFixed(2)}</td>
+              <td>Saldo + 1° acconti</td>
+          </tr>
+          <tr><td>30 novembre 2026</td>
+              <td>€${(acconto2_imp + acconto2_contrib).toFixed(2)}</td>
+              <td>2° acconti</td>
+          </tr>
+        </table>
       `;
 
-      // 6) Spiegazione
+      // 6) Spiegazione testuale
       document.getElementById("spiegazione").innerHTML = `
-        <p><strong>Perché versi i contributi:</strong> la Gestione Separata richiede un contributo pari al 26,07% del reddito imponibile, 
-        calcolato applicando il coefficiente di redditività agli incassi (€${(coeff*100).toFixed(0)}% del fatturato). 
-        Gli acconti (80% del contributo annuo) sono divisi in due rate per consentire un flusso di cassa più uniforme.</p>
-
-        <p><strong>Perché versi l’imposta sostitutiva:</strong> nel regime forfettario l’IRPEF e le addizionali sono sostituite da una flat tax al 5% o 15% 
-        sul reddito imponibile. L’acconto è il 50% dell’imposta dovuta, versato in due rate.</p>
-
-        <p><strong>Scadenze:</strong> 
-        il 30 giugno si pagano il saldo e la prima rata di acconto, il 30 novembre si completa il versamento con la seconda rata.</p>
+        <h2>Come si Calcolano</h2>
+        <p><strong>Reddito netto:</strong> fatturato × coefficiente di redditività (${(coeff*100).toFixed(0)}%).</p>
+        <p><strong>Contributi INPS:</strong> 26,07% sul reddito netto, con saldo (20%) e acconti (80% divisi in due rate) per ripartire il versamento nel 2026.</p>
+        <p><strong>Imposta sostitutiva:</strong> flat tax 5% o 15% sul reddito netto, interamente a saldo + due acconti (50% / 50%).</p>
+        <h2>Perché versi questo</h2>
+        <p>I contributi finanziano la tua assenza di coperture alternative e sono obbligatori per la Gestione Separata. 
+        L’imposta sostitutiva semplifica IRPEF e addizionali con un’aliquota fissa.</p>
+        <p>Acconti e saldo servono a garantire allo Stato un flusso di cassa equilibrato: il saldo copre l’annualità trascorsa, 
+        gli acconti anticipano parte del carico dell’anno successivo.</p>
       `;
     }
   </script>
