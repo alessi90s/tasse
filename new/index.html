@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulatore Regime Forfettario</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    label, select, input { display: block; margin: 10px 0; }
+    .output { margin-top: 20px; background: #f4f4f4; padding: 15px; border-radius: 8px; }
+    .output p { margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+  <h2>Simulatore Tasse Partita IVA (Regime Forfettario)</h2>
+
+  <label for="fatturato">Fatturato annuo (€):</label>
+  <input type="number" id="fatturato" />
+
+  <label for="cassa">Cassa previdenziale:</label>
+  <select id="cassa">
+    <option value="gestioneSeparata">Gestione Separata INPS</option>
+    <option value="commercianti">INPS Commercianti</option>
+    <option value="artigiani">INPS Artigiani</option>
+    <option value="enpap">ENPAP</option>
+  </select>
+
+  <label for="aliquota">Aliquota imposta sostitutiva:</label>
+  <select id="aliquota">
+    <option value="5">5% (startup)</option>
+    <option value="15">15% (standard)</option>
+  </select>
+
+  <button onclick="calcola()">Calcola</button>
+
+  <div class="output" id="risultato"></div>
+
+  <script>
+    function calcola() {
+      const fatturato = parseFloat(document.getElementById("fatturato").value);
+      const cassa = document.getElementById("cassa").value;
+      const aliquota = parseFloat(document.getElementById("aliquota").value);
+
+      if (isNaN(fatturato) || fatturato <= 0) {
+        alert("Inserisci un fatturato valido.");
+        return;
+      }
+
+      let coeff, contributi, contributiMinimi = 4200, reddito, tasse;
+
+      switch (cassa) {
+        case "gestioneSeparata":
+          coeff = 0.78;
+          reddito = fatturato * coeff;
+          contributi = reddito * 0.2607;
+          break;
+        case "commercianti":
+          coeff = 0.40;
+          reddito = fatturato * coeff;
+          contributi = contributiMinimi;
+          if (reddito > 18000) {
+            contributi += (reddito - 18000) * 0.24;
+          }
+          break;
+        case "artigiani":
+          coeff = 0.67;
+          reddito = fatturato * coeff;
+          contributi = contributiMinimi;
+          if (reddito > 18000) {
+            contributi += (reddito - 18000) * 0.24;
+          }
+          break;
+        case "enpap":
+          coeff = 0.78;
+          reddito = fatturato * coeff;
+          contributi = reddito * 0.10;
+          break;
+      }
+
+      tasse = reddito * (aliquota / 100);
+      const netto = fatturato - contributi - tasse;
+
+      document.getElementById("risultato").innerHTML = `
+        <p><strong>Reddito imponibile:</strong> € ${reddito.toFixed(2)}</p>
+        <p><strong>Contributi previdenziali:</strong> € ${contributi.toFixed(2)}</p>
+        <p><strong>Imposta sostitutiva (${aliquota}%):</strong> € ${tasse.toFixed(2)}</p>
+        <p><strong>Reddito netto stimato:</strong> € ${netto.toFixed(2)}</p>
+      `;
+    }
+  </script>
+
+</body>
+</html>
