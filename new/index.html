@@ -2,29 +2,31 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Simulatore Regime Forfettario 2025</title>
+  <title>Simulatore Gestione Separata INPS 2025</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
-    h1 { text-align: center; }
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: 30px auto; padding: 0 15px; }
+    h1 { text-align: center; margin-bottom: 20px; }
     label, select, input, button { display: block; width: 100%; margin: 10px 0; }
-    .output { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-    .output p { margin: 8px 0; }
-    .explanation { margin-top: 20px; padding: 15px; background: #eef; border-radius: 8px; }
+    button { padding: 10px; font-size: 16px; }
+    .output, .explanation { margin-top: 20px; padding: 15px; border-radius: 8px; }
+    .output { background: #f4f4f4; }
+    .explanation { background: #eef; }
+    ul { margin: 5px 0 0 20px; }
   </style>
 </head>
 <body>
 
-  <h1>Simulatore Tasse e Contributi 2025</h1>
+  <h1>Simulatore Gestione Separata INPS 2025</h1>
 
   <label for="fatturato">Fatturato annuo (€):</label>
-  <input type="number" id="fatturato" placeholder="es. 40000" />
+  <input type="number" id="fatturato" placeholder="es. 30000" />
 
-  <label for="cassa">Cassa previdenziale:</label>
-  <select id="cassa">
-    <option value="gestioneSeparata">Gestione Separata INPS</option>
-    <option value="commercianti">INPS Commercianti</option>
-    <option value="artigiani">INPS Artigiani</option>
-    <option value="enpap">ENPAP</option>
+  <label for="coeff">Coefficiente di redditività (%):</label>
+  <select id="coeff">
+    <option value="78">78%</option>
+    <option value="86">86%</option>
+    <option value="40">40%</option>
+    <option value="67">67%</option>
   </select>
 
   <label for="aliquota">Aliquota imposta sostitutiva:</label>
@@ -41,106 +43,63 @@
   <script>
     function calcola() {
       const fatt = parseFloat(document.getElementById("fatturato").value);
-      const cassa = document.getElementById("cassa").value;
+      const coeff = parseFloat(document.getElementById("coeff").value) / 100;
       const aliImp = parseFloat(document.getElementById("aliquota").value) / 100;
-      if (isNaN(fatt) || fatt <= 0) {
-        alert("Inserisci un fatturato valido.");
-        return;
-      }
+      if (!fatt || fatt <= 0) { alert("Inserisci un fatturato valido."); return; }
 
-      // Coefficienti di redditività (Forfettario 2025)
-      const coef = {
-        gestioneSeparata: 0.78,
-        commercianti:    0.40,
-        artigiani:       0.67,
-        enpap:           0.78
-      };
-      const reddito = fatt * coef[cassa];
+      // 1) Reddito imponibile
+      const reddito = fatt * coeff;
 
-      // Variabili per contributi
-      let contrib = 0, details = "", acconti = [];
+      // 2) Contributi Gestione Separata: 26,07% sul reddito imponibile
+      const aliContrib = 0.2607;
+      const contrib = reddito * aliContrib;
 
-      if (cassa === "gestioneSeparata") {
-        const aliquota = 0.2607;         // 26,07% INPS Gestione Separata :contentReference[oaicite:0]{index=0}
-        const minimale = 18555;          // minimale reddito 2025 :contentReference[oaicite:1]{index=1}
-        const massimale = 120607;        // massimale reddito 2025 :contentReference[oaicite:2]{index=2}
-        const base = Math.max(minimale, Math.min(reddito, massimale));
-        contrib = base * aliquota;
-        details = `26,07% su €${base.toFixed(2)}`;
-        // Acconti/saldo su F24 (Contributi+Imposta)
-        acconti.push({
-          desc: `30 giugno: 40% contributi (€${(contrib*0.4).toFixed(2)}) + 40% imposta`,
-          imp: null, con: contrib*0.4
-        });
-        acconti.push({
-          desc: `30 nov: 60% contributi (€${(contrib*0.6).toFixed(2)}) + 60% imposta`,
-          imp: null, con: contrib*0.6
-        });
-      }
-      else if (cassa === "commercianti" || cassa === "artigiani") {
-        const minRed = 18555;            // minimale 2025 :contentReference[oaicite:3]{index=3}
-        const maxRed = 55448;            // massimale prima fascia :contentReference[oaicite:4]{index=4}
-        const aliquota = 0.24;           // 24% su eccedenza :contentReference[oaicite:5]{index=5}
-        const minCon = cassa==="artigiani" ? 4460.64 : 4549.70; // minimi 2025 :contentReference[oaicite:6]{index=6}
-        const ecc = Math.max(0, Math.min(reddito, maxRed) - minRed);
-        contrib = minCon + ecc * aliquota;
-        details = `€${minCon.toFixed(2)} + 24% su eccedenza €${ecc.toFixed(2)}`;
-        acconti.push({
-          desc: `30 giugno: 40% contributi (€${(contrib*0.4).toFixed(2)}) + 40% imposta`,
-          imp: null, con: contrib*0.4
-        });
-        acconti.push({
-          desc: `30 nov: 60% contributi (€${(contrib*0.6).toFixed(2)}) + 60% imposta`,
-          imp: null, con: contrib*0.6
-        });
-      }
-      else if (cassa === "enpap") {
-        const soggAliq = 0.10, minSogg = 856;    // 10% min €856 :contentReference[oaicite:7]{index=7}
-        const intAliq  = 0.02, minInt = 66;     // 2% min €66 :contentReference[oaicite:8]{index=8}
-        const mat = 110;                         // maternità €110 (2024) :contentReference[oaicite:9]{index=9}
-        const sogg = Math.max(minSogg, reddito * soggAliq);
-        const integ = Math.max(minInt, fatt * intAliq);
-        contrib = sogg + integ + mat;
-        details = `Sogg. 10% su €${reddito.toFixed(2)}, min €${minSogg}; Int. 2% su €${fatt.toFixed(2)}, min €${minInt}; Mat. €${mat}`;
-        // ENPAP: 1° marzo 70% (acconto), 1° ott 30% (saldo) :contentReference[oaicite:10]{index=10}
-        acconti.push({
-          desc: `1 marzo: 70% soggettivo (€${(sogg*0.7).toFixed(2)}) + 70% integrativo (€${(integ*0.7).toFixed(2)})`,
-          imp: null, con: null
-        });
-        acconti.push({
-          desc: `1 ott: saldo soggettivo (€${(sogg*0.3).toFixed(2)}) + saldo integr. (€${(integ*0.3).toFixed(2)}) + maternità (€${mat.toFixed(2)})`,
-          imp: null, con: null
-        });
-      }
+      // 3) Acconti contributi: 80% del totale, divisi in 2 quote uguali
+      const accontoTot = contrib * 0.8;
+      const acconto1_contrib = accontoTot / 2;
+      const acconto2_contrib = accontoTot / 2;
 
-      // Imposta sostitutiva
-      const imposta = reddito * aliImp;          // 5% o 15% :contentReference[oaicite:11]{index=11}
-      // Aggancio imposta negli acconti INPS
-      acconti = acconti.map(a => ({
-        desc: a.desc.replace(/imposta/g, `imposta (€${(imposta*(a.desc.includes('40%')?0.4:0.6)).toFixed(2)})`)
-      }));
+      // 4) Imposta sostitutiva flat sul reddito imponibile
+      const imposta = reddito * aliImp;
+      const acconto1_imp = imposta * 0.5;
+      const acconto2_imp = imposta * 0.5;
 
-      // Output numerico
-      let out = `
+      // 5) Output
+      document.getElementById("risultato").innerHTML = `
         <p><strong>Reddito imponibile:</strong> € ${reddito.toFixed(2)}</p>
-        <p><strong>Contributi (${cassa}):</strong> € ${contrib.toFixed(2)}<br><small>${details}</small></p>
+        <p><strong>Contributi (26,07%):</strong> € ${contrib.toFixed(2)}</p>
         <p><strong>Imposta sostitutiva (${(aliImp*100).toFixed(0)}%):</strong> € ${imposta.toFixed(2)}</p>
         <hr>
-        <p><strong>Scadenze e acconti:</strong></p>
-        <ul>`;
-      acconti.forEach(a => out += `<li>${a.desc}</li>`);
-      out += `</ul>`;
-      document.getElementById("risultato").innerHTML = out;
+        <p><strong>Scadenze e versamenti 2026:</strong></p>
+        <ul>
+          <li><em>30 giugno 2026</em>: 
+            <ul>
+              <li>Saldo contributi (€${contrib.toFixed(2)})</li>
+              <li>1&ordm; acconto contributi (€${acconto1_contrib.toFixed(2)})</li>
+              <li>1&ordm; acconto imposta (€${acconto1_imp.toFixed(2)})</li>
+            </ul>
+          </li>
+          <li><em>30 novembre 2026</em>:
+            <ul>
+              <li>2&ordm; acconto contributi (€${acconto2_contrib.toFixed(2)})</li>
+              <li>2&ordm; acconto imposta (€${acconto2_imp.toFixed(2)})</li>
+            </ul>
+          </li>
+        </ul>
+      `;
 
-      // Spiegazione
-      let expl = `
-        <p><em>Perché versi i contributi:</em> sono calcolati sul <strong>reddito imponibile</strong> determinato dal coefficiente di redditività, 
-        come richiesto dalla normativa INPS/ENPAP.</p>
-        <p><em>Perché versi l’imposta sostitutiva:</em> nel regime forfettario si applica una tax rate flat che sostituisce IRPEF e addizionali.</p>
-        <p><em>Acconti e saldo:</em> 
-        gli acconti (40% o 70%) servono a garantire il flusso di cassa dello Stato e degli enti, 
-        il saldo copre la parte rimanente.</p>`;
-      document.getElementById("spiegazione").innerHTML = expl;
+      // 6) Spiegazione
+      document.getElementById("spiegazione").innerHTML = `
+        <p><strong>Perché versi i contributi:</strong> la Gestione Separata richiede un contributo pari al 26,07% del reddito imponibile, 
+        calcolato applicando il coefficiente di redditività agli incassi (€${(coeff*100).toFixed(0)}% del fatturato). 
+        Gli acconti (80% del contributo annuo) sono divisi in due rate per consentire un flusso di cassa più uniforme.</p>
+
+        <p><strong>Perché versi l’imposta sostitutiva:</strong> nel regime forfettario l’IRPEF e le addizionali sono sostituite da una flat tax al 5% o 15% 
+        sul reddito imponibile. L’acconto è il 50% dell’imposta dovuta, versato in due rate.</p>
+
+        <p><strong>Scadenze:</strong> 
+        il 30 giugno si pagano il saldo e la prima rata di acconto, il 30 novembre si completa il versamento con la seconda rata.</p>
+      `;
     }
   </script>
 
