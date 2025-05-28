@@ -403,7 +403,7 @@
         </div>
     
     <header>
-        <h1>Calcolatore Regime <span class="highlight-yellow"><u class="styled-underline">Forfettario</u></span> 2025</h1>
+        <h1>Calcolatore Regime <span class="highlight-yellow"><u class="styled-underline">Forfettario</u></span> 2024</h1>
     </header>
 
     <div class="container">
@@ -416,7 +416,7 @@
                 <form id="calcolatoreForm">
                     <label for="annoReddito"><span class="highlight-yellow">Anno</span> di Riferimento del Reddito:</label>
                     <select id="annoReddito" required disabled>
-                        <option value="2025" selected>2025</option>
+                        <option value="2024" selected>2024</option>
                         <!-- Puoi aggiungere altri anni se necessario -->
                     </select>
 
@@ -458,7 +458,7 @@
                         <!-- Aggiungi altri coefficienti se necessario -->
                     </select>
 
-                    <label for="redditoLordo">Reddito Lordo (quanto hai <span class="highlight-yellow">incassato €</span> nel 2025?):</label>
+                    <label for="redditoLordo">Reddito Lordo (quanto hai <span class="highlight-yellow">incassato €</span> nel 2024?):</label>
                     <input type="number" id="redditoLordo" min="0" step="1" required>
                     
                     <!-- Bottoni per Reddito Lordo Predefinito -->
@@ -546,7 +546,7 @@
                 <h2>Dettaglio pagamenti</h2>
                 <p>
                     Dettaglio dei pagamenti per l'anno <strong id="detAnnoPagamenti"></strong><br>
-                    Hai guadagnato <strong id="detRedditoLordoPagamenti"></strong>€ nel 2025<strong id="detAnnoPagamenti2"></strong>.
+                    Hai guadagnato <strong id="detRedditoLordoPagamenti"></strong>€ nel 2024<strong id="detAnnoPagamenti2"></strong>.
                 </p>
                 <h3>Calcolo del Reddito Netto:</h3>
                 <p>
@@ -571,7 +571,7 @@
                 </p>
                 <h3>Contributi previdenziali:</h3>
                 <p>
-                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul 2025 <strong id="detAnnoPagamenti4"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.
+                    Saldo contributi INPS <span id="detContributiInpsTipoPagamenti"></span> sul 2024 <strong id="detAnnoPagamenti4"></strong> (<span class="highlight-yellow"><strong id="detSaldoContributiPagamenti"></strong>€</span>) da pagare entro il 30 giugno 2025<span id="annoScadenzaGiugnoDettaglio"></span>.
                 </p>
                 <p>
                     Acconto contributi INPS per il <span id="annoAccontoInpsDettaglio"></span> (<span class="highlight-blue"><strong id="detAccontoContributiPagamenti"></strong>€</span>) da pagare in due rate:<br>
@@ -580,7 +580,7 @@
                 </p>
                 <h3>Riepilogo dei Pagamenti:</h3>
                 <ul>
-                    <li>Totale tasse e contributi effettivi sul 2025<strong id="detAnnoPagamenti5"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong>€ (<strong id="percentualeTotaleTasseContributi"></strong> del tuo reddito lordo)</li>
+                    <li>Totale tasse e contributi effettivi sul 2024<strong id="detAnnoPagamenti5"></strong>: <strong id="detTotaleTasseContributiPagamenti"></strong>€ (<strong id="percentualeTotaleTasseContributi"></strong> del tuo reddito lordo)</li>
                     <li>Totale acconti per il <span id="annoAccontoImpostaDettaglio2"></span>: <strong id="detTotaleAccontiPagamenti"></strong>€ (<strong id="percentualeTotaleAcconti"></strong> del tuo reddito lordo)</li>
                     <li>Totale da versare complessivamente: <strong id="detTotaleComplessivoPagamenti"></strong>€ (<strong id="percentualeTotaleComplessivo"></strong> del tuo reddito lordo)</li>
                 </ul>
@@ -659,7 +659,7 @@
             const tabContents = document.querySelectorAll(".tab-content");
 
             // Impostazioni Predefinite
-            document.getElementById("annoReddito").value = "2025";
+            document.getElementById("annoReddito").value = "2024";
             document.getElementById("aliquotaImposta").value = "0.05";
             document.getElementById("coefficienteRedditivita").value = "78"; // Cambiato a 78% per allinearsi all'esempio
 
@@ -745,7 +745,7 @@
 
                 if (cassaInps === "gs_inps") {
                     // Gestione Separata INPS
-                    const aliquotaGsInps = 26.07 / 100; // Aliquota precisa
+                    const aliquotaGsInps = 26.23 / 100; // Aliquota precisa
                     contributiInps = Math.round(redditoNetto * aliquotaGsInps);
                     accontoInps = Math.round(contributiInps * 0.80);
                 } else if (cassaInps === "inps_commercianti") {
@@ -795,7 +795,7 @@
                 }
 
                 // Calcolo delle Scadenze delle Rate Fisse
-                let contributiFissiSulAnno = 0; // Totale Contributi Fissi sul 2025
+                let contributiFissiSulAnno = 0; // Totale Contributi Fissi sul 2024
                 let rateScadenze = [
                     { id: "1", scadenza: `16 maggio ${annoReddito}`, periodo: { start: new Date(annoReddito, 0, 1), end: new Date(annoReddito, 2, 31) }, dettaglio: "Contributi Fissi Gennaio - Marzo" },
                     { id: "2", scadenza: `20 agosto ${annoReddito}`, periodo: { start: new Date(annoReddito, 3, 1), end: new Date(annoReddito, 5, 30) }, dettaglio: "Contributi Fissi Aprile - Giugno" },
