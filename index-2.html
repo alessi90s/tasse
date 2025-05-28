@@ -1,133 +1,328 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<title>Calcolatore Regime Forfettario 2025</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-/* —— palette / font —— */
-:root{--bg:#fff;--accent:#e0f7fa;--accent-act:#b2ebf2;--border:#ccc;--txt:#333}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Poppins,Arial,sans-serif;background:var(--bg);color:var(--txt);display:flex;flex-direction:column;align-items:center;padding:20px}
-h1{font-size:2rem;margin-bottom:1rem;text-align:center}
-/* —— disclaimer —— */
-#disclaimer{background:#f8d7da;color:#721c24;padding:15px;border:1px solid #f5c6cb;margin-bottom:20px;text-align:center}
-/* —— form box —— */
-.calcolatore-container{background:#fff;border:1px solid var(--border);border-radius:8px;max-width:520px;width:100%;padding:20px}
-label{display:block;margin-top:14px;font-weight:600}
-input,select,button{width:100%;padding:8px;margin-top:4px;border:1px solid var(--border);border-radius:4px;font-family:inherit}
-button{background:#fff;cursor:pointer;transition:.2s}
-button:hover{background:#f0f0f0}
-.reddito-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.reddito-buttons button{flex:1 1 calc(33% - 8px);background:#eee;font-size:.9rem}
-/* —— tabs —— */
-.tabs{display:none;margin-top:30px;width:100%;max-width:900px}
-.tab-buttons{display:flex;border-bottom:2px solid var(--border)}
-.tab{flex:1;text-align:center;padding:10px;background:var(--accent);cursor:pointer;font-weight:600}
-.tab.active{background:var(--accent-act);border-bottom:2px solid var(--txt)}
-.tab-content{display:none;padding:20px;background:#fff;border:1px solid var(--border);border-top:none}
-.tab-content.active{display:block}
-/* quaderno stili */
-#explainTab::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.08) 0,rgba(0,0,0,.08) 1px,transparent 1px,transparent 24px);pointer-events:none}
-#explainTab{position:relative}
-#resultsTab{position:relative}
-#resultsTab::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,0,0,.08) 1px,transparent 1px);background-size:25px 25px;pointer-events:none}
-/* tables */
-table{width:100%;border-collapse:collapse;font-size:.9rem}
-th,td{border:1px solid var(--border);padding:8px;text-align:left}
-th{background:#f0f0f0}
-.section-header td{background:#e0e0e0;font-weight:600;text-align:center}
-.highlight-yellow{background:#fff9c4}
-.highlight-blue{background:#bbdefb}
-</style>
+  <meta charset="utf-8">
+  <title>Calcolatore Forfettario 2025</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    /* font e palette */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    :root {
+      --bg: #fff;
+      --border: #ccc;
+      --accent: #e0f7fa;
+      --accent-act: #b2ebf2;
+      --text: #333;
+      --warn-bg: #f8d7da;
+      --warn-text: #721c24;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 16px; font-size: 1.8rem; text-align: center; }
+    /* disclaimer */
+    #disclaimer {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      padding: 12px;
+      border: 1px solid #f5c6cb;
+      margin-bottom: 20px;
+      text-align: center;
+      max-width: 800px;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+    /* form container */
+    .form-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+    }
+    .form-box label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+    }
+    .form-box select,
+    .form-box input,
+    .form-box button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .form-box button {
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-weight: 600;
+    }
+    .form-box button:hover {
+      background: #f0f0f0;
+    }
+    .reddito-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .reddito-buttons button {
+      flex: 1 1 calc(33% - 8px);
+      background: #eee;
+      font-size: 0.9rem;
+    }
+    /* tabs */
+    .tabs {
+      display: none;
+      margin-top: 28px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .tab-buttons {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      background: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .tab.active {
+      background: var(--accent-act);
+      border-bottom: 2px solid var(--text);
+    }
+    .tab-content {
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 20px;
+      position: relative;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* quaderno righe/quadretti */
+    #explainTab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom, rgba(0,0,0,0.08) 0, rgba(0,0,0,0.08) 1px,
+        transparent 1px, transparent 24px
+      );
+      pointer-events: none;
+    }
+    #resultsTab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.08) 1px, transparent 1px);
+      background-size: 25px 25px;
+      pointer-events: none;
+    }
+    /* tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    .section-header td {
+      background: #e0e0e0;
+      font-weight: 600;
+      text-align: center;
+    }
+    .highlight-yellow { background: #fff9c4; }
+    .highlight-blue   { background: #bbdefb; }
+    @media(max-width:600px) {
+      .reddito-buttons button { flex: 1 1 100%; }
+      .tab { font-size: 0.9rem; }
+    }
+  </style>
 </head>
 <body>
 
-<div id="disclaimer"><strong>Questo strumento è indicativo: rivolgiti al tuo commercialista per il calcolo ufficiale.</strong></div>
-<header><h1>Calcolatore Regime Forfettario 2025</h1></header>
+  <div id="disclaimer">
+    <strong>Questo calcolatore è indicativo e non sostituisce il calcolo ufficiale del tuo commercialista.</strong>
+  </div>
 
-<!-- —— FORM —— -->
-<section class="calcolatore-container">
-  <form id="form" onsubmit="return false;">
-    <label>Anno di riferimento (reddito)<select id="anno"><option value="2025" selected>2025</option></select></label>
-    <label>Aliquota imposta sostitutiva<select id="aliq"><option value="0.05" selected>5 %</option><option value="0.15">15 %</option></select></label>
-    <label>Coefficiente di redditivit&agrave;<select id="coeff"><option value="0.86">86 %</option><option value="0.78" selected>78 %</option><option value="0.67">67 %</option><option value="0.4">40 %</option></select></label>
-    <label>Reddito lordo (&euro;)
-      <input type="number" id="lordo" min="0" step="100" required>
-      <div class="reddito-buttons" id="preset"></div>
-    </label>
-    <button type="button" class="advanced-toggle" id="advBtn">Contributi / acconti 2024</button>
-    <div class="advanced" id="adv">
-      <label>Contributi INPS 2024 deducibili (&euro;)<input type="number" id="contrPrev" min="0" step="100" value="0"></label>
-      <label>Acconti imposta 2024 (&euro;)<input type="number" id="accImpPrev" min="0" step="100" value="0"></label>
-      <label>Acconti contributi 2024 (&euro;)<input type="number" id="accConPrev" min="0" step="100" value="0"></label>
+  <h1>Calcolatore Regime Forfettario 2025</h1>
+
+  <!-- == FORM == -->
+  <div class="form-box">
+    <form id="form" onsubmit="return false;">
+      <label>Anno di riferimento
+        <select id="anno"><option value="2025" selected>2025</option></select>
+      </label>
+
+      <label>Aliquota Imposta Sostitutiva
+        <select id="aliq"><option value="0.05" selected>5 %</option><option value="0.15">15 %</option></select>
+      </label>
+
+      <label>Coefficiente di Redditività
+        <select id="coeff">
+          <option value="0.86">86 %</option>
+          <option value="0.78" selected>78 %</option>
+          <option value="0.67">67 %</option>
+          <option value="0.40">40 %</option>
+        </select>
+      </label>
+
+      <label>Reddito Lordo (€)
+        <input type="number" id="lordo" min="0" step="100" required>
+        <div class="reddito-buttons" id="preset"></div>
+      </label>
+
+      <label>Contributi INPS 2024 Deducibili (€)
+        <input type="number" id="contrPrev" min="0" step="100" value="0">
+      </label>
+
+      <label>Acconti Imposta 2024 (€)
+        <input type="number" id="accImpPrev" min="0" step="100" value="0">
+      </label>
+
+      <label>Acconti Contributi 2024 (€)
+        <input type="number" id="accConPrev" min="0" step="100" value="0">
+      </label>
+
+      <button type="button" id="btnCalc">Calcola</button>
+    </form>
+  </div>
+
+  <!-- == TABS == -->
+  <div class="tabs" id="tabs">
+    <div class="tab-buttons">
+      <div class="tab active" data-tab="explainTab">Come si Calcolano</div>
+      <div class="tab"       data-tab="resultsTab">Risultati</div>
     </div>
-    <button type="button" class="action" id="btnCalc">Calcola</button>
-  </form>
-</section>
 
-<!-- —— TABS —— -->
-<div class="tabs" id="tabs">
-  <div class="tab-buttons">
-    <div class="tab active" data-tab="explainTab">Come si calcolano</div>
-    <div class="tab" data-tab="resultsTab">Risultati</div>
+    <!-- spiegazione -->
+    <div id="explainTab" class="tab-content active">
+      <div id="explainText">Compila i dati e premi <em>Calcola</em>.</div>
+    </div>
+
+    <!-- risultati -->
+    <div id="resultsTab" class="tab-content">
+      <table id="table">
+        <thead><tr><th>Descrizione</th><th>Formula / Credito</th><th>Importo (€)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h3 style="margin:20px 0 8px">Scadenze 2026</h3>
+      <table id="sched">
+        <thead><tr><th>Data</th><th>Dettaglio</th><th>Importo (€)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
-  <div id="explainTab" class="tab-content active"><div id="explainText">Compila i dati e premi <em>Calcola</em>.</div></div>
+  <script>
+    // helper
+    const $ = id => document.getElementById(id);
+    const fmt = n => n.toLocaleString('it-IT',{minimumFractionDigits:2});
+    // preset reddito
+    ['10000','15000','20000','30000','45000','60000','85000'].forEach(v=>{
+      const b = document.createElement('button');
+      b.type='button';
+      b.textContent = Number(v).toLocaleString('it-IT')+'€';
+      b.onclick = ()=> { $('lordo').value=v; };
+      $('preset').appendChild(b);
+    });
+    // tabs switch
+    document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active'); $(t.dataset.tab).classList.add('active');
+    });
 
-  <div id="resultsTab" class="tab-content">
-    <table id="table"><thead><tr><th>Descrizione</th><th>Formula / Credito</th><th>Importo</th></tr></thead><tbody></tbody></table>
-    <h3 style="margin:18px 0 6px">Scadenze&nbsp;2026</h3>
-    <table id="sched"><thead><tr><th>Data</th><th>Dettaglio</th><th>Importo</th></tr></thead><tbody></tbody></table>
-  </div>
-</div>
+    function buildExplanation({lordo, coeff, aliq, netto, baseImp, imp, contr, accImpTot, accConTot, contrPrev, creditTotal}) {
+      return `
+        <p>In regime forfettario paghi l'imposta sostitutiva al <strong>${(aliq*100).toFixed(0)}%</strong> 
+        e i contributi INPS al <strong>26%</strong> non sul totale incassato ma sul <em>reddito netto imponibile</em>.</p>
+        <p><mark>${lordo.toLocaleString('it-IT')}€ × ${(coeff*100).toFixed(0)}% = ${fmt(netto)}€</mark> (reddito netto imponibile)</p>
+        <ul>
+          <li>Imposta sostitutiva: ${fmt(netto)}€ × ${(aliq*100).toFixed(0)}% = <strong>${fmt(imp)}€</strong></li>
+          <li>Contributi INPS: ${fmt(netto)}€ × 26% = <strong>${fmt(contr)}€</strong></li>
+        </ul>
+        <p>Saldo totale: <strong>${fmt(imp+contr)}€</strong> (di cui ${fmt(imp)}€ imposta e ${fmt(contr)}€ contributi).</p>
+        <h4>Acconti per il 2026:</h4>
+        <ul>
+          <li>Imposta sostitutiva (100%): <strong>${fmt(imp)}€</strong></li>
+          <li>Contributi INPS (80%): <strong>${fmt(contr*0.8)}€</strong></li>
+        </ul>
+        ${contrPrev>0?`<p>Hai dedotto contributi 2024 per <strong>${fmt(contrPrev)}€</strong>.</p>`:''}
+        ${creditTotal>0?`<p>Hai acconti 2024 per <strong>${fmt(creditTotal)}€</strong> che verranno scalati.</p>`:''}
+      `;
+    }
 
-<script>
-const $=id=>document.getElementById(id), fmt=n=>n.toLocaleString('it-IT',{minimumFractionDigits:2});
-/* preset reddito */
-['10000','15000','30000','45000','60000','85000'].forEach(v=>{const b=document.createElement('button');b.textContent=Number(v).toLocaleString('it-IT')+'€';b.onclick=()=>$('lordo').value=v;$('preset').appendChild(b);});
-/* toggle advanced */
-$('advBtn').onclick=()=>$('adv').style.display=$('adv').style.display==='block'?'none':'block';
-/* tab switching */
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));t.classList.add('active');$(t.dataset.tab).classList.add('active')});
-/* explanation builder */
-function expText({lordo,coeff,aliq,netto,imp,contr,accImp,accCon,contrTxt,credTxt}){
-return `
-In regime forfettario paghi l'imposta sostitutiva al <strong>${aliq*100}%</strong> e il 26% di contributi INPS non sul totale incassato (<strong>${lordo.toLocaleString('it-IT')}€</strong>) ma sul reddito <u>netto</u> (= reddito lordo × coefficiente).
-
-<p><mark>${lordo.toLocaleString('it-IT')}€ × ${(coeff*100).toFixed(0)}% = ${fmt(netto)}€</mark></p>
-
-<ul>
-<li>Imposta sostitutiva: <strong>${fmt(imp)}€</strong></li>
-<li>Contributi INPS: <strong>${fmt(contr)}€</strong></li>
-<li>Saldo complessivo: <strong>${fmt(imp+contr)}€</strong></li>
-</ul>
-<p>Acconti da versare per il 2026: imposta <strong>${fmt(accImp)}€</strong> (100 %) + contributi <strong>${fmt(accCon)}€</strong> (80 %).</p>
-${contrTxt||''}${credTxt||''}
-`;}
-/* calcola */
-$('btnCalc').onclick=()=>{
-  const aliq=+$('aliq').value, coeff=+$('coeff').value, lordo=+$('lordo').value||0;if(!lordo)return alert('Inserisci reddito');const contrPrev=+$('contrPrev').value||0, accImpPrev=+$('accImpPrev').value||0, accConPrev=+$('accConPrev').value||0;
-  const netto=lordo*coeff, baseImp=Math.max(0,netto-contrPrev);
-  const imp=baseImp*aliq, accImp=imp; /* Gestione separata */
-  const contr=netto*0.2607, accCon=contr*0.8;
-  $('explainText').innerHTML=expText({lordo,coeff,aliq,netto,imp,contr,accImp,accCon,
-    contrTxt:contrPrev?`<p>Hai dedotto <strong>${fmt(contrPrev)}€</strong> di contributi 2024.</p>`:'',
-    credTxt:(accImpPrev+accConPrev)?`<p>Hai già versato acconti 2024 per <strong>${fmt(accImpPrev+accConPrev)}€</strong> che verranno scalati dai saldi.</p>`:''
-  });
-  /* tabella risultati */
-  const tb=$('table').querySelector('tbody');tb.innerHTML='';
-  const add=(d,f,v)=>tb.insertAdjacentHTML('beforeend',`<tr><td>${d}</td><td>${f}</td><td>${fmt(v)}</td></tr>`), hdr=t=>tb.insertAdjacentHTML('beforeend',`<tr class="section-header"><td colspan="3">${t}</td></tr>`);
-  hdr('Imposta');add('Saldo imposta','',imp);add('Acconto imposta 100 %','',accImp);
-  hdr('Contributi');add('Saldo contributi 26%','',contr);add('Acconto contributi 80 %','',accCon);
-  hdr('Totale');add('Saldo + acconti','',imp+contr+accImp+accCon);
-  /* scadenze */
-  const sc=$('sched').querySelector('tbody');sc.innerHTML='';
-  sc.insertAdjacentHTML('beforeend',`<tr><td>30/06/2026</td><td>Saldo + 1° acconti</td><td>${fmt(imp+contr+accImp/2+accCon/2)}</td></tr>`);
-  sc.insertAdjacentHTML('beforeend',`<tr><td>30/11/2026</td><td>2° acconti</td><td>${fmt(accImp/2+accCon/2)}</td></tr>`);
-  $('tabs').style.display='block';document.querySelector('[data-tab="resultsTab"]').click();
-};
-</script>
+    $('btnCalc').onclick = ()=>{
+      // input
+      const anno = 2025;
+      const aliq = parseFloat($('aliq').value);
+      const coeff= parseFloat($('coeff').value);
+      const lordo= parseFloat($('lordo').value) || 0;
+      if(!lordo) return alert('Inserisci il reddito lordo');
+      const contrPrev= parseFloat($('contrPrev').value)||0;
+      const accImpPrev= parseFloat($('accImpPrev').value)||0;
+      const accConPrev= parseFloat($('accConPrev').value)||0;
+      // calcoli
+      const netto = lordo * coeff;
+      const baseImp = Math.max(0, netto - contrPrev);
+      const imp    = baseImp * aliq;
+      const contr  = netto * 0.26;
+      const accImpTot = imp;          // 100% saldo
+      const accConTot = contr * 0.8;  // 80% contributi
+      // explanation
+      $('explainText').innerHTML = buildExplanation({
+        lordo, coeff, aliq, netto, baseImp, imp, contr, accImpTot, accConTot,
+        contrPrev, creditTotal: accImpPrev + accConPrev
+      });
+      // tabella risultati
+      const tb = $('table').querySelector('tbody'); tb.innerHTML = '';
+      const add = (d,f,v)=>tb.insertAdjacentHTML('beforeend',`<tr><td>${d}</td><td>${f}</td><td>${fmt(v)}</td></tr>`);
+      const hdr = t=>tb.insertAdjacentHTML('beforeend',`<tr class="section-header"><td colspan="3">${t}</td></tr>`);
+      hdr('Imposta sostitutiva');
+      add('Saldo imposta (30/06/'+(anno+1)+')',`${fmt(baseImp)} × ${(aliq*100).toFixed(0)}%`,imp);
+      add('Acconto imposta (100%)','',accImpTot);
+      hdr('Contributi INPS');
+      add('Saldo contributi (30/06/'+(anno+1)+')',`${fmt(netto)} × 26%`,contr);
+      add('Acconto contributi (80%)','',accConTot);
+      hdr('Totale');
+      add('Totale saldo + acconti','',imp+contr+accImpTot+accConTot);
+      // scadenze
+      const sc = $('sched').querySelector('tbody'); sc.innerHTML = '';
+      const addSc=(d,desc,v)=>sc.insertAdjacentHTML('beforeend',`<tr><td>${d}</td><td>${desc}</td><td>${fmt(v)}</td></tr>`);
+      const next = anno+1;
+      addSc(`30/06/${next}`,'Saldo + 1° acconti',imp+contr + accImpTot/2 + accConTot/2);
+      addSc(`30/11/${next}`,'2° acconti',accImpTot/2 + accConTot/2);
+      // mostra tabs
+      $('tabs').style.display = 'block';
+      document.querySelector('[data-tab="resultsTab"]').click();
+    };
+  </script>
 </body>
 </html>
