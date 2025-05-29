@@ -227,7 +227,7 @@ document.getElementById("btnCalcola").onclick=()=>{
   const intro=`
     <p>In regime forfettario paghi imposte e contributi non sul totale incassato ma sul <strong>reddito lordo</strong> moltiplicato per il tuo <strong>coefficiente di redditività</strong>.</p>
     <p>Il coefficiente dipende dal codice ATECO; nel tuo caso è <strong>${(coeff*100).toFixed(0)} %</strong>.</p>
-    <p>Nello specifico paghi l’aliquota imposta sostitutiva del <strong>${(aliq*100)} %</strong> e il <strong>26,07 %</strong> di contributi INPS.</p>`+
+    <p>Nello specifico paghi l’aliquota <span class="highlight-yellow">imposta sostitutiva del <strong>${(aliq*100)} %</strong> e il <strong>26,07 %</strong> di contributi INPS.</span></p>`+
     (aliq===0.05?`<p style="color:#d32f2f;"><em>L’aliquota ridotta al 5 % si applica solo per i primi 5 anni di attività; dal sesto anno passa al 15 %.</em></p>`:"");
 
   const formule=`
@@ -252,9 +252,9 @@ document.getElementById("btnCalcola").onclick=()=>{
 
   const riepilogo=`
     <h3>Riepilogo importi</h3>
-    <ul><li><strong>Saldi</strong>: ${euro(totSaldo)}</li>
-        <li><strong>Acconti</strong>: ${euro(totAcc)}</li>
-        <li><strong>Totale complessivo</strong>: ${euro(totPay)}</li></ul>`;
+    <ul><li><strong>Saldi</strong>: <span class="highlight-yellow"> ${euro(totSaldo)}</span></li>
+        <li><strong>Acconti</strong>: <span class="highlight-yellow"> ${euro(totAcc)}</span></li>
+        <li><strong>Totale complessivo</strong>: <span class="highlight-yellow"> ${euro(totPay)}</span></li></ul>`;
 
   document.getElementById("come-si-calcolano-tab").innerHTML=intro+formule+saldi+acconti+riepilogo;
 
