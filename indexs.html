@@ -47,6 +47,16 @@ th{background:#f0f0f0;font-weight:600}
 /* responsive */
 @media(max-width:768px){.reddito-buttons button{flex:1 1 48%}}
 @media(max-width:480px){.reddito-buttons button{flex:1 1 100%}#come-si-calcolano-tab *{line-height:20px}}
+  .highlight-yellow {
+    background-color: #fff9b0; /* giallo pastello */
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
 </style>
 </head>
 <body>
@@ -57,7 +67,7 @@ th{background:#f0f0f0;font-weight:600}
 
   <!-- input -->
   <div class="calcolatore-container">
-    <label>Anno di riferimento
+    <label><span class="highlight-yellow">Anno</span> di riferimento
       <select id="anno"><option value="2025" selected>2025</option><option value="2024">2024</option></select>
     </label>
     <label>Aliquota imposta sostitutiva
