@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Simulatore Gestione Separata INPS 2025</title>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+ /* ---------- Base layout ---------- */
+ :root{
+  --bg:#e0f2fe;
+  --card-bg:#0f172a;
+  --accent:#38bdf8;
+  --accent-hover:#0ea5e9;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;padding:2rem;font-family:"Poppins",sans-serif;background:var(--bg);color:#0f172a;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+ h1{margin:0 0 2rem;font-size:2rem;font-weight:600;text-align:center;color:#0f172a}
+ a{color:var(--accent)}
+
+ /* ---------- Calculator Card ---------- */
+ .calculator{background:var(--card-bg);color:#f1f5f9;padding:2rem;border-radius:1.25rem;width:100%;max-width:560px;box-shadow:0 15px 25px rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+ .calculator label{display:block;margin-top:1.25rem;font-size:.9rem}
+ .calculator select,.calculator input{margin-top:.35rem;padding:.6rem .75rem;width:100%;background:#1e293b;border:1px solid #334155;border-radius:.65rem;color:#e2e8f0;font-size:.9rem}
+ .calculator button.action{margin-top:2rem;width:100%;padding:.9rem 1.2rem;background:var(--accent);border:none;border-radius:.8rem;color:#fff;font-size:1.05rem;font-weight:600;cursor:pointer;transition:.2s}
+ .calculator button.action:hover{background:var(--accent-hover)}
+ .preset-buttons{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem;margin-top:.6rem}
+ .preset-buttons button{padding:.45rem 0;background:#334155;border:none;border-radius:.6rem;color:#f1f5f9;font-size:.8rem;cursor:pointer;transition:.2s}
+ .preset-buttons button:hover{background:#475569}
+
+ /* ---------- Advanced options ---------- */
+ .advanced-toggle{margin-top:1.5rem;width:100%;background:none;border:1px solid var(--accent);color:var(--accent);padding:.6rem;border-radius:.8rem;font-size:.9rem;cursor:pointer;transition:.25s}
+ .advanced-toggle:hover{background:var(--accent);color:#fff}
+ .advanced{margin-top:1rem;display:none;animation:fade .4s ease-in-out}
+ @keyframes fade{from{opacity:0;transform:translateY(-6px)}to{opacity:1}}
+
+ /* ---------- Results Notebook ---------- */
+ .notebook{margin-top:3rem;width:100%;max-width:1000px;background:#fefefe;border-radius:1rem;padding:2rem 1.5rem;box-shadow:0 8px 20px rgba(0,0,0,.15);overflow-x:auto}
+ table{border-collapse:collapse;width:100%;font-size:.85rem}
+ th,td{border:1px solid #cbd5e1;padding:.55rem .6rem;text-align:left}
+ th{background:#e2e8f0;font-weight:600}
+ .section-header td{background:#cbd5e1;font-weight:600;text-align:center}
+
+ /* ---------- Note ---------- */
+ .note{margin-top:2rem;font-size:.85rem;text-align:center;color:#334155;max-width:900px}
+ @media(max-width:600px){h1{font-size:1.6rem}}
+</style>
+</head>
+<body>
+<h1>Simulatore Gestione Separata INPS 2025</h1>
+
+<div class="calculator" id="calcCard">
+ <form id="taxForm" onsubmit="return false;">
+  <!-- Input fields -->
+  <label>Anno di riferimento
+   <select id="anno">
+    <option value="2025" selected>2025</option>
+    <option value="2024">2024</option>
+   </select>
+  </label>
+  <label>Aliquota Imposta Sostitutiva
+   <select id="aliquota_imposta">
+    <option value="0.05" selected>5%</option>
+    <option value="0.15">15%</option>
+   </select>
+  </label>
+  <label>Coefficiente di redditivit&agrave;
+   <select id="coeff">
+    <option value="0.86">86%</option>
+    <option value="0.78" selected>78%</option>
+    <option value="0.67">67%</option>
+    <option value="0.40">40%</option>
+   </select>
+  </label>
+  <label>Reddito lordo (&euro;)
+   <input type="number" id="reddito_lordo" min="0" step="100" required>
+   <div class="preset-buttons" id="presetBtnGroup"></div>
+  </label>
+
+  <!-- Advanced toggle -->
+  <button type="button" class="advanced-toggle" id="advToggle">Opzioni aggiuntive (acconti e contributi 2024)</button>
+  <div class="advanced" id="advancedFields">
+    <label>Contributi INPS versati nel 2025 (deducibili) (&euro;)
+      <input type="number" id="contrib_deduc_prev" min="0" step="100" value="0">
+    </label>
+    <label>Acconti imposta versati nel 2025 (&euro;)
+      <input type="number" id="acconti_imposta_prev" min="0" step="100" value="0">
+    </label>
+    <label>Acconti contributi INPS versati nel 2025 (&euro;)
+      <input type="number" id="acconti_contrib_prev" min="0" step="100" value="0">
+    </label>
+  </div>
+
+  <button type="button" class="action" id="btnCalcola">Calcola</button>
+ </form>
+</div>
+
+<div id="output" class="notebook" style="display:none;">
+ <h2 style="margin-top:0">Risultati dettagliati</h2>
+ <table id="resultsTable">
+  <thead><tr><th>Descrizione</th><th>Formula / Credito</th><th>Importo (&euro;)</th></tr></thead>
+  <tbody></tbody>
+ </table>
+
+ <h3 style="margin-top:2rem">Scadenze pagamento (anno successivo)</h3>
+ <table id="scheduleTable">
+  <thead><tr><th>Data</th><th>Dettaglio</th><th>Importo (&euro;)</th></tr></thead>
+  <tbody></tbody>
+ </table>
+</div>
+
+<p class="note">Dati aggiornati a maggio 2025 (Circolare INPS n.27/2025 – aliquota 26,07 %). Gli acconti 2026 sono calcolati 50 % a giugno e 50 % a novembre. Strumento indicativo: per conferme rivolgersi al proprio consulente.</p>
+
+<script>
+// --------- Utility ---------
+const fmt=n=>n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// --------- Preset buttons ---------
+(()=>{
+ const presets=[10000,15000,20000,25000,30000,35000,40000,45000,50000,55000,60000,65000,70000,75000,80000,85000];
+ const group=document.getElementById('presetBtnGroup');
+ presets.forEach(v=>{
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.textContent=(v/1000)+'k€';
+  btn.onclick=()=>document.getElementById('reddito_lordo').value=v;
+  group.appendChild(btn);
+ });
+})();
+
+// --------- Toggle advanced fields ---------
+const advToggle=document.getElementById('advToggle');
+const advBox=document.getElementById('advancedFields');
+advToggle.addEventListener('click',()=>{
+ advBox.style.display=advBox.style.display==='block'?'none':'block';
+});
+
+// --------- Main calculation ---------
+function calcola(){
+ const anno=+document.getElementById('anno').value;
+ const aliquota=+document.getElementById('aliquota_imposta').value;
+ const coeff=+document.getElementById('coeff').value;
+ const lordo=+document.getElementById('reddito_lordo').value;
+ if(!lordo){alert('Inserisci il reddito lordo');return;}
+ const contribDeduc=+document.getElementById('contrib_deduc_prev').value||0;
+ let creditImp=+document.getElementById('acconti_imposta_prev').value||0;
+ let creditCon=+document.getElementById('acconti_contrib_prev').value||0;
+
+ const netto=lordo*coeff;
+ const baseImp=Math.max(0,netto-contribDeduc);
+
+ // ---- Imposta ----
+ const saldoImp=baseImp*aliquota;
+ const accImpTot=baseImp*0.05;
+ const [accImp1,accImp2]=[accImpTot/2,accImpTot/2];
+ const coveredSaldoImp=Math.min(saldoImp,creditImp);
+ creditImp-=coveredSaldoImp;
+ const saldoImpPay=saldoImp-coveredSaldoImp;
+ const coveredAccImp1=Math.min(accImp1,creditImp);
+ creditImp-=coveredAccImp1;
+ const accImp1Pay=accImp1-coveredAccImp1;
+ const coveredAccImp2=Math.min(accImp2,creditImp);
+ creditImp-=coveredAccImp2;
+ const accImp2Pay=accImp2-coveredAccImp2;
+
+ // ---- Contributi ----
+ const saldoCon=netto*0.2607;
+ const accConTot=saldoCon*0.80;
+ const [accCon1,accCon2]=[accConTot/2,accConTot/2];
+ const coveredSaldoCon=Math.min(saldoCon,creditCon);
+ creditCon-=coveredSaldoCon;
+ const saldoConPay=saldoCon-coveredSaldoCon;
+ const coveredAccCon1=Math.min(accCon1,creditCon);
+ creditCon-=coveredAccCon1;
+ const accCon1Pay=accCon1-coveredAccCon1;
+ const coveredAccCon2=Math.min(accCon2,creditCon);
+ creditCon-=coveredAccCon2;
+ const accCon2Pay=accCon2-coveredAccCon2;
+
+ // ---- Totals ----
+ const totalAccPay=accImp1Pay+accImp2Pay+accCon1Pay+accCon2Pay;
+ const totalPay=saldoImpPay+saldoConPay+totalAccPay;
+
+ // ---- Build tables ----
+ const tbody=document.querySelector('#resultsTable tbody');
+ tbody.innerHTML='';
+ const addHeader=t=>tbody.insertAdjacentHTML('beforeend',`<tr class="section-header"><td colspan="3">${t}</td></tr>`);
+ const addRow=(d,f,v)=>tbody.insertAdjacentHTML('beforeend',`<tr><td>${d}</td><td>${f}</td><td>${fmt(v)}</td></tr>`);
+
+ addHeader('Reddito e imponibile');
+ addRow('Reddito Lordo','',lordo);
+ addRow('Reddito Netto',`${lordo.toLocaleString('it-IT')} × ${coeff}`,netto);
+ addRow('Contributi deducibili 2025','- '+fmt(contribDeduc),-contribDeduc);
+ addRow('Base imponibile imposta',`${fmt(netto)} - ${fmt(contribDeduc)}`,baseImp);
+
+ addHeader('Imposta sostitutiva');
+ addRow(`Saldo (30/06/${anno+1})`,`${fmt(baseImp)} × ${(aliquota*100)}%`,saldoImp);
+ addRow('Credito sul saldo','',-coveredSaldoImp);
+ addRow('Saldo da versare','',saldoImpPay);
+ addRow(`1° acconto 50 % (30/06)`,``,accImp1);
+ addRow('Credito sul 1° acconto','',-coveredAccImp1);
+ addRow('1° acconto da versare','',accImp1Pay);
+ addRow(`2° acconto 50 % (30/11)`,``,accImp2);
+ addRow('Credito sul 2° acconto','',-coveredAccImp2);
+ addRow('2° acconto da versare','',accImp2Pay);
+ if(creditImp>0) addRow('Credito imposta residuo','',creditImp);
+
+ addHeader('Contributi INPS Gest. Separata');
+ addRow(`Saldo (30/06/${anno+1})`,`${fmt(netto)} × 26,07%`,saldoCon);
+ addRow('Credito sul saldo','',-coveredSaldoCon);
+ addRow('Saldo da versare','',saldoConPay);
+ addRow(`1° acconto 50 % (30/06)`,``,accCon1);
+ addRow('Credito sul 1° acconto','',-coveredAccCon1);
+ addRow('1° acconto da versare','',accCon1Pay);
+ addRow(`2° acconto 50 % (30/11)`,``,accCon2);
+ addRow('Credito sul 2° acconto','',-coveredAccCon2);
+ addRow('2° acconto da versare','',accCon2Pay);
+ if(creditCon>0) addRow('Credito contributi residuo','',creditCon);
+
+ addHeader('Totali');
+ addRow('Totale acconti da versare','Σ',totalAccPay);
+ addRow('Totale da versare','',totalPay);
+
+ // Schedule
+ const sched=document.querySelector('#scheduleTable tbody');
+ sched.innerHTML='';
+ const next=anno+1;
+ const schedRow=(d,desc,amt)=>sched.insertAdjacentHTML('beforeend',`<tr><td>${d}</td><td>${desc}</td><td>${fmt(amt)}</td></tr>`);
+ schedRow(`30/06/${next}`,'Saldo + 1° acconti',saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
+ schedRow(`30/11/${next}`,'2° acconti',accImp2Pay+accCon2Pay);
+
+ document.getElementById('output').style.display='block';
+}
+
+// Bind button click
+document.getElementById('btnCalcola').addEventListener('click',calcola);
+
+</script>
+
+</body>
+</html>
