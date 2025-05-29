@@ -223,17 +223,17 @@ document.getElementById("btnCalcola").onclick=()=>{
 
   const formule=`
     <h3>Dati di partenza</h3>
-    <p><strong>Reddito lordo</strong>: ${euro(lordo)}</p>
-    <p><strong>Coefficiente</strong>: ${(coeff*100).toFixed(0)} %</p>
+    <p><strong>Fatture incassate nel 2025:</strong>: ${euro(lordo)}</p>
+    <p><strong>Coefficiente di redditività</strong>: ${(coeff*100).toFixed(0)} %</p>
     <p><strong>Reddito netto</strong>: ${euro(netto)}</p>`+
-    (contribDeduc>0?`<p><strong>Reddito imponibile</strong>: ${euro(impon)} (dopo deduzione contributi)</p>`:"")+
+    (contribDeduc>0?`<p><strong>Reddito netto</strong>: ${euro(impon)} (dopo deduzione contributi)</p>`:"")+
     `<h3>Calcolo delle imposte e contributi</h3>
      <p>${(aliq*100)} % × ${(contribDeduc>0?"reddito imponibile":"reddito netto")} (<strong>${euro(impon)}</strong>) = <strong>${euro(saldoImp)}</strong></p>
      <p>26,07 % × reddito netto (<strong>${euro(netto)}</strong>) = <strong>${euro(saldoCon)}</strong></p>`;
 
   const saldi=`
     <h3>SALDI (${anno+1})</h3>
-    <ul><li>Imposta: <strong>${euro(saldoImpPay)}</strong></li>
+    <ul><li>Di Imposta pagherai il ${(aliq*100)} % di : <strong>${euro(saldoImpPay)}</strong></li>
         <li>Contributi: <strong>${euro(saldoConPay)}</strong></li></ul>`;
 
   const acconti=`
