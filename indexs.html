@@ -7,11 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* ---------- Base ---------- */
+/* ---------- Base palette ---------- */
 :root{
   --accent:#00bcd4;
   --accent-light:#e0f7fa;
-  --accent-dark:#0097a7;
   --bg:#ffffff;
   --text:#333;
   --border:#ccc;
@@ -43,14 +42,15 @@ header{text-align:center;margin:2rem 0}
 label{display:block;margin-top:10px;font-weight:600}
 input,select,button{
   width:100%;padding:8px;margin-top:5px;
-  border-radius:4px;border:1px solid var(--border);
-  font-family:inherit
+  border-radius:4px;border:1px solid var(--border);font-family:inherit
 }
 button{
   background:#fff;color:var(--text);cursor:pointer;font-size:16px;
   transition:.3s;margin-top:10px
 }
 button:hover{background:#f0f0f0}
+
+/* Preset income buttons */
 .reddito-buttons{
   display:flex;flex-wrap:wrap;gap:10px;margin-top:10px
 }
@@ -59,6 +59,15 @@ button:hover{background:#f0f0f0}
   color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:14px
 }
 .reddito-buttons button:hover{background:#d5d5d5}
+
+/* ---------- Advanced options ---------- */
+.advanced-toggle{
+  background:#fff;border:1px solid var(--border);
+  padding:8px;border-radius:4px;font-weight:600;cursor:pointer
+}
+.advanced-toggle:hover{background:#f0f0f0}
+.advanced{display:none;margin-top:15px;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(-6px)}to{opacity:1}}
 
 /* ---------- Tabs ---------- */
 .tabs{display:flex;gap:10px;margin:30px 0;flex-wrap:wrap}
@@ -77,26 +86,15 @@ button:hover{background:#f0f0f0}
 }
 .tab-content.active{display:block}
 
-/* ---------- Notebook look ---------- */
-#come-si-calcolano-tab{
-  position:relative;overflow:hidden
-}
+/* Notebook look */
+#come-si-calcolano-tab{position:relative;overflow:hidden}
 #come-si-calcolano-tab::before{
   content:\"\";position:absolute;inset:0;pointer-events:none;
   background-image:repeating-linear-gradient(to bottom,rgba(197,197,197,.2) 0,rgba(197,197,197,.2) 1px,transparent 1px,transparent 24px)
 }
 #come-si-calcolano-tab *{line-height:25px}
-#dettaglio-pagamenti-tab{
-  position:relative;overflow:hidden
-}
-#dettaglio-pagamenti-tab::before{
-  content:\"\";position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(to right,rgba(197,197,197,.2) 1px,transparent 1px),
-                    linear-gradient(to bottom,rgba(197,197,197,.2) 1px,transparent 1px);
-  background-size:25px 25px
-}
 
-/* ---------- Tables ---------- */
+/* Tables */
 .table-container{
   overflow-x:auto;border:1px solid var(--border);
   padding:10px;border-radius:4px;background:#fff
@@ -106,62 +104,39 @@ th,td{padding:10px;border:1px solid #ddd;text-align:left;font-size:.95em}
 th{background:#f0f0f0;font-weight:600}
 .section-header td{background:var(--accent-light);font-weight:600;text-align:center}
 
-/* ---------- Download button ---------- */
-#downloadRecap{
-  background:#fff;color:var(--text);border:1px solid var(--border);
-  margin:20px auto;padding:10px 20px;border-radius:4px;
-  cursor:pointer;transition:.3s;font-size:16px;display:block;max-width:300px;
-  box-shadow:0 2px 5px rgba(0,0,0,.2)
-}
-#downloadRecap:hover{background:#f0f0f0}
-
-/* ---------- Responsive ---------- */
-@media(max-width:768px){
-  .reddito-buttons button{flex:1 1 48%}
-  #downloadRecap{font-size:14px;padding:8px 16px}
-}
+/* Responsive tweaks */
+@media(max-width:768px){.reddito-buttons button{flex:1 1 48%}}
 @media(max-width:480px){
   .reddito-buttons button{flex:1 1 100%}
-  #downloadRecap{font-size:12px;width:100%}
   #come-si-calcolano-tab *{line-height:20px}
 }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Simulatore Gestione Separata INPS 2025</h1>
-</header>
+<header><h1>Simulatore Gestione Separata INPS 2025</h1></header>
 
 <div class="container">
 
   <div id="disclaimer">
-    Strumento indicativo: per conferme rivolgersi al proprio consulente.
+    Strumento indicativo: per conferme rivolgersi al proprio consulente.<br>
     Dati aggiornati a maggio 2025 (Circolare INPS 27/2025 – aliquota 26,07 %).
   </div>
 
   <!-- CALCOLATORE -->
   <div class="calcolatore-container">
     <label>Anno di riferimento
-      <select id="anno">
-        <option value="2025" selected>2025</option>
-        <option value="2024">2024</option>
-      </select>
+      <select id="anno"><option value="2025" selected>2025</option><option value="2024">2024</option></select>
     </label>
 
     <label>Aliquota imposta sostitutiva
-      <select id="aliquota_imposta">
-        <option value="0.05" selected>5 %</option>
-        <option value="0.15">15 %</option>
-      </select>
+      <select id="aliquota_imposta"><option value="0.05" selected>5 %</option><option value="0.15">15 %</option></select>
     </label>
 
     <label>Coefficiente di redditività
       <select id="coeff">
-        <option value="0.86">86 %</option>
-        <option value="0.78" selected>78 %</option>
-        <option value="0.67">67 %</option>
-        <option value="0.40">40 %</option>
+        <option value="0.86">86 %</option><option value="0.78" selected>78 %</option>
+        <option value="0.67">67 %</option><option value="0.40">40 %</option>
       </select>
     </label>
 
@@ -170,10 +145,25 @@ th{background:#f0f0f0;font-weight:600}
       <div class="reddito-buttons" id="presetBtnGroup"></div>
     </label>
 
+    <!-- Toggle avanzato -->
+    <button type="button" class="advanced-toggle" id="advToggle">Opzioni aggiuntive (acconti 2025)</button>
+
+    <div class="advanced" id="advancedFields">
+      <label>Contributi INPS deducibili versati 2025 (€)
+        <input type="number" id="contrib_deduc_prev" min="0" step="100" value="0">
+      </label>
+      <label>Acconti imposta versati 2025 (€)
+        <input type="number" id="acconti_imposta_prev" min="0" step="100" value="0">
+      </label>
+      <label>Acconti contributi INPS versati 2025 (€)
+        <input type="number" id="acconti_contrib_prev" min="0" step="100" value="0">
+      </label>
+    </div>
+
     <button type="button" id="btnCalcola">Calcola</button>
   </div>
 
-  <!-- RISULTATI & SCHEDE -->
+  <!-- RISULTATI -->
   <div class="risultati-container" id="resultBox">
 
     <div class="tabs">
@@ -181,7 +171,6 @@ th{background:#f0f0f0;font-weight:600}
       <div class="tab" data-tab="come-si-calcolano-tab">Come si calcolano</div>
     </div>
 
-    <!-- TAB RISULTATI -->
     <div id="risultati-tab" class="tab-content active">
       <div class="table-container">
         <table id="resultsTable">
@@ -199,7 +188,6 @@ th{background:#f0f0f0;font-weight:600}
       </div>
     </div>
 
-    <!-- TAB SPIEGAZIONE -->
     <div id="come-si-calcolano-tab" class="tab-content"></div>
   </div>
 
@@ -210,150 +198,152 @@ th{background:#f0f0f0;font-weight:600}
 const fmt = n => n.toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2});
 const euro = v => v.toLocaleString("it-IT",{style:"currency",currency:"EUR"});
 
-// ---------- Preset buttons ----------
-(()=>{
-  const presets=[10000,15000,20000,25000,30000,35000,40000,45000,50000,60000];
+// Preset reddito
+(()=>{const presets=[10000,15000,20000,25000,30000,35000,40000];
   const box=document.getElementById("presetBtnGroup");
-  presets.forEach(v=>{
-    const b=document.createElement("button");
-    b.type="button";b.textContent=(v/1000)+"k€";
-    b.onclick=()=>document.getElementById("reddito_lordo").value=v;
-    box.appendChild(b);
-  });
-})();
+  presets.forEach(v=>{const b=document.createElement("button");
+    b.type="button";b.textContent=(v/1000)+"k€";b.onclick=()=>document.getElementById("reddito_lordo").value=v;
+    box.appendChild(b);});})();
 
-// ---------- Tab behaviour ----------
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick = ()=>{
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
-    tab.classList.add("active");
-    document.getElementById(tab.dataset.tab).classList.add("active");
-  };
+// Toggle avanzato
+document.getElementById("advToggle").onclick=()=>{
+  const a=document.getElementById("advancedFields");
+  a.style.display=a.style.display==="block"?"none":"block";
+};
+
+// Tabs
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+  t.classList.add("active");document.getElementById(t.dataset.tab).classList.add("active");
 });
 
-// ---------- Calculation ----------
-document.getElementById("btnCalcola").onclick = ()=>{
-  const anno = +document.getElementById("anno").value;
-  const aliquota = +document.getElementById("aliquota_imposta").value;
-  const coeff = +document.getElementById("coeff").value;
-  const lordo = +document.getElementById("reddito_lordo").value;
+// ---------- Calcolo ----------
+document.getElementById("btnCalcola").onclick=()=>{
+  const anno=+document.getElementById("anno").value;
+  const aliquota=+document.getElementById("aliquota_imposta").value;
+  const coeff=+document.getElementById("coeff").value;
+  const lordo=+document.getElementById("reddito_lordo").value;
   if(!lordo){alert("Inserisci il reddito lordo");return;}
 
-  // --- Dati fissi / ipotesi ---
-  const contribAliquota = 0.2607;
+  const contribDeduc=+document.getElementById("contrib_deduc_prev").value||0;
+  let creditImp=+document.getElementById("acconti_imposta_prev").value||0;
+  let creditCon=+document.getElementById("acconti_contrib_prev").value||0;
 
-  // --- Calcoli reddito ---
-  const netto = lordo*coeff;
-  const baseImp = netto;                    // Contributi deducibili non gestiti in questa versione
+  const netto=lordo*coeff;
+  const baseImp=Math.max(0,netto-contribDeduc);
 
   // --- IMPOSTA ---
-  const saldoImp = baseImp*aliquota;        // saldo effettivo
-  let creditImp = 0;                        // crediti non gestiti ora
-  const coveredSaldoImp = Math.min(saldoImp,creditImp);
-  creditImp -= coveredSaldoImp;
-  const saldoImpPay = saldoImp - coveredSaldoImp;
+  const saldoImp=baseImp*aliquota;
+  const coveredSaldoImp=Math.min(saldoImp,creditImp);
+  creditImp-=coveredSaldoImp;
+  const saldoImpPay=saldoImp-coveredSaldoImp;
 
-  // **Acconti 100 % del saldo effettivamente da versare**
-  const accImpTot = saldoImpPay;
-  const accImp1 = accImpTot/2, accImp2 = accImpTot/2;
-  const coveredAccImp1 = Math.min(accImp1,creditImp);
-  creditImp -= coveredAccImp1;
-  const accImp1Pay = accImp1-coveredAccImp1;
-  const coveredAccImp2 = Math.min(accImp2,creditImp);
-  creditImp -= coveredAccImp2;
-  const accImp2Pay = accImp2-coveredAccImp2;
+  const accImpTot=saldoImpPay;            // 100 % del saldo effettivo
+  const accImp1=accImpTot/2, accImp2=accImpTot/2;
+  const coveredAccImp1=Math.min(accImp1,creditImp);
+  creditImp-=coveredAccImp1;
+  const accImp1Pay=accImp1-coveredAccImp1;
+  const coveredAccImp2=Math.min(accImp2,creditImp);
+  creditImp-=coveredAccImp2;
+  const accImp2Pay=accImp2-coveredAccImp2;
 
   // --- CONTRIBUTI ---
-  const saldoCon = netto*contribAliquota;
-  let creditCon = 0;
-  const coveredSaldoCon = Math.min(saldoCon,creditCon);
-  creditCon -= coveredSaldoCon;
-  const saldoConPay = saldoCon-coveredSaldoCon;
+  const contribAliquota=0.2607;
+  const saldoCon=netto*contribAliquota;
+  const coveredSaldoCon=Math.min(saldoCon,creditCon);
+  creditCon-=coveredSaldoCon;
+  const saldoConPay=saldoCon-coveredSaldoCon;
 
-  const accConTot = saldoConPay*0.80;       // acconti 80 %
-  const accCon1 = accConTot/2, accCon2 = accConTot/2;
-  const coveredAccCon1 = Math.min(accCon1,creditCon);
-  creditCon -= coveredAccCon1;
-  const accCon1Pay = accCon1-coveredAccCon1;
-  const coveredAccCon2 = Math.min(accCon2,creditCon);
-  creditCon -= coveredAccCon2;
-  const accCon2Pay = accCon2-coveredAccCon2;
+  const accConTot=saldoConPay*0.80;       // 80 % del saldo effettivo
+  const accCon1=accConTot/2, accCon2=accConTot/2;
+  const coveredAccCon1=Math.min(accCon1,creditCon);
+  creditCon-=coveredAccCon1;
+  const accCon1Pay=accCon1-coveredAccCon1;
+  const coveredAccCon2=Math.min(accCon2,creditCon);
+  creditCon-=coveredAccCon2;
+  const accCon2Pay=accCon2-coveredAccCon2;
 
-  // --- Totali ---
-  const totalAccPay = accImp1Pay+accImp2Pay+accCon1Pay+accCon2Pay;
-  const totalPay = saldoImpPay+saldoConPay+totalAccPay;
+  // Totali
+  const totalAccPay=accImp1Pay+accImp2Pay+accCon1Pay+accCon2Pay;
+  const totalPay=saldoImpPay+saldoConPay+totalAccPay;
 
-  // ---------- TABELLA RISULTATI ----------
-  const tbody=document.querySelector("#resultsTable tbody");
-  tbody.innerHTML="";
-  const addHeader=t=>tbody.insertAdjacentHTML("beforeend",`<tr class="section-header"><td colspan="3">${t}</td></tr>`);
-  const addRow=(d,f,v)=>tbody.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${f}</td><td>${fmt(v)}</td></tr>`);
+  // ---------- Tabella RISULTATI ----------
+  const body=document.querySelector("#resultsTable tbody");
+  body.innerHTML="";
+  const header=t=>body.insertAdjacentHTML("beforeend",`<tr class="section-header"><td colspan="3">${t}</td></tr>`);
+  const row=(d,f,v)=>body.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${f}</td><td>${fmt(v)}</td></tr>`);
 
-  addHeader("Reddito e imponibile");
-  addRow("Reddito lordo","",lordo);
-  addRow("Reddito netto",`${fmt(lordo)} × ${coeff}`,netto);
-  addRow("Base imponibile imposta","",baseImp);
+  header("Reddito e imponibile");
+  row("Reddito lordo","",lordo);
+  row("Reddito netto",`${fmt(lordo)} × ${coeff}`,netto);
+  row("Contributi deducibili 2025","- "+fmt(contribDeduc),-contribDeduc);
+  row("Base imponibile imposta","",baseImp);
 
-  addHeader("Imposta sostitutiva");
-  addRow(`Saldo (30/06/${anno+1})`,`${fmt(baseImp)} × ${(aliquota*100)} %`,saldoImp);
-  addRow("Credito sul saldo","",-coveredSaldoImp);
-  addRow("Saldo da versare","",saldoImpPay);
-  addRow("1° acconto 50 % (30/06)", "", accImp1);
-  addRow("Credito sul 1° acconto","",-coveredAccImp1);
-  addRow("1° acconto da versare","",accImp1Pay);
-  addRow("2° acconto 50 % (30/11)", "", accImp2);
-  addRow("Credito sul 2° acconto","",-coveredAccImp2);
-  addRow("2° acconto da versare","",accImp2Pay);
+  header("Imposta sostitutiva");
+  row(`Saldo (30/06/${anno+1})`,`${fmt(baseImp)} × ${(aliquota*100)} %`,saldoImp);
+  row("Credito sul saldo","",-coveredSaldoImp);
+  row("Saldo da versare","",saldoImpPay);
+  row("1° acconto 50 % (30/06)","",accImp1);
+  row("Credito sul 1° acconto","",-coveredAccImp1);
+  row("1° acconto da versare","",accImp1Pay);
+  row("2° acconto 50 % (30/11)","",accImp2);
+  row("Credito sul 2° acconto","",-coveredAccImp2);
+  row("2° acconto da versare","",accImp2Pay);
+  if(creditImp>0) row("Credito imposta residuo","",creditImp);
 
-  addHeader("Contributi INPS Gest. Separata");
-  addRow(`Saldo (30/06/${anno+1})`,`${fmt(netto)} × 26,07 %`,saldoCon);
-  addRow("Credito sul saldo","",-coveredSaldoCon);
-  addRow("Saldo da versare","",saldoConPay);
-  addRow("1° acconto 50 % (30/06)","",accCon1);
-  addRow("Credito sul 1° acconto","",-coveredAccCon1);
-  addRow("1° acconto da versare","",accCon1Pay);
-  addRow("2° acconto 50 % (30/11)","",accCon2);
-  addRow("Credito sul 2° acconto","",-coveredAccCon2);
-  addRow("2° acconto da versare","",accCon2Pay);
+  header("Contributi INPS Gest. Separata");
+  row(`Saldo (30/06/${anno+1})`,`${fmt(netto)} × 26,07 %`,saldoCon);
+  row("Credito sul saldo","",-coveredSaldoCon);
+  row("Saldo da versare","",saldoConPay);
+  row("1° acconto 50 % (30/06)","",accCon1);
+  row("Credito sul 1° acconto","",-coveredAccCon1);
+  row("1° acconto da versare","",accCon1Pay);
+  row("2° acconto 50 % (30/11)","",accCon2);
+  row("Credito sul 2° acconto","",-coveredAccCon2);
+  row("2° acconto da versare","",accCon2Pay);
+  if(creditCon>0) row("Credito contributi residuo","",creditCon);
 
-  addHeader("Totali");
-  addRow("Totale acconti da versare","Σ",totalAccPay);
-  addRow("Totale da versare","",totalPay);
+  header("Totali");
+  row("Totale acconti da versare","Σ",totalAccPay);
+  row("Totale da versare","",totalPay);
 
-  // ---------- SCADENZE ----------
+  // ---------- Scadenze ----------
   const sched=document.querySelector("#scheduleTable tbody");
   sched.innerHTML="";
   const next=anno+1;
-  const rowSched=(d,desc,amt)=>sched.insertAdjacentHTML("beforeend",
-    `<tr><td>${d}</td><td>${desc}</td><td>${fmt(amt)}</td></tr>`);
-  rowSched(`30/06/${next}`,"Saldo & 1° acconti",saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
-  rowSched(`30/11/${next}`,"2° acconti",accImp2Pay+accCon2Pay);
+  const schedRow=(d,desc,amt)=>sched.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${desc}</td><td>${fmt(amt)}</td></tr>`);
+  schedRow(`30/06/${next}`,"Saldo + 1° acconti",saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
+  schedRow(`30/11/${next}`,"2° acconti",accImp2Pay+accCon2Pay);
 
-  // ---------- SPIEGAZIONE ----------
-  document.getElementById("come-si-calcolano-tab").innerHTML = `
-    <h2>Logica del calcolo</h2>
-    <p>In regime forfettario l’imponibile non è l’intero incassato, ma il reddito lordo moltiplicato per il
-       coefficiente di redditività (<strong>${(coeff*100).toFixed(0)} %</strong> nel tuo caso).</p>
-    <p>Sull’imponibile così ottenuto applichi l’<strong>imposta sostitutiva ${(aliquota*100)} %</strong>
-       e i <strong>contributi INPS 26,07 %</strong>.</p>
+  // ---------- Spiegazione ----------
+  document.getElementById("come-si-calcolano-tab").innerHTML=`
+    <h2>Come si calcolano</h2>
+    <p>Il regime forfettario tassa il <strong>reddito netto</strong> =
+       reddito lordo × coefficiente di redditività
+       (<strong>${(coeff*100).toFixed(0)} %</strong>).</p>
+    <p>I contributi deducibili versati nel 2025 riducono la base imponibile:
+       reddito netto – contributi = <strong>${euro(baseImp)}</strong>.</p>
     <h3>Imposta sostitutiva</h3>
     <ul>
-      <li>Saldo da versare: <strong>${euro(saldoImpPay)}</strong></li>
-      <li>Acconti 2026 (100 % del saldo): due rate da <strong>${euro(accImp1Pay)}</strong> ciascuna.</li>
+      <li>Aliquota applicata: <strong>${(aliquota*100)} %</strong></li>
+      <li>Saldo da versare (dopo crediti): <strong>${euro(saldoImpPay)}</strong></li>
+      <li>Acconti 2026: due rate da <strong>${euro(accImp1Pay)}</strong> (giugno) e
+          <strong>${euro(accImp2Pay)}</strong> (novembre).</li>
     </ul>
     <h3>Contributi INPS</h3>
     <ul>
-      <li>Saldo da versare: <strong>${euro(saldoConPay)}</strong></li>
-      <li>Acconti 2026 (80 % del saldo): due rate da <strong>${euro(accCon1Pay)}</strong> ciascuna.</li>
+      <li>Aliquota: <strong>26,07 %</strong></li>
+      <li>Saldo da versare (dopo crediti): <strong>${euro(saldoConPay)}</strong></li>
+      <li>Acconti 2026 (80 %): due rate da <strong>${euro(accCon1Pay)}</strong> e
+          <strong>${euro(accCon2Pay)}</strong>.</li>
     </ul>
-    <h3>Totale</h3>
-    <p>Saldi + acconti da pagare: <strong>${euro(totalPay)}</strong></p>
+    <h3>Totali</h3>
+    <p>Importo complessivo (saldi + acconti): <strong>${euro(totalPay)}</strong></p>
   `;
 
-  // Mostra la sezione risultati se è la prima volta
+  // mostra risultati
   document.getElementById("resultBox").style.display="block";
-  // Resta sulla tab “Risultati”
   document.querySelector("[data-tab='risultati-tab']").click();
 };
 </script>
