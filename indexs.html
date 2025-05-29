@@ -229,9 +229,7 @@ document.getElementById("btnCalcola").onclick=()=>{
   const contribDeduc=+document.getElementById("contrib_deduc_prev").value||0;
   const creditImpOrig=+document.getElementById("acconti_imposta_prev").value||0;
   const creditConOrig=+document.getElementById("acconti_contrib_prev").value||0;
-
-  let creditImp=creditImpOrig;
-  let creditCon=creditConOrig;
+  let creditImp=creditImpOrig, creditCon=creditConOrig;
 
   const netto=lordo*coeff;
   const baseImp=Math.max(0,netto-contribDeduc);
@@ -242,7 +240,7 @@ document.getElementById("btnCalcola").onclick=()=>{
   creditImp-=coveredSaldoImp;
   const saldoImpPay=saldoImp-coveredSaldoImp;
 
-  const accImpTot=saldoImpPay;            // 100 % del saldo effettivo
+  const accImpTot=saldoImpPay;                   // 100 % del saldo
   const accImp1=accImpTot/2, accImp2=accImpTot/2;
   const coveredAccImp1=Math.min(accImp1,creditImp);
   creditImp-=coveredAccImp1;
@@ -258,7 +256,7 @@ document.getElementById("btnCalcola").onclick=()=>{
   creditCon-=coveredSaldoCon;
   const saldoConPay=saldoCon-coveredSaldoCon;
 
-  const accConTot=saldoConPay*0.80;       // 80 % del saldo effettivo
+  const accConTot=saldoConPay*0.80;              // 80 % del saldo
   const accCon1=accConTot/2, accCon2=accConTot/2;
   const coveredAccCon1=Math.min(accCon1,creditCon);
   creditCon-=coveredAccCon1;
@@ -269,7 +267,8 @@ document.getElementById("btnCalcola").onclick=()=>{
 
   // Totali
   const totalAccPay=accImp1Pay+accImp2Pay+accCon1Pay+accCon2Pay;
-  const totalPay=saldoImpPay+saldoConPay+totalAccPay;
+  const totalSaldo=saldoImpPay+saldoConPay;
+  const totalPay=totalSaldo+totalAccPay;
 
   // ---------- Tabella RISULTATI ----------
   const body=document.querySelector("#resultsTable tbody");
@@ -308,8 +307,9 @@ document.getElementById("btnCalcola").onclick=()=>{
   if(creditCon>0) row("Credito contributi residuo","",creditCon);
 
   header("Totali");
-  row("Totale acconti da versare","Σ",totalAccPay);
-  row("Totale da versare","",totalPay);
+  row("Totale saldi da versare","",totalSaldo);
+  row("Totale acconti da versare","",totalAccPay);
+  row("Somma saldi + acconti","",totalPay);
 
   // ---------- Scadenze ----------
   const sched=document.querySelector("#scheduleTable tbody");
@@ -322,37 +322,43 @@ document.getElementById("btnCalcola").onclick=()=>{
   // ---------- Spiegazione (dinamica) ----------
   let exp=`
     <h2>Come si calcolano</h2>
-    <p>Il regime forfettario tassa il <strong>reddito netto</strong>:
+    <p>Il regime forfettario parte dal <strong>reddito netto</strong> =
        reddito lordo × coefficiente di redditività
        (<strong>${(coeff*100).toFixed(0)} %</strong>).</p>`;
   if(contribDeduc>0){
-    exp+=`<p>I contributi INPS deducibili versati nel 2025 riducono la base imponibile:
-          reddito netto – contributi = <strong>${euro(baseImp)}</strong>.</p>`;
+    exp+=`<p>I contributi deducibili versati nel 2025 riducono la base imponibile:
+          reddito netto – contributi = <strong>${fmt(baseImp)}</strong>.</p>`;
   }
   if(aliquota===0.05){
-    exp+=`<p style="color:#d32f2f;"><em>L’aliquota ridotta al 5 % vale
-           solo per i primi 5 anni di attività; dal sesto anno passa al 15 %.</em></p>`;
+    exp+=`<p style="color:#d32f2f;"><em>L’aliquota ridotta al 5 % si applica
+           solo per i primi 5 anni di attività; poi sale al 15 %.</em></p>`;
   }
 
-  exp+=`<h3>Imposta sostitutiva</h3><ul>
-        <li>Aliquota applicata: <strong>${(aliquota*100)} %</strong></li>`;
-  exp+= creditImpOrig>0
-        ? `<li>Saldo da versare (dopo crediti): <strong>${euro(saldoImpPay)}</strong></li>`
-        : `<li>Saldo da versare: <strong>${euro(saldoImpPay)}</strong></li>`;
-  exp+=`<li>Acconti 2026: due rate da
-        <strong>${euro(accImp1Pay)}</strong> ciascuna.</li></ul>`;
+  exp+=`
+    <p><strong>Quindi paghi di imposta sostitutiva</strong> il ${(aliquota*100)} % su
+       reddito lordo × coefficiente${contribDeduc>0?" – contributi deducibili":""}
+       = <strong>${euro(saldoImp)}</strong>.</p>
+    <p><strong>E di contributi INPS</strong> il 26,07 % su
+       reddito lordo × coefficiente = <strong>${euro(saldoCon)}</strong>.</p>
 
-  exp+=`<h3>Contributi INPS</h3><ul>
-        <li>Aliquota: <strong>26,07 %</strong></li>`;
-  exp+= creditConOrig>0
-        ? `<li>Saldo da versare (dopo crediti): <strong>${euro(saldoConPay)}</strong></li>`
-        : `<li>Saldo da versare: <strong>${euro(saldoConPay)}</strong></li>`;
-  exp+=`<li>Acconti 2026 (80 %): due rate da
-        <strong>${euro(accCon1Pay)}</strong> e <strong>${euro(accCon2Pay)}</strong>.</li></ul>`;
+    <h3>SALDI (pagamento ${anno+1})</h3>
+    <ul>
+      <li>Saldo imposta sostitutiva: <strong>${euro(saldoImpPay)}</strong></li>
+      <li>Saldo contributi INPS: <strong>${euro(saldoConPay)}</strong></li>
+    </ul>
 
-  exp+=`<h3>Totale</h3>
-        <p>Saldi + acconti da pagare: <strong>${euro(totalPay)}</strong></p>`;
+    <h3>ACCONTI 2026</h3>
+    <ul>
+      <li>Imposta (100 % del saldo): due rate da <strong>${euro(accImp1Pay)}</strong></li>
+      <li>Contributi (80 % del saldo): due rate da <strong>${euro(accCon1Pay)}</strong></li>
+    </ul>
 
+    <h3>Riepilogo importi</h3>
+    <ul>
+      <li>Totale saldi: <strong>${euro(totalSaldo)}</strong></li>
+      <li>Totale acconti: <strong>${euro(totalAccPay)}</strong></li>
+      <li><strong>Totale complessivo: ${euro(totalPay)}</strong></li>
+    </ul>`;
   document.getElementById("come-si-calcolano-tab").innerHTML=exp;
 
   // mostra risultati
