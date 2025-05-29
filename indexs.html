@@ -89,7 +89,7 @@ button:hover{background:#f0f0f0}
 /* Notebook look */
 #come-si-calcolano-tab{position:relative;overflow:hidden}
 #come-si-calcolano-tab::before{
-  content:\"\";position:absolute;inset:0;pointer-events:none;
+  content:"";position:absolute;inset:0;pointer-events:none;
   background-image:repeating-linear-gradient(to bottom,rgba(197,197,197,.2) 0,rgba(197,197,197,.2) 1px,transparent 1px,transparent 24px)
 }
 #come-si-calcolano-tab *{line-height:25px}
@@ -227,8 +227,11 @@ document.getElementById("btnCalcola").onclick=()=>{
   if(!lordo){alert("Inserisci il reddito lordo");return;}
 
   const contribDeduc=+document.getElementById("contrib_deduc_prev").value||0;
-  let creditImp=+document.getElementById("acconti_imposta_prev").value||0;
-  let creditCon=+document.getElementById("acconti_contrib_prev").value||0;
+  const creditImpOrig=+document.getElementById("acconti_imposta_prev").value||0;
+  const creditConOrig=+document.getElementById("acconti_contrib_prev").value||0;
+
+  let creditImp=creditImpOrig;
+  let creditCon=creditConOrig;
 
   const netto=lordo*coeff;
   const baseImp=Math.max(0,netto-contribDeduc);
@@ -277,30 +280,30 @@ document.getElementById("btnCalcola").onclick=()=>{
   header("Reddito e imponibile");
   row("Reddito lordo","",lordo);
   row("Reddito netto",`${fmt(lordo)} × ${coeff}`,netto);
-  row("Contributi deducibili 2025","- "+fmt(contribDeduc),-contribDeduc);
+  if(contribDeduc>0) row("Contributi deducibili 2025","- "+fmt(contribDeduc),-contribDeduc);
   row("Base imponibile imposta","",baseImp);
 
   header("Imposta sostitutiva");
   row(`Saldo (30/06/${anno+1})`,`${fmt(baseImp)} × ${(aliquota*100)} %`,saldoImp);
-  row("Credito sul saldo","",-coveredSaldoImp);
+  if(creditImpOrig>0) row("Credito sul saldo","",-coveredSaldoImp);
   row("Saldo da versare","",saldoImpPay);
   row("1° acconto 50 % (30/06)","",accImp1);
-  row("Credito sul 1° acconto","",-coveredAccImp1);
+  if(creditImpOrig>0) row("Credito sul 1° acconto","",-coveredAccImp1);
   row("1° acconto da versare","",accImp1Pay);
   row("2° acconto 50 % (30/11)","",accImp2);
-  row("Credito sul 2° acconto","",-coveredAccImp2);
+  if(creditImpOrig>0) row("Credito sul 2° acconto","",-coveredAccImp2);
   row("2° acconto da versare","",accImp2Pay);
   if(creditImp>0) row("Credito imposta residuo","",creditImp);
 
   header("Contributi INPS Gest. Separata");
   row(`Saldo (30/06/${anno+1})`,`${fmt(netto)} × 26,07 %`,saldoCon);
-  row("Credito sul saldo","",-coveredSaldoCon);
+  if(creditConOrig>0) row("Credito sul saldo","",-coveredSaldoCon);
   row("Saldo da versare","",saldoConPay);
   row("1° acconto 50 % (30/06)","",accCon1);
-  row("Credito sul 1° acconto","",-coveredAccCon1);
+  if(creditConOrig>0) row("Credito sul 1° acconto","",-coveredAccCon1);
   row("1° acconto da versare","",accCon1Pay);
   row("2° acconto 50 % (30/11)","",accCon2);
-  row("Credito sul 2° acconto","",-coveredAccCon2);
+  if(creditConOrig>0) row("Credito sul 2° acconto","",-coveredAccCon2);
   row("2° acconto da versare","",accCon2Pay);
   if(creditCon>0) row("Credito contributi residuo","",creditCon);
 
@@ -316,31 +319,41 @@ document.getElementById("btnCalcola").onclick=()=>{
   schedRow(`30/06/${next}`,"Saldo + 1° acconti",saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
   schedRow(`30/11/${next}`,"2° acconti",accImp2Pay+accCon2Pay);
 
-  // ---------- Spiegazione ----------
-  document.getElementById("come-si-calcolano-tab").innerHTML=`
+  // ---------- Spiegazione (dinamica) ----------
+  let exp=`
     <h2>Come si calcolano</h2>
-    <p>Il regime forfettario tassa il <strong>reddito netto</strong> =
+    <p>Il regime forfettario tassa il <strong>reddito netto</strong>:
        reddito lordo × coefficiente di redditività
-       (<strong>${(coeff*100).toFixed(0)} %</strong>).</p>
-    <p>I contributi deducibili versati nel 2025 riducono la base imponibile:
-       reddito netto – contributi = <strong>${euro(baseImp)}</strong>.</p>
-    <h3>Imposta sostitutiva</h3>
-    <ul>
-      <li>Aliquota applicata: <strong>${(aliquota*100)} %</strong></li>
-      <li>Saldo da versare (dopo crediti): <strong>${euro(saldoImpPay)}</strong></li>
-      <li>Acconti 2026: due rate da <strong>${euro(accImp1Pay)}</strong> (giugno) e
-          <strong>${euro(accImp2Pay)}</strong> (novembre).</li>
-    </ul>
-    <h3>Contributi INPS</h3>
-    <ul>
-      <li>Aliquota: <strong>26,07 %</strong></li>
-      <li>Saldo da versare (dopo crediti): <strong>${euro(saldoConPay)}</strong></li>
-      <li>Acconti 2026 (80 %): due rate da <strong>${euro(accCon1Pay)}</strong> e
-          <strong>${euro(accCon2Pay)}</strong>.</li>
-    </ul>
-    <h3>Totali</h3>
-    <p>Importo complessivo (saldi + acconti): <strong>${euro(totalPay)}</strong></p>
-  `;
+       (<strong>${(coeff*100).toFixed(0)} %</strong>).</p>`;
+  if(contribDeduc>0){
+    exp+=`<p>I contributi INPS deducibili versati nel 2025 riducono la base imponibile:
+          reddito netto – contributi = <strong>${euro(baseImp)}</strong>.</p>`;
+  }
+  if(aliquota===0.05){
+    exp+=`<p style="color:#d32f2f;"><em>L’aliquota ridotta al 5 % vale
+           solo per i primi 5 anni di attività; dal sesto anno passa al 15 %.</em></p>`;
+  }
+
+  exp+=`<h3>Imposta sostitutiva</h3><ul>
+        <li>Aliquota applicata: <strong>${(aliquota*100)} %</strong></li>`;
+  exp+= creditImpOrig>0
+        ? `<li>Saldo da versare (dopo crediti): <strong>${euro(saldoImpPay)}</strong></li>`
+        : `<li>Saldo da versare: <strong>${euro(saldoImpPay)}</strong></li>`;
+  exp+=`<li>Acconti 2026: due rate da
+        <strong>${euro(accImp1Pay)}</strong> ciascuna.</li></ul>`;
+
+  exp+=`<h3>Contributi INPS</h3><ul>
+        <li>Aliquota: <strong>26,07 %</strong></li>`;
+  exp+= creditConOrig>0
+        ? `<li>Saldo da versare (dopo crediti): <strong>${euro(saldoConPay)}</strong></li>`
+        : `<li>Saldo da versare: <strong>${euro(saldoConPay)}</strong></li>`;
+  exp+=`<li>Acconti 2026 (80 %): due rate da
+        <strong>${euro(accCon1Pay)}</strong> e <strong>${euro(accCon2Pay)}</strong>.</li></ul>`;
+
+  exp+=`<h3>Totale</h3>
+        <p>Saldi + acconti da pagare: <strong>${euro(totalPay)}</strong></p>`;
+
+  document.getElementById("come-si-calcolano-tab").innerHTML=exp;
 
   // mostra risultati
   document.getElementById("resultBox").style.display="block";
