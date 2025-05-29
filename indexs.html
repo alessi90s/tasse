@@ -319,15 +319,15 @@ document.getElementById("btnCalcola").onclick=()=>{
   schedRow(`30/06/${next}`,"Saldo + 1° acconti",saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
   schedRow(`30/11/${next}`,"2° acconti",accImp2Pay+accCon2Pay);
 
-  // ---------- Spiegazione (dinamica) ----------
+  // ---------- Spiegazione dettagliata ----------
   let exp=`
     <h2>Come si calcolano</h2>
-    <p>Il regime forfettario parte dal <strong>reddito netto</strong> =
-       reddito lordo × coefficiente di redditività
-       (<strong>${(coeff*100).toFixed(0)} %</strong>).</p>`;
+    <p><strong>Reddito lordo</strong>: ${euro(lordo)}</p>
+    <p><strong>Coefficiente di redditività</strong>: ${(coeff*100).toFixed(0)} %</p>
+    <p><strong>Reddito netto</strong>: ${euro(netto)} ( ${fmt(lordo)} × ${(coeff*100).toFixed(0)} % )</p>`;
   if(contribDeduc>0){
-    exp+=`<p>I contributi deducibili versati nel 2025 riducono la base imponibile:
-          reddito netto – contributi = <strong>${fmt(baseImp)}</strong>.</p>`;
+    exp+=`<p><strong>Reddito imponibile</strong>: ${euro(baseImp)}  
+           ( ${euro(netto)} − ${euro(contribDeduc)} contributi deducibili )</p>`;
   }
   if(aliquota===0.05){
     exp+=`<p style="color:#d32f2f;"><em>L’aliquota ridotta al 5 % si applica
@@ -335,29 +335,31 @@ document.getElementById("btnCalcola").onclick=()=>{
   }
 
   exp+=`
-    <p><strong>Quindi paghi di imposta sostitutiva</strong> il ${(aliquota*100)} % su
-       reddito lordo × coefficiente${contribDeduc>0?" – contributi deducibili":""}
-       = <strong>${euro(saldoImp)}</strong>.</p>
-    <p><strong>E di contributi INPS</strong> il 26,07 % su
-       reddito lordo × coefficiente = <strong>${euro(saldoCon)}</strong>.</p>
+    <p><strong>Imposta sostitutiva</strong>: ${(aliquota*100)} % ×
+       ${contribDeduc>0?"reddito imponibile":"reddito netto"} =
+       <strong>${euro(saldoImp)}</strong></p>
+    <p><strong>Contributi INPS</strong>: 26,07 % × reddito netto =
+       <strong>${euro(saldoCon)}</strong></p>
 
-    <h3>SALDI (pagamento ${anno+1})</h3>
+    <h3>SALDI (${anno+1})</h3>
     <ul>
-      <li>Saldo imposta sostitutiva: <strong>${euro(saldoImpPay)}</strong></li>
-      <li>Saldo contributi INPS: <strong>${euro(saldoConPay)}</strong></li>
+      <li>Imposta: <strong>${euro(saldoImpPay)}</strong>
+          (${euro(saldoImp)} − crediti ${euro(coveredSaldoImp)})</li>
+      <li>Contributi: <strong>${euro(saldoConPay)}</strong>
+          (${euro(saldoCon)} − crediti ${euro(coveredSaldoCon)})</li>
     </ul>
 
     <h3>ACCONTI 2026</h3>
     <ul>
-      <li>Imposta (100 % del saldo): due rate da <strong>${euro(accImp1Pay)}</strong></li>
-      <li>Contributi (80 % del saldo): due rate da <strong>${euro(accCon1Pay)}</strong></li>
+      <li>Imposta (100 % del saldo): 2 × <strong>${euro(accImp1Pay)}</strong></li>
+      <li>Contributi (80 % del saldo): 2 × <strong>${euro(accCon1Pay)}</strong></li>
     </ul>
 
     <h3>Riepilogo importi</h3>
     <ul>
-      <li>Totale saldi: <strong>${euro(totalSaldo)}</strong></li>
-      <li>Totale acconti: <strong>${euro(totalAccPay)}</strong></li>
-      <li><strong>Totale complessivo: ${euro(totalPay)}</strong></li>
+      <li><strong>Saldi</strong>: imposta ${euro(saldoImpPay)} + contributi ${euro(saldoConPay)} = <strong>${euro(totalSaldo)}</strong></li>
+      <li><strong>Acconti</strong>: imposta ${euro(accImp1Pay+accImp2Pay)} + contributi ${euro(accCon1Pay+accCon2Pay)} = <strong>${euro(totalAccPay)}</strong></li>
+      <li><strong>Totale complessivo</strong>: ${euro(totalPay)}</li>
     </ul>`;
   document.getElementById("come-si-calcolano-tab").innerHTML=exp;
 
