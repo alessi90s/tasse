@@ -305,7 +305,9 @@ document.getElementById("btnCalcola").onclick=()=>{
   let html=`
    <p>Imposta (${aliq*100} %) e contributi (26,07 %) <strong>non</strong> si calcolano su ${euro(lordo)}, ma su ${euro(netto)} (incassato × coeff. ${Math.round(coeff*100)} %).</p>`+
    (contribDeduc?`<p>Imponibile dopo deduzione contributi: <strong>${euro(impon)}</strong>.</p>`:"")+
-   `<p>Paghi quindi il ${aliq*100} % di imposta e il 26,07 % di contributi sul reddito netto.</p>
+   `<p>Paghi quindi il ${aliq*100} % di imposta e il 26,07 % di contributi sul reddito netto.</p>+
+    (aliq===0.05?`<p style="color:#d32f2f;"><em>L’aliquota al 5 % vale solo per i primi 5 anni; poi diventa 15 %.</em></p>`:"")
+
 
    <h3>Saldi 2026</h3>
    <p>Imposta saldo: ${euro(saldoImp)}${labelAccImp} = <strong>${euro(saldoImpPay)}</strong> (giugno)</p>
