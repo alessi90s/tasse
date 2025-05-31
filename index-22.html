@@ -295,15 +295,14 @@ document.getElementById("btnCalcola").onclick=()=>{
   }
 
   /* ---------- SEZ. “COME SI CALCOLANO” ---------- */
-  const sp=document.getElementById("come-si-calcolano-tab");
-  const labelAccImp  = copSalImp?` − acconti già versati ${fmt(copSalImp)}`:"";
-  const labelAccCon  = copSalCon?` − acconti già versati ${fmt(copSalCon)}`:"";
+  /* ---------- SEZ. “COME SI CALCOLANO” ---------- */
+const sp = document.getElementById("come-si-calcolano-tab");
 
-  const impAccTotPay = accImp1Pay+accImp2Pay;
-  const conAccTotPay = accCon1Pay+accCon2Pay;
+const impAccTotPay = accImp1Pay + accImp2Pay;
+const conAccTotPay = accCon1Pay + accCon2Pay;
 
-  let html=`
-   <p>
+let html = `
+  <p>
     Imposta (${aliq * 100} %) e contributi (26,07 %) <strong>non</strong> si calcolano su
     ${euro(lordo)}, ma sul tuo reddito netto di ${euro(netto)}
     (incassato × coeff. ${Math.round(coeff * 100)} %).
@@ -318,38 +317,47 @@ document.getElementById("btnCalcola").onclick=()=>{
   </p>
 
   ${aliq === 0.05
-      ? `<p style="color:#d32f2f;"><em>L’aliquota al 5 % vale solo per i primi 5 anni;
-         poi diventa 15 %.</em></p>`
+      ? `<p style="color:#d32f2f;"><em>L’aliquota al 5 % vale solo per i primi
+         5 anni; successivamente sarà del 15 %.</em></p>`
       : ''}
+
+  <h3>Saldi 2026</h3>
+  <p>Imposta saldo: ${euro(saldoImp)}
+     ${copSalImp ? `− acconti già versati ${euro(copSalImp)}` : ''}
+     = <strong>${euro(saldoImpPay)}</strong> (giugno)</p>
+  <p>Contributi saldo: ${euro(saldoCon)}
+     ${copSalCon ? `− acconti già versati ${euro(copSalCon)}` : ''}
+     = <strong>${euro(saldoConPay)}</strong> (giugno)</p>
+
+  <h3>Acconti 2026</h3>
+  <p>Imposta (100 % del saldo): <strong>${euro(accImp1Pay)}</strong> + <strong>${euro(accImp2Pay)}</strong>
+     = <strong>${euro(impAccTotPay)}</strong></p>
+  <p>Contributi (80 % del saldo): <strong>${euro(accCon1Pay)}</strong> + <strong>${euro(accCon2Pay)}</strong>
+     = <strong>${euro(conAccTotPay)}</strong></p>
+
+  <h3>Totali</h3>
+  <ul>
+    <li>Saldi: <strong>${euro(totSaldo)}</strong> (${pct(totSaldo, lordo)})
+        &nbsp;– imposta ${euro(saldoImpPay)}, contributi ${euro(saldoConPay)}</li>
+    <li>Acconti: <strong>${euro(totAcc)}</strong> (${pct(totAcc, lordo)})
+        &nbsp;– imposta ${euro(impAccTotPay)}, contributi ${euro(conAccTotPay)}</li>
+    <li><strong>Complessivo</strong>: ${euro(totPay)} (${pct(totPay, lordo)})
+        &nbsp;– saldi ${euro(totSaldo)}, acconti ${euro(totAcc)}</li>
+  </ul>
 `;
 
-
-   <h3>Saldi 2026</h3>
-   <p>Imposta saldo: ${euro(saldoImp)}${labelAccImp} = <strong>${euro(saldoImpPay)}</strong> (giugno)</p>
-   <p>Contributi saldo: ${euro(saldoCon)}${labelAccCon} = <strong>${euro(saldoConPay)}</strong> (giugno)</p>
-
-   <h3>Acconti 2026</h3>
-   <p>Imposta (100 % del saldo): <strong>${euro(accImp1Pay)}</strong> + <strong>${euro(accImp2Pay)}</strong> = <strong>${euro(impAccTotPay)}</strong></p>
-   <p>Contributi (80 % del saldo): <strong>${euro(accCon1Pay)}</strong> + <strong>${euro(accCon2Pay)}</strong> = <strong>${euro(conAccTotPay)}</strong></p>
-
-   <h3>Totali</h3>
-   <ul>
-     <li>Saldi: <strong>${euro(totSaldo)}</strong> (${pct(totSaldo,lordo)}) – imposta ${euro(saldoImpPay)}, contributi ${euro(saldoConPay)}</li>
-     <li>Acconti: <strong>${euro(totAcc)}</strong> (${pct(totAcc,lordo)}) – imposta ${euro(impAccTotPay)}, contributi ${euro(conAccTotPay)}</li>
-     <li><strong>Complessivo</strong>: ${euro(totPay)} (${pct(totPay,lordo)}) – saldi ${euro(totSaldo)}, acconti ${euro(totAcc)}</li>
-   </ul>`;
-
-  if(rateMode==="rate"){
-    const base=totPay;
-    html+=`<h3>Piano rateale (5 rate giugno-ottobre)</h3><ul>`;
-    for(let i=0;i<5;i++){
-      const quota=base/5*rateMult[i];
-      html+=`<li>${rateDates[i]}: ${euro(quota)}</li>`;
-    }
-    html+=`<li>30 novembre: ${euro(accImp2Pay+accCon2Pay)} (2° acconti)</li></ul>`;
+if (rateMode === "rate") {
+  const base = totPay;
+  html += `<h3>Piano rateale (5 rate da giugno a ottobre)</h3><ul>`;
+  for (let i = 0; i < 5; i++) {
+    const quota = base / 5 * rateMult[i];
+    html += `<li>${rateDates[i]}: ${euro(quota)}</li>`;
   }
+  html += `<li>30 novembre: ${euro(accImp2Pay + accCon2Pay)} (2° acconti)</li></ul>`;
+}
 
-  sp.innerHTML=html;
+sp.innerHTML = html;
+
 
   /* ----- mostra output e torna a tab spiegazione ----- */
   document.getElementById("resultBox").style.display="block";
