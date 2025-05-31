@@ -176,12 +176,12 @@ th{background:#f0f0f0;font-weight:600}
     </div>
   </div>
 <script>
-/* ------------ utility ------------- */
-const fmt  = n => n.toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2});
-const euro = v => v.toLocaleString("it-IT",{style:"currency",currency:"EUR"});
-const pct  = (num,den) => Math.round(num/den*100)+" %";
+/* ---------- utility ---------- */
+const fmt  = n=>n.toLocaleString("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2});
+const euro = v=>v.toLocaleString("it-IT",{style:"currency",currency:"EUR"});
+const pct  = (num,den)=>Math.round(num/den*100)+" %";
 
-/* ---------- preset reddito ---------- */
+/* ---------- preset redditi ---------- */
 (()=>{const vals=[10000,15000,20000,25000,30000,35000,40000];
  const box=document.getElementById("presetBtnGroup");
  vals.forEach(v=>{
@@ -192,165 +192,153 @@ const pct  = (num,den) => Math.round(num/den*100)+" %";
    box.appendChild(b);
  });})();
 
-/* ---------- rate toggle buttons ---------- */
-document.querySelectorAll(".rate-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".rate-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-  });
-});
-
-/* ---------- advanced toggle ---------- */
+/* ---------- toggle avanzate ---------- */
 document.getElementById("advToggle").onclick=()=>{
-  const blk=document.getElementById("advancedFields");
-  blk.style.display=blk.style.display==="block"?"none":"block";
+  const a=document.getElementById("advancedFields");
+  a.style.display=a.style.display==="block"?"none":"block";
 };
 
-/* ---------- tab switch ---------- */
+/* ---------- rate toggle ---------- */
+document.querySelectorAll(".rate-btn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".rate-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+  };
+});
+
+/* ---------- tabs ---------- */
 document.querySelectorAll(".tab").forEach(t=>{
-  t.addEventListener("click",()=>{
+  t.onclick=()=>{
     document.querySelectorAll(".tab, .tab-content").forEach(el=>el.classList.remove("active"));
     t.classList.add("active");
     document.getElementById(t.dataset.tab).classList.add("active");
-  });
+  };
 });
 
-/* ---------- CALCOLO ---------- */
+/* ---------- CALCOLA ---------- */
 document.getElementById("btnCalcola").onclick=()=>{
-  const anno      = +document.getElementById("anno").value;
-  const aliq      = +document.getElementById("aliquota_imposta").value;
-  const coeff     = +document.getElementById("coeff").value;
-  const lordo     = +document.getElementById("reddito_lordo").value;
+  const anno  =+document.getElementById("anno").value;
+  const aliq  =+document.getElementById("aliquota_imposta").value;
+  const coeff =+document.getElementById("coeff").value;
+  const lordo =+document.getElementById("reddito_lordo").value;
   if(!lordo){alert("Inserisci il reddito lordo");return;}
 
-  const rateMode  = document.querySelector(".rate-btn.active").dataset.rate;   // "unica" | "rate"
-  const rateDates = ["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
-  const rateMult  = [1,1.0018,1.0051,1.0084,1.0117];  // maggiorazioni 0 %, 0,18 % ecc.
+  const rateMode=document.querySelector(".rate-btn.active").dataset.rate;  // "unica" | "rate"
+  const rateDates=["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
+  const rateMult =[1,1.0018,1.0051,1.0084,1.0117];
 
-  const contribDeduc = +document.getElementById("contrib_deduc_prev").value||0;
-  const credImp0     = +document.getElementById("acconti_imposta_prev").value||0;
-  const credCon0     = +document.getElementById("acconti_contrib_prev").value||0;
-  let   credImp=credImp0, credCon=credCon0;
+  const contribDeduc=+document.getElementById("contrib_deduc_prev").value||0;
+  const credImp0    =+document.getElementById("acconti_imposta_prev").value||0;
+  const credCon0    =+document.getElementById("acconti_contrib_prev").value||0;
+  let credImp=credImp0, credCon=credCon0;
 
   const netto = lordo*coeff;
   const impon = Math.max(0,netto-contribDeduc);
 
-  /* -------- imposta -------- */
-  const saldoImp    = impon*aliq;
-  const copSaldoImp = Math.min(saldoImp,credImp); credImp-=copSaldoImp;
-  const saldoImpPay = saldoImp-copSaldoImp;
+  /* --- imposta --- */
+  const saldoImp   = impon*aliq;
+  const copSalImp  = Math.min(saldoImp,credImp); credImp-=copSalImp;
+  const saldoImpPay= saldoImp-copSalImp;
+  const accImpTot  = saldoImpPay;
+  const accImp1    = accImpTot/2, accImp2=accImpTot/2;
+  const copAcc1    = Math.min(accImp1,credImp); credImp-=copAcc1;
+  const accImp1Pay = accImp1-copAcc1;
+  const copAcc2    = Math.min(accImp2,credImp); credImp-=copAcc2;
+  const accImp2Pay = accImp2-copAcc2;
 
-  const accImpTot   = saldoImpPay;        // 100 %
-  const accImp1     = accImpTot/2, accImp2=accImpTot/2;
-  const copAccImp1  = Math.min(accImp1,credImp); credImp-=copAccImp1;
-  const accImp1Pay  = accImp1-copAccImp1;
-  const copAccImp2  = Math.min(accImp2,credImp); credImp-=copAccImp2;
-  const accImp2Pay  = accImp2-copAccImp2;
+  /* --- contributi --- */
+  const aliqCon=0.2607;
+  const saldoCon   = netto*aliqCon;
+  const copSalCon  = Math.min(saldoCon,credCon); credCon-=copSalCon;
+  const saldoConPay= saldoCon-copSalCon;
+  const accConTot  = saldoConPay*0.80;
+  const accCon1    = accConTot/2, accCon2=accConTot/2;
+  const copCon1    = Math.min(accCon1,credCon); credCon-=copCon1;
+  const accCon1Pay = accCon1-copCon1;
+  const copCon2    = Math.min(accCon2,credCon); credCon-=copCon2;
+  const accCon2Pay = accCon2-copCon2;
 
-  /* -------- contributi -------- */
-  const aliqCon     = 0.2607;
-  const saldoCon    = netto*aliqCon;
-  const copSaldoCon = Math.min(saldoCon,credCon); credCon-=copSaldoCon;
-  const saldoConPay = saldoCon-copSaldoCon;
+  /* totali */
+  const totSaldo=saldoImpPay+saldoConPay;
+  const totAcc  =accImp1Pay+accImp2Pay+accCon1Pay+accCon2Pay;
+  const totPay  =totSaldo+totAcc;
 
-  const accConTot   = saldoConPay*0.80;   // 80 %
-  const accCon1     = accConTot/2, accCon2=accConTot/2;
-  const copAccCon1  = Math.min(accCon1,credCon); credCon-=copAccCon1;
-  const accCon1Pay  = accCon1-copAccCon1;
-  const copAccCon2  = Math.min(accCon2,credCon); credCon-=copAccCon2;
-  const accCon2Pay  = accCon2-copAccCon2;
+  /* ---------- TABELLA RISULTATI ---------- */
+  const body=document.querySelector("#resultsTable tbody");body.innerHTML="";
+  const r=(d,v)=>body.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${fmt(v)}</td></tr>`);
+  r(`Saldo imposta (30/06/${anno+1})`,saldoImpPay);
+  r(`Saldo contributi (30/06/${anno+1})`,saldoConPay);
+  r("1° acconto imposta (30/06)",accImp1Pay);
+  r("1° acconto contributi (30/06)",accCon1Pay);
+  r("2° acconto imposta (30/11)",accImp2Pay);
+  r("2° acconto contributi (30/11)",accCon2Pay);
+  r("<strong>Totale saldi</strong>",totSaldo);
+  r("<strong>Totale acconti</strong>",totAcc);
+  r("<strong>Somma saldi + acconti</strong>",totPay);
 
-  const totSaldo = saldoImpPay+saldoConPay;
-  const totAcc   = accImp1Pay+accImp2Pay+accCon1Pay+accCon2Pay;
-  const totPay   = totSaldo+totAcc;
-
-  /* ---------- TAB “RISULTATI” (tabella flussi) ---------- */
-  const tbody=document.querySelector("#resultsTable tbody");tbody.innerHTML="";
-  const addRow=(d,v)=>tbody.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${fmt(v)}</td></tr>`);
-  addRow(`Saldo imposta (30/06/${anno+1})`,saldoImpPay);
-  addRow(`Saldo contributi (30/06/${anno+1})`,saldoConPay);
-  addRow("1° acconto imposta (30/06)",accImp1Pay);
-  addRow("1° acconto contributi (30/06)",accCon1Pay);
-  addRow("2° acconto imposta (30/11)",accImp2Pay);
-  addRow("2° acconto contributi (30/11)",accCon2Pay);
-  addRow("<strong>Totale saldi</strong>",totSaldo);
-  addRow("<strong>Totale acconti</strong>",totAcc);
-  addRow("<strong>Somma saldi + acconti</strong>",totPay);
-
-  /* ---------- scadenze ---------- */
+  /* ---------- SCADENZE ---------- */
   const sched=document.querySelector("#scheduleTable tbody");sched.innerHTML="";
   const next=anno+1;
-  const schedRow=(d,ds,amt)=>sched.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${ds}</td><td>${fmt(amt)}</td></tr>`);
+  const addS=(d,ds,amt)=>sched.insertAdjacentHTML("beforeend",`<tr><td>${d}</td><td>${ds}</td><td>${fmt(amt)}</td></tr>`);
 
   if(rateMode==="unica"){
-    schedRow(`30/06/${next}`,"Saldo + 1° acconti",saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
-    schedRow(`30/11/${next}`,"2° acconti",accImp2Pay+accCon2Pay);
+    addS(`30/06/${next}`,"Saldo + 1° acconti",saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay);
+    addS(`30/11/${next}`,"2° acconti",accImp2Pay+accCon2Pay);
   }else{
-    const baseTot = saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay+accImp2Pay+accCon2Pay;
+    const base=totPay;            // rateizzate tutto il complessivo in 5 parti
     for(let i=0;i<5;i++){
-      const quota=baseTot/5*rateMult[i];
-      schedRow(`${rateDates[i]} ${next}`,`${i+1}a rata`,quota);
+      const quota=base/5*rateMult[i];
+      addS(`${rateDates[i]} ${next}`,`${i+1}a rata`,quota);
     }
+    // ricorda comunque il 30/11 dei secondi acconti
+    addS(`30/11/${next}`,"Versamento 2° acconti (memo)",accImp2Pay+accCon2Pay);
   }
 
-  /* ---------- SEZIONE “COME SI CALCOLANO” ---------- */
-  const disp = v=>v?euro(v):"<em>0 €</em>";
+  /* ---------- SEZ. “COME SI CALCOLANO” ---------- */
+  const sp=document.getElementById("come-si-calcolano-tab");
+  const labelAccImp  = copSalImp?` − acconti già versati ${fmt(copSalImp)}`:"";
+  const labelAccCon  = copSalCon?` − acconti già versati ${fmt(copSalCon)}`:"";
+
+  const impAccTotPay = accImp1Pay+accImp2Pay;
+  const conAccTotPay = accCon1Pay+accCon2Pay;
+
   let html=`
-    <p><em style="font-size:.9rem;">(coefficiente ricavato dal tuo codice ATECO: <strong>${(coeff*100).toFixed(0)} %</strong>)</em></p>
+   <p>Imposta (${aliq*100} %) e contributi (26,07 %) <strong>non</strong> si calcolano su ${euro(lordo)}, ma su ${euro(netto)} (incassato × coeff. ${Math.round(coeff*100)} %).</p>`+
+   (contribDeduc?`<p>Imponibile dopo deduzione contributi: <strong>${euro(impon)}</strong>.</p>`:"")+
+   `<p>Paghi quindi il ${aliq*100} % di imposta e il 26,07 % di contributi sul reddito netto.</p>
 
-    <p>Nel regime forfettario imposta (${aliq*100} %) e contributi (26,07 %) si calcolano <u>non</u> sul totale incassato (<strong>${euro(lordo)}</strong>) ma sul tuo incassato × coefficiente (<strong>${euro(netto)}</strong>).</p>`+
-    (contribDeduc>0?`<p>Deducendo contributi versati <strong>${euro(contribDeduc)}</strong> ottieni un imponibile di <strong>${euro(impon)}</strong>.</p>`:"")+
-    `<p>Paghi l’imposta sostitutiva del <strong>${aliq*100} %</strong> e i contributi INPS del <strong>26,07 %</strong>.</p>`+
-    (aliq===0.05?`<p style="color:#d32f2f;"><em>L’aliquota al 5 % vale solo per i primi 5 anni; poi diventa 15 %.</em></p>`:"")+
+   <h3>Saldi 2026</h3>
+   <p>Imposta saldo: ${euro(saldoImp)}${labelAccImp} = <strong>${euro(saldoImpPay)}</strong> (giugno)</p>
+   <p>Contributi saldo: ${euro(saldoCon)}${labelAccCon} = <strong>${euro(saldoConPay)}</strong> (giugno)</p>
 
-    `<h3>Tabella riepilogo</h3>
-     <div class="table-container" style="margin-bottom:20px">
-       <table class="summ">
-         <tr><th>Descrizione</th><th>Importo</th></tr>
-         <tr><td>Reddito lordo</td><td>${euro(lordo)}</td></tr>
-         <tr><td>Reddito netto</td><td>${euro(netto)}</td></tr>
-         ${contribDeduc?`<tr><td>Imponibile</td><td>${euro(impon)}</td></tr>`:""}
-         <tr class="hl-y"><td>Imposta sostitutiva ${aliq*100} %</td><td>${euro(saldoImp)}</td></tr>
-         <tr class="hl-b"><td>Acconto imposta (100 %)</td><td>${euro(accImpTot)}</td></tr>
-         <tr class="hl-y"><td>Contributi INPS</td><td>${euro(saldoCon)}</td></tr>
-         <tr class="hl-b"><td>Acconto contributi (80 %)</td><td>${euro(accConTot)}</td></tr>
-       </table>
-     </div>`;
+   <h3>Acconti 2026</h3>
+   <p>Imposta (100 % del saldo): <strong>${euro(accImp1Pay)}</strong> + <strong>${euro(accImp2Pay)}</strong> = <strong>${euro(impAccTotPay)}</strong></p>
+   <p>Contributi (80 % del saldo): <strong>${euro(accCon1Pay)}</strong> + <strong>${euro(accCon2Pay)}</strong> = <strong>${euro(conAccTotPay)}</strong></p>
 
-  html+=`
-    <h3>Saldi 2026</h3>
-    <p>Imposta saldo: ${euro(saldoImp)} − acconti già versati ${disp(copSaldoImp)} = <strong>${euro(saldoImpPay)}</strong> (giugno)</p>
-    <p>Contributi saldo: ${euro(saldoCon)} − acconti già versati ${disp(copSaldoCon)} = <strong>${euro(saldoConPay)}</strong> (giugno)</p>
-
-    <h3>Acconti 2026</h3>
-    <p>Imposta (100 % del saldo): <strong>${euro(accImp1Pay)}</strong> a giugno e <strong>${euro(accImp2Pay)}</strong> a novembre</p>
-    <p>Contributi (80 % del saldo): <strong>${euro(accCon1Pay)}</strong> + <strong>${euro(accCon2Pay)}</strong></p>
-
-    <h3>Totali</h3>
-    <ul>
-      <li>Saldi: <strong>${euro(totSaldo)}</strong> (${pct(totSaldo,lordo)})</li>
-      <li>Acconti: <strong>${euro(totAcc)}</strong> (${pct(totAcc,lordo)})</li>
-      <li><strong>Complessivo</strong>: ${euro(totPay)} (${pct(totPay,lordo)})</li>
-    </ul>`;
+   <h3>Totali</h3>
+   <ul>
+     <li>Saldi: <strong>${euro(totSaldo)}</strong> (${pct(totSaldo,lordo)}) – imposta ${euro(saldoImpPay)}, contributi ${euro(saldoConPay)}</li>
+     <li>Acconti: <strong>${euro(totAcc)}</strong> (${pct(totAcc,lordo)}) – imposta ${euro(impAccTotPay)}, contributi ${euro(conAccTotPay)}</li>
+     <li><strong>Complessivo</strong>: ${euro(totPay)} (${pct(totPay,lordo)}) – saldi ${euro(totSaldo)}, acconti ${euro(totAcc)}</li>
+   </ul>`;
 
   if(rateMode==="rate"){
-    const baseTot = saldoImpPay+saldoConPay+accImp1Pay+accCon1Pay+accImp2Pay+accCon2Pay;
-    html+=`<h3>Piano rateale (5 rate da giugno a ottobre)</h3><ul>`;
+    const base=totPay;
+    html+=`<h3>Piano rateale (5 rate giugno-ottobre)</h3><ul>`;
     for(let i=0;i<5;i++){
-      const quota=baseTot/5*rateMult[i];
-      html+=`<li>${rateDates[i]}: <strong>${euro(quota)}</strong></li>`;
+      const quota=base/5*rateMult[i];
+      html+=`<li>${rateDates[i]}: ${euro(quota)}</li>`;
     }
-    html+="</ul>";
+    html+=`<li>30 novembre: ${euro(accImp2Pay+accCon2Pay)} (2° acconti)</li></ul>`;
   }
 
-  document.getElementById("come-si-calcolano-tab").innerHTML=html;
+  sp.innerHTML=html;
 
-  /* -------- mostra output e torna alla scheda spiegazione -------- */
+  /* ----- mostra output e torna a tab spiegazione ----- */
   document.getElementById("resultBox").style.display="block";
   document.querySelectorAll(".tab, .tab-content").forEach(el=>el.classList.remove("active"));
   document.querySelector("[data-tab='come-si-calcolano-tab']").classList.add("active");
-  document.getElementById("come-si-calcolano-tab").classList.add("active");
+  sp.classList.add("active");
 };
 </script>
-</body>
-</html>
+</body></html>
