@@ -16,11 +16,16 @@
   .results{margin-top:24px; padding:20px; background:#f3f4f6; border-radius:12px;}
   .kpi{margin:10px 0; font-weight:bold;}
   .explanation{margin-top:20px; line-height:1.6;}
+  details{margin-top:16px; background:#f9fafb; border:1px solid #ddd; border-radius:8px; padding:10px;}
+  summary{cursor:pointer; font-weight:600;}
+  table{width:100%; border-collapse:collapse; margin-top:16px;}
+  th, td{border:1px solid #ddd; padding:8px; text-align:center;}
+  th{background:#f3f4f6;}
 </style>
 </head>
 <body>
 <div class="container">
-  <h1>Simulatore Regime Forfettario – GS 2025</h1>
+  <h1>Simulatore Forfettario – GS 2025</h1>
 
   <!-- Input -->
   <div id="inputs">
@@ -40,14 +45,19 @@
       <option value="0.15">15% (Ordinaria)</option>
     </select>
 
-    <label>Contributi previdenziali già versati (€)</label>
-    <input id="deducibili" type="number" min="0" step="0.01" value="0" />
+    <details>
+      <summary>Mostra opzioni avanzate</summary>
+      <div style="margin-top:10px;">
+        <label>Contributi previdenziali già versati (€)</label>
+        <input id="deducibili" type="number" min="0" step="0.01" value="0" />
 
-    <label>Acconti imposta versati l’anno prima (€)</label>
-    <input id="accImpostaVersati" type="number" min="0" step="0.01" value="0" />
+        <label>Acconti imposta versati l’anno prima (€)</label>
+        <input id="accImpostaVersati" type="number" min="0" step="0.01" value="0" />
 
-    <label>Acconti INPS GS versati l’anno prima (€)</label>
-    <input id="accInpsVersati" type="number" min="0" step="0.01" value="0" />
+        <label>Acconti INPS GS versati l’anno prima (€)</label>
+        <input id="accInpsVersati" type="number" min="0" step="0.01" value="0" />
+      </div>
+    </details>
 
     <button id="btnCalc">CALCOLA</button>
   </div>
@@ -62,6 +72,14 @@
     <div class="kpi">Acconti per l’anno prossimo: <span id="outAcconti"></span></div>
     <div class="kpi">Totale da versare: <span id="outTotale"></span></div>
 
+    <h3>Rateizzazione giugno (5 rate)</h3>
+    <table id="tblRate">
+      <thead>
+        <tr><th>Rata</th><th>Importo</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
     <div class="explanation" id="explanation"></div>
   </div>
 </div>
@@ -73,9 +91,9 @@
     const incassato = parseFloat(document.getElementById("incassato").value)||0;
     const coeff = parseFloat(document.getElementById("coeff").value);
     const impostaRate = parseFloat(document.getElementById("imposta").value);
-    const deducibili = parseFloat(document.getElementById("deducibili").value)||0;
-    const accImpVersati = parseFloat(document.getElementById("accImpostaVersati").value)||0;
-    const accInpsVersati = parseFloat(document.getElementById("accInpsVersati").value)||0;
+    const deducibili = parseFloat(document.getElementById("deducibili")?.value)||0;
+    const accImpVersati = parseFloat(document.getElementById("accImpostaVersati")?.value)||0;
+    const accInpsVersati = parseFloat(document.getElementById("accInpsVersati")?.value)||0;
 
     const ALIQUOTA_INPS = 0.2607;
     const ACCONTO_INPS_PERC = 0.80;
@@ -103,17 +121,27 @@
     document.getElementById("outAcconti").textContent = €(accontiTotali);
     document.getElementById("outTotale").textContent = €(totale);
 
+    // Tabella rateizzazione (5 rate di giugno: saldo + 1° acconto imposta + 1° acconto INPS)
+    const giugnoDaPagare = saldoTotale + (accImpostaTot*0.5) + (accInpsTot*0.5);
+    const rata = giugnoDaPagare / 5;
+    const tbody = document.querySelector("#tblRate tbody");
+    tbody.innerHTML = "";
+    for(let i=1;i<=5;i++){
+      tbody.innerHTML += `<tr><td>Rata ${i}</td><td>${€(rata)}</td></tr>`;
+    }
+
     // Spiegazione personalizzata
     let spiegazione = `
-      Hai indicato che nell’anno hai incassato <b>${€(incassato)}</b>.
-      Con il coefficiente di redditività scelto (${Math.round(coeff*100)}%) il fisco considera solo una parte come “guadagno”.
-      Su questo calcoliamo i <b>contributi INPS</b> con l’aliquota del 26,07%.
-      Per l’imposta sostitutiva hai scelto l’aliquota del <b>${Math.round(impostaRate*100)}%</b>, 
-      che si applica dopo aver tolto eventuali contributi già versati (<b>${€(deducibili)}</b>).
-      Guardando agli acconti: l’anno scorso hai già versato <b>${€(accImpVersati)}</b> di imposta e <b>${€(accInpsVersati)}</b> di INPS.
-      Quindi il tuo <b>saldo adesso</b> è quello che rimane dopo aver tolto quegli acconti.
-      In più versi <b>acconti per l’anno prossimo</b> (imposta al 100%, INPS all’80%) così l’anno dopo pagherai meno.
-      Alla fine, quello che devi pagare adesso è la somma del saldo e degli acconti.
+      Hai dichiarato un incassato annuo di <b>${€(incassato)}</b>.
+      Con il coefficiente del ${Math.round(coeff*100)}% il reddito forfettario su cui calcolare tasse e contributi è ridotto.
+      Su questo si calcolano i <b>contributi INPS (26,07%)</b>.
+      Per l’imposta sostitutiva hai scelto <b>${Math.round(impostaRate*100)}%</b>,
+      applicata al reddito forfettario meno i contributi già versati (<b>${€(deducibili)}</b>).
+      Dal totale tolgo gli acconti pagati l’anno prima (<b>${€(accImpVersati)}</b> di imposta e <b>${€(accInpsVersati)}</b> di INPS),
+      e ottengo il <b>saldo da pagare ora</b>.
+      Poi calcolo anche gli <b>acconti per l’anno prossimo</b> (100% imposta + 80% INPS).
+      La somma di saldo e acconti è quello che devi versare quest’anno.
+      Per aiutarti, l’importo di giugno può essere suddiviso in 5 rate uguali.
     `;
     document.getElementById("explanation").innerHTML = spiegazione;
 
