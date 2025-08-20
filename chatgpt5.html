@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
 <title>Simulatore Forfettario – GS 2025</title>
 <style>
   body{font-family:Arial, sans-serif; background:#f9fafb; margin:0; color:#111;}
@@ -14,10 +13,6 @@
   button:hover{background:#1d4ed8;}
   .hidden{display:none;}
   .results{margin-top:24px; padding:20px; background:#f3f4f6; border-radius:12px;}
-  .kpi{margin:10px 0; font-weight:bold;}
-  .explanation{margin-top:20px; line-height:1.6;}
-  details{margin-top:16px; background:#f9fafb; border:1px solid #ddd; border-radius:8px; padding:10px;}
-  summary{cursor:pointer; font-weight:600;}
   table{width:100%; border-collapse:collapse; margin-top:16px;}
   th, td{border:1px solid #ddd; padding:8px; text-align:center;}
   th{background:#f3f4f6;}
@@ -27,129 +22,98 @@
 <div class="container">
   <h1>Simulatore Forfettario – GS 2025</h1>
 
-  <!-- Input -->
-  <div id="inputs">
-    <label>Incassato annuo (€)</label>
-    <input id="incassato" type="number" min="0" step="0.01" placeholder="Es. 30000" />
+  <label>Incassato annuo (€)</label>
+  <input id="incassato" type="number" placeholder="es. 30000">
 
-    <label>Coefficiente di redditività</label>
-    <select id="coeff">
-      <option value="0.78">78%</option>
-      <option value="0.86">86%</option>
-      <option value="0.67">67%</option>
-    </select>
+  <label>Coefficiente di redditività</label>
+  <select id="coeff">
+    <option value="0.78">78%</option>
+    <option value="0.86">86%</option>
+    <option value="0.67">67%</option>
+  </select>
 
-    <label>Imposta sostitutiva</label>
-    <select id="imposta">
-      <option value="0.05">5% (Startup)</option>
-      <option value="0.15">15% (Ordinaria)</option>
-    </select>
+  <label>Imposta sostitutiva</label>
+  <select id="imposta">
+    <option value="0.05">5% (Startup)</option>
+    <option value="0.15">15% (Ordinaria)</option>
+  </select>
 
-    <details>
-      <summary>Mostra opzioni avanzate</summary>
-      <div style="margin-top:10px;">
-        <label>Contributi previdenziali già versati (€)</label>
-        <input id="deducibili" type="number" min="0" step="0.01" value="0" />
+  <details>
+    <summary>Mostra opzioni avanzate</summary>
+    <label>Contributi già versati (€)</label>
+    <input id="deducibili" type="number" value="0">
+    <label>Acconti imposta versati anno prima (€)</label>
+    <input id="accImpostaVersati" type="number" value="0">
+    <label>Acconti INPS versati anno prima (€)</label>
+    <input id="accInpsVersati" type="number" value="0">
+  </details>
 
-        <label>Acconti imposta versati l’anno prima (€)</label>
-        <input id="accImpostaVersati" type="number" min="0" step="0.01" value="0" />
+  <button onclick="calcola()">CALCOLA</button>
 
-        <label>Acconti INPS GS versati l’anno prima (€)</label>
-        <input id="accInpsVersati" type="number" min="0" step="0.01" value="0" />
-      </div>
-    </details>
-
-    <button id="btnCalc">CALCOLA</button>
-  </div>
-
-  <!-- Risultati -->
-  <div id="results" class="results hidden">
+  <div id="risultati" class="results hidden">
     <h2>Risultati</h2>
-    <div class="kpi">Reddito imponibile forfettario: <span id="outImponibile"></span></div>
-    <div class="kpi">Contributi INPS dovuti: <span id="outInps"></span></div>
-    <div class="kpi">Imposta sostitutiva: <span id="outImposta"></span></div>
-    <div class="kpi">Saldo da pagare ora: <span id="outSaldo"></span></div>
-    <div class="kpi">Acconti per l’anno prossimo: <span id="outAcconti"></span></div>
-    <div class="kpi">Totale da versare: <span id="outTotale"></span></div>
+    <p><b>Reddito imponibile:</b> <span id="outImponibile"></span></p>
+    <p><b>Contributi INPS:</b> <span id="outInps"></span></p>
+    <p><b>Imposta sostitutiva:</b> <span id="outImposta"></span></p>
+    <p><b>Saldo da pagare ora:</b> <span id="outSaldo"></span></p>
+    <p><b>Acconti anno prossimo:</b> <span id="outAcconti"></span></p>
+    <p><b>Totale da versare:</b> <span id="outTotale"></span></p>
 
-    <h3>Rateizzazione giugno (5 rate)</h3>
+    <h3>Rate di giugno (5 rate)</h3>
     <table id="tblRate">
-      <thead>
-        <tr><th>Mese</th><th>Importo</th></tr>
-      </thead>
+      <thead><tr><th>Mese</th><th>Importo</th></tr></thead>
       <tbody></tbody>
     </table>
-
-    <div class="explanation" id="explanation"></div>
   </div>
 </div>
 
 <script>
-  const € = n => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
+function €(n){return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0)}
 
-  document.getElementById("btnCalc").addEventListener("click", ()=>{
-    const getVal = id => parseFloat(document.getElementById(id)?.value)||0;
+function calcola(){
+  const incassato = parseFloat(document.getElementById("incassato").value)||0;
+  const coeff = parseFloat(document.getElementById("coeff").value);
+  const impostaRate = parseFloat(document.getElementById("imposta").value);
+  const deducibili = parseFloat(document.getElementById("deducibili")?.value)||0;
+  const accImpVersati = parseFloat(document.getElementById("accImpostaVersati")?.value)||0;
+  const accInpsVersati = parseFloat(document.getElementById("accInpsVersati")?.value)||0;
 
-    const incassato = getVal("incassato");
-    const coeff = parseFloat(document.getElementById("coeff").value);
-    const impostaRate = parseFloat(document.getElementById("imposta").value);
-    const deducibili = getVal("deducibili");
-    const accImpVersati = getVal("accImpostaVersati");
-    const accInpsVersati = getVal("accInpsVersati");
+  const ALIQUOTA_INPS = 0.2607;
+  const ACCONTO_INPS_PERC = 0.80;
 
-    const ALIQUOTA_INPS = 0.2607;
-    const ACCONTO_INPS_PERC = 0.80;
+  const imponibileForf = incassato * coeff;
+  const inps = imponibileForf * ALIQUOTA_INPS;
+  const imponibileFiscale = Math.max(0, imponibileForf - deducibili);
+  const imposta = imponibileFiscale * impostaRate;
 
-    const imponibileForf = incassato * coeff;
-    const inps = imponibileForf * ALIQUOTA_INPS;
-    const imponibileFiscale = Math.max(0, imponibileForf - deducibili);
-    const imposta = imponibileFiscale * impostaRate;
+  const saldoImposta = Math.max(0, imposta - accImpVersati);
+  const saldoInps = Math.max(0, inps - accInpsVersati);
+  const saldoTotale = saldoImposta + saldoInps;
 
-    const saldoImposta = Math.max(0, imposta - accImpVersati);
-    const saldoInps = Math.max(0, inps - accInpsVersati);
-    const saldoTotale = saldoImposta + saldoInps;
+  const accImpostaTot = imposta;
+  const accInpsTot = inps * ACCONTO_INPS_PERC;
+  const accontiTotali = accImpostaTot + accInpsTot;
 
-    const accImpostaTot = imposta;
-    const accInpsTot = inps * ACCONTO_INPS_PERC;
-    const accontiTotali = accImpostaTot + accInpsTot;
+  const totale = saldoTotale + accontiTotali;
 
-    const totale = saldoTotale + accontiTotali;
+  document.getElementById("outImponibile").textContent = €(imponibileForf);
+  document.getElementById("outInps").textContent = €(inps);
+  document.getElementById("outImposta").textContent = €(imposta);
+  document.getElementById("outSaldo").textContent = €(saldoTotale);
+  document.getElementById("outAcconti").textContent = €(accontiTotali);
+  document.getElementById("outTotale").textContent = €(totale);
 
-    // Output numerico
-    document.getElementById("outImponibile").textContent = €(imponibileForf);
-    document.getElementById("outInps").textContent = €(inps);
-    document.getElementById("outImposta").textContent = €(imposta);
-    document.getElementById("outSaldo").textContent = €(saldoTotale);
-    document.getElementById("outAcconti").textContent = €(accontiTotali);
-    document.getElementById("outTotale").textContent = €(totale);
+  // Tabella rate (saldo + primi acconti divisi in 5 mesi)
+  const giugnoDaPagare = saldoTotale + (accImpostaTot*0.5) + (accInpsTot*0.5);
+  const rata = giugnoDaPagare/5;
+  const mesi=["Giugno","Luglio","Agosto","Settembre","Ottobre"];
+  const tbody=document.querySelector("#tblRate tbody");
+  tbody.innerHTML="";
+  mesi.forEach(m=>tbody.innerHTML+=`<tr><td>${m}</td><td>${€(rata)}</td></tr>`);
 
-    // Rate giugno (Saldo + 1° acconto di ciascun tipo)
-    const giugnoDaPagare = saldoTotale + (accImpostaTot*0.5) + (accInpsTot*0.5);
-    const rata = giugnoDaPagare / 5;
-    const mesi = ["Giugno","Luglio","Agosto","Settembre","Ottobre"];
-    const tbody = document.querySelector("#tblRate tbody");
-    tbody.innerHTML = "";
-    mesi.forEach((m,i)=>{
-      tbody.innerHTML += `<tr><td>${m}</td><td>${€(rata)}</td></tr>`;
-    });
-
-    // Spiegazione personalizzata
-    let spiegazione = `
-      Hai inserito un incassato annuo di <b>${€(incassato)}</b>.
-      Con il coefficiente del ${Math.round(coeff*100)}% il fisco considera una parte di questo come reddito imponibile.
-      Su questo si calcolano i contributi INPS (26,07%).
-      L’imposta sostitutiva scelta è del <b>${Math.round(impostaRate*100)}%</b>, applicata dopo aver tolto eventuali contributi già versati (<b>${€(deducibili)}</b>).
-      Sottraendo gli acconti dell’anno precedente (<b>${€(accImpVersati)}</b> di imposta e <b>${€(accInpsVersati)}</b> di INPS) otteniamo il <b>saldo da pagare ora</b>.
-      Poi calcoliamo anche gli acconti per l’anno prossimo (100% dell’imposta + 80% dell’INPS).
-      La somma di saldo e acconti è il totale di quest’anno.
-      Per il pagamento di giugno, puoi suddividerlo in 5 rate mensili uguali da giugno a ottobre.
-    `;
-    document.getElementById("explanation").innerHTML = spiegazione;
-
-    // Mostra risultati
-    document.getElementById("results").classList.remove("hidden");
-    window.scrollTo({top: document.getElementById("results").offsetTop, behavior:'smooth'});
-  });
+  document.getElementById("risultati").classList.remove("hidden");
+  window.scrollTo({top: document.getElementById("risultati").offsetTop, behavior:'smooth'});
+}
 </script>
 </body>
 </html>
