@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simulatore Forfettario • GS 2025</title>
+<title>Simulatore Forfettario • Gestione Separata 2025</title>
 <style>
   :root{
     --bg:#f7f9fc; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
@@ -68,7 +68,7 @@
 <div class="wrap">
   <header>
     <h1>Simulatore Forfettario • Gestione Separata 2025</h1>
-    <p class="sub">Imponibile, INPS 26,07%, imposta 5%/15%, saldi, acconti e rate (con interessi ufficiali).</p>
+    <p class="sub">Imponibile, INPS 26,07%, imposta 5%/15%, saldi, acconti (con compensazione crediti) e rate con interessi.</p>
   </header>
 
   <!-- INPUT -->
@@ -171,7 +171,7 @@
           <div class="kpi">
             <h3>Acconti per l’anno prossimo</h3>
             <div class="big" id="outAcconti">€ 0,00</div>
-            <div class="muted" style="font-size:12px">Imposta 100% • INPS 80% (2 rate)</div>
+            <div class="muted" style="font-size:12px">Imposta 100% • INPS 80% (2 rate) <i>al netto dei crediti</i></div>
           </div>
           <div class="kpi">
             <h3>Totale da versare</h3>
@@ -261,11 +261,11 @@
     }
     document.getElementById('err').classList.add('hidden');
 
-    // Calcoli base
+    // Base
     var imponibileForf = incassato * coeff;
     var inps           = imponibileForf * ALIQUOTA_INPS;
 
-    // Deduzione solo per imposta
+    // Imposta (deduzione solo qui)
     var imponibileFisc = imponibileForf - Math.max(0, deducibili);
     if(imponibileFisc < 0) imponibileFisc = 0;
     var imposta        = imponibileFisc * impRate;
@@ -275,14 +275,22 @@
     var saldoInps      = inps    - Math.max(0, accInpsPrev); if(saldoInps<0) saldoInps=0;
     var saldoTotale    = saldoImposta + saldoInps;
 
-    // Acconti (storico)
-    var accImpTot  = imposta;            // 100%
-    var accImp1    = accImpTot * 0.50;
-    var accImp2    = accImpTot * 0.50;
+    // ---- CREDITI DA ACCONTI PRECEDENTI (se superano il dovuto) ----
+    var creditoImp  = Math.max(0, accImpPrev  - imposta); // eccedenza acconti imposta
+    var creditoInps = Math.max(0, accInpsPrev - inps);    // eccedenza acconti INPS
 
-    var accInpsTot = inps * ACCONTO_INPS_PERC; // 80%
-    var accInps1   = accInpsTot * 0.50;        // 40%
-    var accInps2   = accInpsTot * 0.50;        // 40%
+    // ---- ACCONTI (metodo storico) AL NETTO DEI CREDITI ----
+    var accImpTotBase  = imposta;                 // 100% imposta
+    var accInpsTotBase = inps * ACCONTO_INPS_PERC;// 80% INPS
+
+    var accImpTot  = Math.max(0, accImpTotBase  - creditoImp);   // ridotti dal credito imposta
+    var accInpsTot = Math.max(0, accInpsTotBase - creditoInps);  // ridotti dal credito INPS
+
+    var creditoImpResid  = Math.max(0, creditoImp  - accImpTotBase);  // se avanza oltre l'intero acconto
+    var creditoInpsResid = Math.max(0, creditoInps - accInpsTotBase);
+
+    var accImp1  = accImpTot * 0.50,  accImp2  = accImpTot * 0.50;
+    var accInps1 = accInpsTot * 0.50, accInps2 = accInpsTot * 0.50;
 
     var accontiTot = accImpTot + accInpsTot;
 
@@ -319,12 +327,28 @@
     det+=tr('Acconti INPS versati anno precedente', '− '+euro(accInpsPrev));
     det+=tr('<b>Saldo INPS</b>', '<b>'+euro(saldoInps)+'</b>');
     det+=tr('<b>Saldo totale (imposta + INPS)</b>', '<b>'+euro(saldoTotale)+'</b>');
-    det+='<tr><th colspan="2">Acconti per l’anno prossimo (metodo storico)</th></tr>';
+
+    if(creditoImp>0 || creditoInps>0){
+      det+='<tr><th colspan="2">Eventuali crediti da acconti precedenti</th></tr>';
+      if(creditoImp>0)  det+=tr('Credito imposta che riduce i <i>nuovi acconti</i>', '− '+euro(creditoImp));
+      if(creditoInps>0) det+=tr('Credito INPS che riduce i <i>nuovi acconti</i>',  '− '+euro(creditoInps));
+    }
+
+    det+='<tr><th colspan="2">Acconti per l’anno prossimo (metodo storico) — <i>al netto dei crediti</i></th></tr>';
+    det+=tr('Imposta – Totale acconti', euro(accImpTot));
+    det+=tr('INPS – Totale acconti',    euro(accInpsTot));
     det+=tr('Imposta – 1° acconto (50%)', euro(accImp1));
     det+=tr('Imposta – 2° acconto (50%)', euro(accImp2));
     det+=tr('INPS – 1° acconto (40%)',    euro(accInps1));
     det+=tr('INPS – 2° acconto (40%)',    euro(accInps2));
     det+=tr('<b>Acconti totali</b>', '<b>'+euro(accontiTot)+'</b>');
+
+    if(creditoImpResid>0 || creditoInpsResid>0){
+      det+='<tr><th colspan="2">Credito residuo da riportare</th></tr>';
+      if(creditoImpResid>0)  det+=tr('Credito imposta residuo', euro(creditoImpResid));
+      if(creditoInpsResid>0) det+=tr('Credito INPS residuo',    euro(creditoInpsResid));
+    }
+
     det+='<tr><th colspan="2">Scadenze</th></tr>';
     det+=tr('Giugno — Saldo (imp.+INPS) + 1° acconti', euro(giugnoTot));
     det+=tr('Novembre — 2° acconti',                   euro(novTot));
@@ -335,54 +359,52 @@
     var chk=document.getElementById('toggleRate');
     if(chk.checked){ buildRate(); } else { hide('tblRate'); }
 
-    // ----- SPIEGAZIONE NARRATIVA (senza "max(0, ...)") -----
+    // ----- SPIEGAZIONE NARRATIVA -----
     var S='';
-    // 1) Introduzione + imponibile
     S += '<p class="line">Nel <b>regime forfettario</b> paghi l’<b>imposta sostitutiva</b> al <span class="hl y"><b>'+Math.round(impRate*100)+'%</b></span> e i <b>contributi INPS – Gestione Separata</b> al <span class="hl y"><b>26,07%</b></span>.</p>';
     S += '<p class="line">La base di tutto è l’<b>imponibile forfettario</b>: <span class="mono">Imponibile = Incassato × Coefficiente</span>. Con i tuoi dati: <span class="hl g"><b>'+euro(incassato)+'</b> × <b>'+Math.round(coeff*100)+'%</b> = <b>'+euro(imponibileForf)+'</b></span>.</p>';
 
-    // 2) Sezione dedicata ai contributi INPS
     S += '<h3>Contributi INPS (come si calcolano)</h3>';
-    S += '<p class="line">I contributi si calcolano <i>sempre</i> sull’<b>imponibile</b>, applicando il <b>26,07%</b>. Quindi: <span class="mono">Contributi INPS = Imponibile × 26,07%</span> → <span class="hl y"><b>'+euro(imponibileForf)+'</b> × 26,07% = <b>'+euro(inps)+'</b></span>.</p>';
-    S += '<p class="line muted">Gli eventuali contributi che hai già pagato durante l’anno <b>non riducono</b> questa cifra: servono solo per il calcolo dell’imposta (vedi sotto).</p>';
+    S += '<p class="line">Si applica il <b>26,07%</b> all’imponibile: <span class="mono">Contributi INPS = Imponibile × 26,07%</span> → <span class="hl y"><b>'+euro(inps)+'</b></span>. I contributi che hai già pagato nell’anno <i>non</i> riducono questa cifra.</p>';
 
-    // 3) Imposta con deduzioni
-    S += '<h3>Imposta sostitutiva (deduzioni comprese)</h3>';
+    S += '<h3>Imposta sostitutiva (con deduzioni)</h3>';
     if(deducibili>0){
       if(deducibili>=imponibileForf){
-        S += '<p class="line">Hai indicato <span class="hl b"><b>'+euro(deducibili)+'</b></span> di contributi già versati nell’anno. Poiché superano l’imponibile, la <b>base per l’imposta si azzera</b>. L’imposta con aliquota <b>'+Math.round(impRate*100)+'%</b> risulta quindi <span class="hl y"><b>'+euro(imposta)+'</b></span>.</p>';
+        S += '<p class="line">Hai indicato <span class="hl b"><b>'+euro(deducibili)+'</b></span> di contributi già versati: la <b>base dell’imposta si azzera</b> e l’imposta con aliquota <b>'+Math.round(impRate*100)+'%</b> risulta <span class="hl y"><b>'+euro(imposta)+'</b></span>.</p>';
       }else{
-        S += '<p class="line">Hai indicato <span class="hl b"><b>'+euro(deducibili)+'</b></span> di contributi già versati nell’anno: li sottraiamo dall’imponibile <b>solo</b> per il calcolo dell’imposta. <span class="mono">Base imposta = Imponibile − Contributi deducibili</span> → <span class="hl b"><b>'+euro(imponibileForf)+'</b> − <b>'+euro(deducibili)+'</b> = <b>'+euro(imponibileFisc)+'</b></span>. L’imposta è <span class="hl y"><b>'+euro(imposta)+'</b></span> con aliquota <b>'+Math.round(impRate*100)+'%</b>.</p>';
+        S += '<p class="line">Deduzione: <span class="hl b"><b>'+euro(deducibili)+'</b></span>. <span class="mono">Base imposta = Imponibile − Contributi deducibili</span> → <span class="hl b"><b>'+euro(imponibileFisc)+'</b></span>. Imposta con aliquota <b>'+Math.round(impRate*100)+'%</b>: <span class="hl y"><b>'+euro(imposta)+'</b></span>.</p>';
       }
     }else{
-      S += '<p class="line">Non risultano contributi deducibili nell’anno: la <b>base per l’imposta</b> coincide con l’imponibile (<b>'+euro(imponibileForf)+'</b>). Con aliquota <b>'+Math.round(impRate*100)+'%</b> l’imposta è <span class="hl y"><b>'+euro(imposta)+'</b></span>.</p>';
+      S += '<p class="line">Nessuna deduzione: l’imposta si calcola direttamente su <b>'+euro(imponibileForf)+'</b> con aliquota <b>'+Math.round(impRate*100)+'%</b> → <span class="hl y"><b>'+euro(imposta)+'</b></span>.</p>';
     }
 
-    // 4) Saldi adesso (prima INPS poi imposta)
     S += '<h3>Saldi da pagare adesso</h3>';
-    S += '<p class="line"><b>Saldo INPS</b> = contributi INPS − acconti INPS versati l’anno scorso → <span class="hl y"><b>'+euro(inps)+'</b> − <b>'+euro(accInpsPrev)+'</b> = <b>'+euro(saldoInps)+'</b></span> (se gli acconti erano più alti, il saldo si considera zero).</p>';
-    S += '<p class="line"><b>Saldo imposta</b> = imposta − acconti imposta versati l’anno scorso → <span class="hl y"><b>'+euro(imposta)+'</b> − <b>'+euro(accImpPrev)+'</b> = <b>'+euro(saldoImposta)+'</b></span>.</p>';
-    S += '<p class="line">Il <b>saldo complessivo</b> da versare ora (imposta + INPS) è <span class="hl g"><b>'+euro(saldoTotale)+'</b></span>.</p>';
+    S += '<p class="line"><b>Saldo INPS</b> = contributi INPS − acconti INPS già versati → <span class="hl y"><b>'+euro(saldoInps)+'</b></span>. <b>Saldo imposta</b> = imposta − acconti imposta già versati → <span class="hl y"><b>'+euro(saldoImposta)+'</b></span>. In totale ora versi <span class="hl g"><b>'+euro(saldoTotale)+'</b></span>.</p>';
 
-    // 5) Acconti
-    var accImp1 = accImpTot*0.50, accImp2 = accImpTot*0.50;
-    var accInps1 = accInpsTot*0.50, accInps2 = accInpsTot*0.50;
     S += '<h3>Acconti per l’anno prossimo (metodo storico)</h3>';
-    S += '<p class="line">Per l’<b>imposta</b> versi il <b>100%</b> dell’imposta di quest’anno in due metà uguali (<i>50% a giugno</i> e <i>50% a novembre</i>): <b>'+euro(accImp1)+'</b> + <b>'+euro(accImp2)+'</b>.</p>';
-    S += '<p class="line">Per l’<b>INPS</b> versi l’<b>80%</b> dei contributi in due metà uguali (<i>40% a giugno</i> e <i>40% a novembre</i>): <b>'+euro(accInps1)+'</b> + <b>'+euro(accInps2)+'</b>.</p>';
-    S += '<p class="line">Gli <b>acconti totali</b> ammontano a <span class="hl g"><b>'+euro(accontiTot)+'</b></span>.</p>';
-
-    // 6) Scadenze + rate
+    if(creditoImp>0 || creditoInps>0){
+      S += '<p class="line">Hai <b>crediti</b> da acconti dell’anno scorso che <i>superano il dovuto</i>: prima azzerano i saldi, poi <b>riducano i nuovi acconti</b>.';
+      if(creditoImp>0){ S += ' Credito imposta usato: <span class="hl b"><b>'+euro(creditoImp)+'</b></span>.'; }
+      if(creditoInps>0){ S += ' Credito INPS usato: <span class="hl b"><b>'+euro(creditoInps)+'</b></span>.'; }
+      S += '</p>';
+    }
+    S += '<p class="line">Imposta: acconti totali (al netto crediti) = <span class="hl y"><b>'+euro(accImpTot)+'</b></span> → metà giugno <b>'+euro(accImp1)+'</b>, metà novembre <b>'+euro(accImp2)+'</b>.</p>';
+    S += '<p class="line">INPS: acconti totali (al netto crediti) = <span class="hl y"><b>'+euro(accInpsTot)+'</b></span> → metà giugno <b>'+euro(accInps1)+'</b>, metà novembre <b>'+euro(accInps2)+'</b>.</p>';
+    if(creditoImpResid>0 || creditoInpsResid>0){
+      S += '<p class="line">Resta un <b>credito residuo</b> da riportare: ';
+      if(creditoImpResid>0)  S += 'imposta <span class="hl g"><b>'+euro(creditoImpResid)+'</b></span> ';
+      if(creditoImpResid>0 && creditoInpsResid>0) S += '• ';
+      if(creditoInpsResid>0) S += 'INPS <span class="hl g"><b>'+euro(creditoInpsResid)+'</b></span>';
+      S += '.</p>';
+    }
     var rataGiu = giugnoTot/5;
     S += '<h3>Quando paghi</h3>';
-    S += '<p class="line"><b>Giugno</b> = saldi (imposta + INPS) + primi acconti → <span class="hl y"><b>'+euro(giugnoTot)+'</b></span>. Puoi dividerlo in <b>5 rate</b> da '+euro(rataGiu)+' circa, con interessi <i>per rata</i> pari a <b>0,00% • 0,18% • 0,51% • 0,84% • 1,17%</b> sul totale di giugno (vedi tabella).</p>';
+    S += '<p class="line"><b>Giugno</b> = saldi (imposta + INPS) + primi acconti → <span class="hl y"><b>'+euro(giugnoTot)+'</b></span>. Puoi dividerlo in <b>5 rate</b> (giu→ott) con interessi per rata: <b>0,00% • 0,18% • 0,51% • 0,84% • 1,17%</b>.</p>';
     S += '<p class="line"><b>Novembre</b> = secondi acconti → <span class="hl y"><b>'+euro(novTot)+'</b></span>.</p>';
 
-    // 7) Totale
     S += '<h3>Totale anno e incidenza</h3>';
-    S += '<p class="line">Totale complessivo (<i>saldi + tutti gli acconti</i>): <span class="hl g"><b>'+euro(totale)+'</b></span>. Incidono sul tuo incassato per <b>'+perc(totale,incassato)+'</b> (saldi: '+perc(saldoTotale,incassato)+' • acconti: '+perc(accontiTot,incassato)+').</p>';
+    S += '<p class="line">Totale complessivo (<i>saldi + acconti</i>): <span class="hl g"><b>'+euro(totale)+'</b></span>. Incidono sul tuo incassato per <b>'+perc(totale,incassato)+'</b> (saldi: '+perc(saldoTotale,incassato)+' • acconti: '+perc(accontiTot,incassato)+').</p>';
 
-    // Soglie
     if(incassato>100000){
       S += '<p class="line muted"><b>Attenzione:</b> incassi oltre 100.000€ → uscita <b>immediata</b> dal forfettario nell’anno.</p>';
     }else if(incassato>85000){
@@ -397,9 +419,11 @@
     var tot = cacheGiugno;
     var quota = tot/5;
     var tbody='', sumInt=0, sumTot=0;
+    var RATE_PERC = [0.00, 0.18, 0.51, 0.84, 1.17]; // %
+    var RATE_DATE = ["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
     for(var i=0;i<5;i++){
       var p = RATE_PERC[i]/100;
-      var interesse = tot * p;               // percentuali fornite (sul totale di giugno)
+      var interesse = tot * p;   // percentuali sul totale di giugno (come da richiesta)
       var rata = quota + interesse;
       sumInt += interesse; sumTot += rata;
       tbody += '<tr>'+
@@ -433,7 +457,7 @@
       document.getElementById('coeff').value='0.78';
       document.getElementById('imposta').value='0.05';
       document.getElementById('toggleRate').checked=false;
-      hide('tblRate'); hide('resultsBox'); 
+      hide('tblRate'); hide('resultsBox');
       var err=document.getElementById('err'); err.classList.add('hidden'); err.textContent='';
       window.scrollTo({top:0,behavior:'smooth'});
     });
