@@ -30,7 +30,7 @@
   <!-- Input -->
   <div id="inputs">
     <label>Incassato annuo (€)</label>
-    <input id="incassato" type="number" min="0" step="0.01" placeholder="Es. 45000" />
+    <input id="incassato" type="number" min="0" step="0.01" placeholder="Es. 30000" />
 
     <label>Coefficiente di redditività</label>
     <select id="coeff">
@@ -75,7 +75,7 @@
     <h3>Rateizzazione giugno (5 rate)</h3>
     <table id="tblRate">
       <thead>
-        <tr><th>Rata</th><th>Importo</th></tr>
+        <tr><th>Mese</th><th>Importo</th></tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -88,12 +88,14 @@
   const € = n => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0);
 
   document.getElementById("btnCalc").addEventListener("click", ()=>{
-    const incassato = parseFloat(document.getElementById("incassato").value)||0;
+    const getVal = id => parseFloat(document.getElementById(id)?.value)||0;
+
+    const incassato = getVal("incassato");
     const coeff = parseFloat(document.getElementById("coeff").value);
     const impostaRate = parseFloat(document.getElementById("imposta").value);
-    const deducibili = parseFloat(document.getElementById("deducibili")?.value)||0;
-    const accImpVersati = parseFloat(document.getElementById("accImpostaVersati")?.value)||0;
-    const accInpsVersati = parseFloat(document.getElementById("accInpsVersati")?.value)||0;
+    const deducibili = getVal("deducibili");
+    const accImpVersati = getVal("accImpostaVersati");
+    const accInpsVersati = getVal("accInpsVersati");
 
     const ALIQUOTA_INPS = 0.2607;
     const ACCONTO_INPS_PERC = 0.80;
@@ -121,27 +123,26 @@
     document.getElementById("outAcconti").textContent = €(accontiTotali);
     document.getElementById("outTotale").textContent = €(totale);
 
-    // Tabella rateizzazione (5 rate di giugno: saldo + 1° acconto imposta + 1° acconto INPS)
+    // Rate giugno (Saldo + 1° acconto di ciascun tipo)
     const giugnoDaPagare = saldoTotale + (accImpostaTot*0.5) + (accInpsTot*0.5);
     const rata = giugnoDaPagare / 5;
+    const mesi = ["Giugno","Luglio","Agosto","Settembre","Ottobre"];
     const tbody = document.querySelector("#tblRate tbody");
     tbody.innerHTML = "";
-    for(let i=1;i<=5;i++){
-      tbody.innerHTML += `<tr><td>Rata ${i}</td><td>${€(rata)}</td></tr>`;
-    }
+    mesi.forEach((m,i)=>{
+      tbody.innerHTML += `<tr><td>${m}</td><td>${€(rata)}</td></tr>`;
+    });
 
     // Spiegazione personalizzata
     let spiegazione = `
-      Hai dichiarato un incassato annuo di <b>${€(incassato)}</b>.
-      Con il coefficiente del ${Math.round(coeff*100)}% il reddito forfettario su cui calcolare tasse e contributi è ridotto.
-      Su questo si calcolano i <b>contributi INPS (26,07%)</b>.
-      Per l’imposta sostitutiva hai scelto <b>${Math.round(impostaRate*100)}%</b>,
-      applicata al reddito forfettario meno i contributi già versati (<b>${€(deducibili)}</b>).
-      Dal totale tolgo gli acconti pagati l’anno prima (<b>${€(accImpVersati)}</b> di imposta e <b>${€(accInpsVersati)}</b> di INPS),
-      e ottengo il <b>saldo da pagare ora</b>.
-      Poi calcolo anche gli <b>acconti per l’anno prossimo</b> (100% imposta + 80% INPS).
-      La somma di saldo e acconti è quello che devi versare quest’anno.
-      Per aiutarti, l’importo di giugno può essere suddiviso in 5 rate uguali.
+      Hai inserito un incassato annuo di <b>${€(incassato)}</b>.
+      Con il coefficiente del ${Math.round(coeff*100)}% il fisco considera una parte di questo come reddito imponibile.
+      Su questo si calcolano i contributi INPS (26,07%).
+      L’imposta sostitutiva scelta è del <b>${Math.round(impostaRate*100)}%</b>, applicata dopo aver tolto eventuali contributi già versati (<b>${€(deducibili)}</b>).
+      Sottraendo gli acconti dell’anno precedente (<b>${€(accImpVersati)}</b> di imposta e <b>${€(accInpsVersati)}</b> di INPS) otteniamo il <b>saldo da pagare ora</b>.
+      Poi calcoliamo anche gli acconti per l’anno prossimo (100% dell’imposta + 80% dell’INPS).
+      La somma di saldo e acconti è il totale di quest’anno.
+      Per il pagamento di giugno, puoi suddividerlo in 5 rate mensili uguali da giugno a ottobre.
     `;
     document.getElementById("explanation").innerHTML = spiegazione;
 
