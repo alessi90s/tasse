@@ -8,8 +8,7 @@
   :root{
     --bg:#f7f9fc; --card:#ffffff; --text:#0f172a; --muted:#6b7280; --border:#e5e7eb;
     --accent:#2563eb; --accent-2:#16a34a; --warn:#f59e0b; --danger:#ef4444;
-    --radius:16px; --shadow:0 12px 28px rgba(15,23,42,.08);
-    --mono:#0b1220; --chip:#eef2ff;
+    --radius:16px; --shadow:0 12px 28px rgba(15,23,42,.08); --chip:#eef2ff;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
@@ -48,17 +47,15 @@
   th,td{border:1px solid var(--border);padding:12px 10px}
   th{background:#f3f4f6;color:var(--muted);font-weight:800}
   td:first-child{font-weight:600}
-  .muted{color:var(--muted)}
+  .nov-row{background:#fffbe6} /* novembre evidenziato */
 
-  /* Blocchi formula */
+  /* Blocchi formula/spiegazione */
   .explanation{max-width:860px;margin:0 auto;text-align:left}
-  .explanation .lead{font-size:18px;color:#0b1220;margin:0 0 14px}
-  .section{margin:18px 0}
-  .fbox{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:10px 0}
-  .ftitle{font-weight:800;margin:0 0 6px}
-  .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;color:var(--mono);background:var(--chip);border-radius:8px;padding:10px;line-height:1.5;overflow:auto}
-  .formula strong{font-weight:800}
-  .chip{display:inline-block;background:var(--chip);padding:4px 8px;border-radius:999px;font-size:12px;margin-left:6px}
+  .section{margin:20px 0}
+  .fbox{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:12px 0}
+  .ftitle{font-weight:800;margin:0 0 8px}
+  .formula{font-family:ui-monospace,Consolas,Menlo,monospace;background:var(--chip);border-radius:8px;padding:10px;line-height:1.6;overflow:auto}
+  .note{color:#374151;font-size:14px}
 
   .error{margin-top:12px;padding:12px;border-left:4px solid var(--danger);background:#fdecec;border-radius:10px;color:#7f1d1d}
 
@@ -78,7 +75,7 @@
   <div class="wrap">
     <header>
       <h1>Simulatore Forfettario • Gestione Separata 2025</h1>
-      <p class="sub">Stile semplice e centrato: imponibile, INPS (26,07%), imposta 5%/15%, saldi e acconti (storico), formule chiare.</p>
+      <p class="sub">Stile semplice: imponibile, INPS (26,07%), imposta 5%/15%, saldi e acconti (storico). Con formule e testo chiaro.</p>
     </header>
 
     <!-- INPUT -->
@@ -121,9 +118,7 @@
               <div class="field">
                 <label for="deducibili">Contributi previdenziali <u>già versati</u> nell’anno (€)</label>
                 <input id="deducibili" type="text" inputmode="decimal" value="0" />
-                <div class="muted" style="font-size:12px;margin-top:6px">
-                  I contributi deducibili <b>riducano solo la base dell’imposta</b> (non i contributi INPS).
-                </div>
+                <div class="note">I contributi deducibili <b>riducano solo la base dell’IMPOSTA</b> (non i contributi INPS).</div>
               </div>
               <div class="field"></div>
             </div>
@@ -202,7 +197,7 @@
           </table>
 
           <div style="margin:14px 0">
-            <label><input type="checkbox" id="toggleRate"> Mostra rate di giugno in 5 rate</label>
+            <label><input type="checkbox" id="toggleRate"> Mostra rate di giugno in 5 rate (+ rata di novembre)</label>
           </div>
 
           <table id="tblRate" class="hidden">
@@ -212,7 +207,7 @@
 
           <div class="hr"></div>
 
-          <h3 style="margin:8px 0">Spiegazione con formule (usando i tuoi dati)</h3>
+          <h3 style="margin:8px 0">Spiegazione chiara con formule (usando i tuoi dati)</h3>
           <div id="explanation" class="explanation"></div>
         </div>
       </div>
@@ -244,7 +239,7 @@
   var ACCONTO_INPS_PERC = 0.80;   // 80% (2 rate 40/40)
   // Imposta: acconti 100% (2 rate 50/50)
 
-  var cacheGiugno = 0;
+  var cacheGiugno = 0, cacheNov = 0;
 
   function compute(){
     hide('err'); setHTML('err','');
@@ -294,7 +289,7 @@
     setHTML('outAcconti',    euro(accontiTot));
     setHTML('outTotale',     euro(totale));
 
-    // Warnings
+    // Warnings soglie
     var w='';
     if(incassato>100000) w='<div class="dangerbox">Incassato oltre <b>100.000€</b>: uscita <b>immediata</b> dal forfettario nell’anno.</div>';
     else if(incassato>85000) w='<div class="warnbox">Superata la soglia <b>85.000€</b>: in via ordinaria si esce dal forfettario dall’anno successivo.</div>';
@@ -325,92 +320,95 @@
     var giugnoTot=saldoTotale+accImp1+accInps1;
     var novTot=accImp2+accInps2;
     det+=tr('Giugno — Saldo (imp.+INPS) + 1° acconti', euro(giugnoTot));
-    det+=tr('Novembre — 2° acconti',                   euro(novTot));
+    det+='<tr class="nov-row"><td><b>Novembre — 2° acconti</b></td><td style="text-align:center"><b>'+euro(novTot)+'</b></td></tr>';
     setHTML('tblDettaglio', det);
 
-    // Rate giugno (toggle)
-    cacheGiugno=giugnoTot;
+    // Aliquote effettive (incidenza % sul tuo incassato)
+    function perc(n){ return incassato>0 ? (n/incassato*100).toFixed(2)+'%' : '0.00%'; }
+
+    // Rate giugno + riga novembre
+    cacheGiugno=giugnoTot; cacheNov=novTot;
     var chk=document.getElementById('toggleRate');
     if(chk.checked){ buildRate(); } else { hide('tblRate'); }
 
-    // ---- SPIEGAZIONE A FORMULE ----
-    function fml(title, general, withValues){
+    // ---- Spiegazione narrativa + formule ----
+    function box(tit,formula,values,nota){
       return (
         '<div class="fbox">'+
-          '<div class="ftitle">'+title+'</div>'+
-          '<div class="formula"><strong>Formula:</strong> '+general+'</div>'+
-          '<div class="formula" style="margin-top:8px"><strong>Con i tuoi dati:</strong><br>'+withValues+'</div>'+
+          '<div class="ftitle">'+tit+'</div>'+
+          (formula? '<div class="formula"><b>Formula:</b> '+formula+'</div>' : '')+
+          (values? '<div class="formula" style="margin-top:8px"><b>Con i tuoi dati:</b><br>'+values+'</div>' : '')+
+          (nota? '<div class="note" style="margin-top:8px">'+nota+'</div>' : '')+
         '</div>'
       );
     }
-    var txt = '';
-    txt += '<p class="lead"><b>Come si legge:</b> qui sotto trovi ogni passaggio espresso prima come formula generale e poi calcolato con i tuoi dati.</p>';
 
-    // Imponibile
-    txt += fml(
+    var txt='';
+    txt += '<div class="section"><div class="note"><b>Panoramica</b>: partiamo dal tuo incassato, applichiamo il coefficiente per ottenere l’imponibile. Su quello calcoliamo i contributi INPS. Per l’imposta, prima deduciamo i contributi già versati, poi applichiamo l’aliquota scelta. Infine togliamo gli acconti dell’anno precedente (per trovare il <b>saldo</b>) e aggiungiamo gli <b>acconti</b> per l’anno prossimo. Sotto trovi formule e calcoli già compilati con i tuoi importi.</div></div>';
+
+    txt += box(
       '1) Imponibile forfettario',
       'Imponibile = Incassato × Coefficiente',
       euro(incassato)+' × '+Math.round(coeff*100)+'% = <b>'+euro(imponibileForf)+'</b>'
     );
 
-    // Contributi INPS
-    txt += fml(
-      '2) Contributi INPS (Gestione Separata)',
-      'Contributi INPS = Imponibile × 26,07%',
-      euro(imponibileForf)+' × 26,07% = <b>'+euro(inps)+'</b>'
+    txt += box(
+      '2) Contributi INPS (Gestione Separata 26,07%)',
+      'Contributi = Imponibile × 26,07%',
+      euro(imponibileForf)+' × 26,07% = <b>'+euro(inps)+'</b>',
+      'Questa voce non è influenzata dai contributi già pagati: la base rimane l’imponibile forfettario.'
     );
 
-    // Imposta sostitutiva (con deduzione)
-    txt += fml(
-      '3) Imposta sostitutiva (con deduzione dei contributi già versati)',
-      'Base imposta = max(0, Imponibile − Contributi deducibili)<br>Imposta = Base imposta × Aliquota (5% o 15%)',
-      'Base imposta = max(0, '+euro(imponibileForf)+' − '+euro(deducibili)+') = <b>'+euro(imponibileFisc)+'</b><br>'+
-      'Imposta = '+euro(imponibileFisc)+' × '+Math.round(impRate*100)+'% = <b>'+euro(imposta)+'</b>'
+    txt += box(
+      '3) Imposta sostitutiva',
+      'Base imposta = max(0, Imponibile − Contributi deducibili) → Imposta = Base × Aliquota (5% o 15%)',
+      'Base = max(0, '+euro(imponibileForf)+' − '+euro(deducibili)+') = <b>'+euro(imponibileFisc)+'</b><br>'+
+      'Imposta = '+euro(imponibileFisc)+' × '+Math.round(impRate*100)+'% = <b>'+euro(imposta)+'</b>',
+      '<b>Attenzione:</b> i contributi deducibili riducono <u>solo</u> la base dell’imposta, non i contributi INPS.'
     );
 
-    // Saldi
-    txt += fml(
-      '4) Saldi da versare ora (al netto degli acconti dell’anno prima)',
-      'Saldo imposta = max(0, Imposta − Acconti imposta)<br>Saldo INPS = max(0, Contributi INPS − Acconti INPS)<br>Saldo totale = Saldo imposta + Saldo INPS',
+    txt += box(
+      '4) Saldi da pagare adesso (netti degli acconti già pagati)',
+      'Saldo imposta = max(0, Imposta − Acconti imposta);  Saldo INPS = max(0, Contributi − Acconti INPS)',
       'Saldo imposta = max(0, '+euro(imposta)+' − '+euro(accImpPrev)+') = <b>'+euro(saldoImposta)+'</b><br>'+
       'Saldo INPS = max(0, '+euro(inps)+' − '+euro(accInpsPrev)+') = <b>'+euro(saldoInps)+'</b><br>'+
       'Saldo totale = '+euro(saldoImposta)+' + '+euro(saldoInps)+' = <b>'+euro(saldoTotale)+'</b>'
     );
 
-    // Acconti anno prossimo (storico)
-    txt += fml(
+    txt += box(
       '5) Acconti per l’anno prossimo (metodo storico)',
-      'Imposta: 100% (50% a giugno + 50% a novembre)<br>INPS: 80% (40% a giugno + 40% a novembre)',
-      'Imposta: 50% = <b>'+euro(accImp1)+'</b> e 50% = <b>'+euro(accImp2)+'</b><br>'+
-      'INPS: 40% = <b>'+euro(accInps1)+'</b> e 40% = <b>'+euro(accInps2)+'</b><br>'+
+      'Imposta: 100% (50% giugno + 50% novembre);  INPS: 80% (40% giugno + 40% novembre)',
+      'Imposta: <b>'+euro(accImp1)+'</b> (giugno) + <b>'+euro(accImp2)+'</b> (novembre)<br>'+
+      'INPS: <b>'+euro(accInps1)+'</b> (giugno) + <b>'+euro(accInps2)+'</b> (novembre)<br>'+
       'Acconti totali = <b>'+euro(accontiTot)+'</b>'
     );
 
-    // Totale anno, giugno, novembre
-    txt += fml(
-      '6) Totali e scadenze',
-      'Totale anno = Saldo totale + Acconti totali<br>Giugno = Saldo totale + 1° acconti (imposta + INPS)<br>Novembre = 2° acconti (imposta + INPS)',
+    txt += box(
+      '6) Quanto paghi e quando',
+      'Totale anno = Saldo totale + Acconti totali;  Giugno = Saldo totale + 1° acconti;  Novembre = 2° acconti',
       'Totale anno = '+euro(saldoTotale)+' + '+euro(accontiTot)+' = <b>'+euro(totale)+'</b><br>'+
       'Giugno = '+euro(saldoTotale)+' + '+euro(accImp1)+' + '+euro(accInps1)+' = <b>'+euro(giugnoTot)+'</b><br>'+
-      'Novembre = '+euro(accImp2)+' + '+euro(accInps2)+' = <b>'+euro(novTot)+'</b>'
+      'Novembre = '+euro(accImp2)+' + '+euro(accInps2)+' = <b>'+euro(novTot)+'</b>',
+      'Spunta “Mostra rate” per dividere <b>giugno</b> in 5 rate uguali (giu→ott). La riga di <b>novembre</b> resta come singola scadenza.'
     );
 
-    // Nota soglie
-    if(incassato>100000){
-      txt += '<div class="fbox"><div class="ftitle">Nota soglie</div><div class="formula">Incassato > 100.000€ → uscita <b>immediata</b> dal forfettario nell’anno.</div></div>';
-    }else if(incassato>85000){
-      txt += '<div class="fbox"><div class="ftitle">Nota soglie</div><div class="formula">Incassato > 85.000€ → in via ordinaria uscita dal forfettario <b>dall’anno successivo</b>.</div></div>';
-    }
+    txt += box(
+      '7) Incidenza sul tuo incassato',
+      'Incidenza % = Voce / Incassato',
+      'Saldo: <b>'+perc(saldoTotale)+'</b>  •  Acconti: <b>'+perc(accontiTot)+'</b>  •  Totale: <b>'+perc(totale)+'</b>'
+    );
 
     setHTML('explanation', txt);
-
     show('resultsBox');
   }
 
   function buildRate(){
     var rata=cacheGiugno/5;
     var mesi=['Giugno','Luglio','Agosto','Settembre','Ottobre'];
-    var html=''; for(var i=0;i<5;i++){ html+='<tr><td>'+mesi[i]+'</td><td>'+euro(rata)+'</td></tr>'; }
+    var html='';
+    for(var i=0;i<5;i++){ html+='<tr><td>'+mesi[i]+'</td><td>'+euro(rata)+'</td></tr>'; }
+    // aggiungo anche la rata unica di novembre (secondi acconti)
+    html+='<tr class="nov-row"><td><b>Novembre — 2° acconti</b></td><td><b>'+euro(cacheNov)+'</b></td></tr>';
     setHTML('rateBody', html); show('tblRate');
   }
 
