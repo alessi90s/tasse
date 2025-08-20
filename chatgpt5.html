@@ -3,42 +3,77 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simulatore Forfettario – GS 2025</title>
+<title>Simulatore Forfettario – Gestione Separata 2025</title>
 <style>
-  body{font-family:Arial,Helvetica,sans-serif;background:#f6f7fb;margin:0;color:#111}
-  .wrap{max-width:760px;margin:32px auto;padding:0 16px}
-  .card{background:#fff;border:1px solid #e6e8ee;border-radius:14px;box-shadow:0 8px 20px rgba(10,37,64,.06)}
-  .pad{padding:20px}
-  h1{margin:0 0 12px 0;font-size:32px}
+  :root{
+    --bg:#f7f9fc;
+    --text:#0f172a;
+    --muted:#6b7280;
+    --card:#ffffff;
+    --border:#e5e7eb;
+    --accent:#2563eb;  /* blu Fiscozen-like */
+    --accent-2:#16a34a;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --radius:14px;
+    --shadow:0 10px 24px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+  .wrap{max-width:920px;margin:34px auto;padding:0 16px}
+  header{margin-bottom:14px}
+  h1{margin:0;font-size:32px;font-weight:800;letter-spacing:.2px}
+  p.sub{margin:.25rem 0 0 0;color:var(--muted)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .pad{padding:18px}
   label{display:block;margin:14px 0 6px;font-weight:600}
-  input,select{width:100%;padding:12px;border:1px solid #dfe3ea;border-radius:10px;font-size:15px;background:#fff}
-  button{display:inline-block;margin-top:20px;padding:12px 20px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer}
-  button:hover{background:#1e4fd6}
-  details{margin-top:16px;border:1px solid #e6e8ee;border-radius:10px;background:#fafbff}
+  input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:16px}
+  input:focus,select:focus{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
+  .btn{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:12px 18px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .btn.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}
+  .controls{display:flex;gap:10px;flex-wrap:wrap}
+
+  details{margin-top:12px;border:1px solid var(--border);border-radius:12px;background:#fbfcff}
   summary{cursor:pointer;padding:12px 14px;font-weight:700}
   details .inner{padding:0 14px 14px}
+
   .hidden{display:none}
-  .results{margin-top:18px}
-  .kpi p{margin:6px 0}
-  .muted{color:#6b7280}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{border:1px solid #e6e8ee;padding:8px;text-align:center}
-  th{background:#f3f4f6}
-  .top-space{margin-top:10px}
-  .warn{margin-top:10px;padding:10px;border-left:4px solid #f59e0b;background:#fff7ed;border-radius:8px}
-  .danger{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fef2f2;border-radius:8px}
+  .results{margin-top:16px}
+  .kpis{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:850px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  .kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
+  .kpi h3{margin:0 0 6px 0;font-size:13px;color:var(--muted)}
+  .kpi .big{font-size:22px;font-weight:800}
+  .hr{height:1px;background:var(--border);margin:14px 0}
+  .warnbox{margin-top:10px;padding:12px;border-left:4px solid var(--warn);background:#fff7ed;border-radius:10px}
+  .dangerbox{margin-top:10px;padding:12px;border-left:4px solid var(--danger);background:#fef2f2;border-radius:10px}
+  table{width:100%;border-collapse:collapse}
+  th,td{border:1px solid var(--border);padding:10px;text-align:center}
+  th{background:#f3f4f6;color:var(--muted)}
+  .muted{color:var(--muted)}
+  .explanation{line-height:1.7}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border-radius:999px;padding:6px 10px;font-size:12px}
+  .opts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .toggle{display:flex;align-items:center;gap:8px}
+  .toggle input{width:auto}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="pad">
-      <h1>Simulatore Forfettario – GS 2025</h1>
+  <div class="wrap">
+    <header>
+      <h1>Simulatore Forfettario – Gestione Separata 2025</h1>
+      <p class="sub">Calcolo pulito: imponibile forfettario, INPS (26,07%), imposta 5%/15%, saldi &amp; acconti (metodo storico). Stile Fiscozen.</p>
+    </header>
 
-      <!-- CALCOLATORE (solo input) -->
-      <div id="form">
-        <label for="incassato">Incassato annuo (€)</label>
-        <input id="incassato" type="number" step="0.01" placeholder="es. 30000">
+    <!-- INPUT -->
+    <section class="card">
+      <div class="pad">
+        <div class="pill">Aliquota INPS GS 2025: 26,07%</div>
+
+        <label for="incassato">Incassato annuo (€ – principio di cassa)</label>
+        <input id="incassato" type="number" step="0.01" inputmode="decimal" placeholder="es. 30000">
 
         <label for="coeff">Coefficiente di redditività</label>
         <select id="coeff">
@@ -56,63 +91,103 @@
         <details>
           <summary>Mostra opzioni avanzate</summary>
           <div class="inner">
-            <label for="deducibili">Contributi previdenziali già versati (€) – deducibili</label>
+            <label for="deducibili">Contributi previdenziali <u>già versati</u> nell’anno (€) – deducibili per l’IMPOSTA</label>
             <input id="deducibili" type="number" step="0.01" value="0">
 
-            <label for="accImpPrev">Acconti imposta versati l’anno prima (€)</label>
+            <label for="accImpPrev">Acconti IMPOSTA versati l’anno prima (€) – somma 1790+1791</label>
             <input id="accImpPrev" type="number" step="0.01" value="0">
 
-            <label for="accInpsPrev">Acconti INPS GS versati l’anno prima (€)</label>
+            <label for="accInpsPrev">Acconti INPS GS versati l’anno prima (€) – somma delle due rate</label>
             <input id="accInpsPrev" type="number" step="0.01" value="0">
           </div>
         </details>
 
-        <button id="btnCalc" type="button">CALCOLA</button>
-      </div>
-
-      <!-- RISULTATI (nascosti finché non calcoli) -->
-      <div id="out" class="results hidden">
-        <div class="kpi">
-          <p><b>Reddito imponibile forfettario:</b> <span id="oImponibile">€ 0,00</span></p>
-          <p><b>Contributi INPS (GS 26,07%):</b> <span id="oInps">€ 0,00</span></p>
-          <p><b>Imposta sostitutiva:</b> <span id="oImposta">€ 0,00</span></p>
-          <p><b>Saldo da pagare ora:</b> <span id="oSaldo">€ 0,00</span></p>
-          <p><b>Acconti per l’anno successivo:</b> <span id="oAcconti">€ 0,00</span></p>
-          <p><b>Totale da versare quest’anno:</b> <span id="oTotale">€ 0,00</span></p>
+        <div class="controls">
+          <button id="btnCalc" class="btn">CALCOLA</button>
+          <button id="btnReset" class="btn secondary" type="button">Reset</button>
         </div>
+      </div>
+    </section>
 
-        <div id="soglieBox"></div>
+    <!-- RISULTATI -->
+    <section id="resultsBox" class="results hidden">
+      <div class="card">
+        <div class="pad">
+          <h2 style="margin:0 0 6px 0">Risultati</h2>
+          <div class="kpis">
+            <div class="kpi">
+              <h3>Reddito imponibile forfettario</h3>
+              <div class="big" id="outImponibile">€ 0,00</div>
+              <div class="muted" style="font-size:12px">Incassato × coefficiente</div>
+            </div>
+            <div class="kpi">
+              <h3>Contributi INPS GS (26,07%)</h3>
+              <div class="big" id="outInps">€ 0,00</div>
+              <div class="muted" style="font-size:12px">Base: imponibile forfettario</div>
+            </div>
+            <div class="kpi">
+              <h3>Imposta sostitutiva</h3>
+              <div class="big" id="outImposta">€ 0,00</div>
+              <div class="muted" style="font-size:12px">Aliquota scelta su (imponibile − deducibili)</div>
+            </div>
+          </div>
 
-        <div class="top-space">
-          <label><input type="checkbox" id="toggleRate"> Mostra tabella rate (5 rate da giugno)</label>
-          <table id="rateTable" class="hidden">
-            <thead><tr><th>Mese</th><th>Importo</th></tr></thead>
+          <div class="hr"></div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <h3>Saldo da pagare ora</h3>
+              <div class="big" id="outSaldo">€ 0,00</div>
+              <div class="muted" style="font-size:12px">= saldo imposta + saldo INPS (al netto degli acconti versati)</div>
+            </div>
+            <div class="kpi">
+              <h3>Acconti per l’anno prossimo</h3>
+              <div class="big" id="outAcconti">€ 0,00</div>
+              <div class="muted" style="font-size:12px">Imposta 100% (2×50%) • INPS 80% (2×40%)</div>
+            </div>
+            <div class="kpi">
+              <h3>Totale da versare</h3>
+              <div class="big" id="outTotale">€ 0,00</div>
+              <div class="muted" style="font-size:12px">Saldo + acconti</div>
+            </div>
+          </div>
+
+          <div id="warnings"></div>
+
+          <div class="hr"></div>
+
+          <h3 style="margin:8px 0">Dettaglio calcolo & scadenze</h3>
+          <table>
+            <tbody id="tblDettaglio"></tbody>
+          </table>
+
+          <div class="opts" style="margin-top:12px">
+            <label class="toggle"><input type="checkbox" id="toggleRate"> Mostra rate di giugno in 5 rate</label>
+          </div>
+
+          <table id="tblRate" class="hidden" style="margin-top:10px">
+            <thead><tr><th>Mese</th><th>Importo rata</th></tr></thead>
             <tbody id="rateBody"></tbody>
           </table>
-        </div>
 
-        <div class="top-space">
-          <h3 style="margin:12px 0 6px 0">Spiegazione semplice</h3>
-          <p id="spiega" class="muted" style="line-height:1.6"></p>
+          <div class="hr"></div>
+
+          <h3 style="margin:8px 0">Spiegazione (con i tuoi dati)</h3>
+          <div id="explanation" class="explanation muted"></div>
         </div>
       </div>
-
-      <div id="err" class="danger hidden"></div>
-    </div>
+    </section>
   </div>
-</div>
 
 <script>
 (function(){
-  // --- Utilità compatibili ---
-  function formatEuro(n){
-    try { return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0); }
-    catch(e){ return "€ " + (Math.round((n||0)*100)/100).toFixed(2).replace(".",","); }
-  }
-  function num(id){
+  // ---- Utility robuste ----
+  function €(n){ try{ return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n||0); }
+                 catch(e){ n = Math.round((n||0)*100)/100; return "€ "+n.toFixed(2).replace(".",","); } }
+  function valNum(id){
     var el = document.getElementById(id);
     if(!el) return 0;
-    var v = String(el.value||"").replace(/\./g,"").replace(",",".");
+    var v = (el.value||"").toString().replace(/\./g,"").replace(",",".");
     var n = parseFloat(v);
     return isNaN(n) ? 0 : n;
   }
@@ -120,114 +195,135 @@
   function show(el){ el.classList.remove("hidden"); }
   function hide(el){ el.classList.add("hidden"); }
 
-  // --- Costanti 2025 ---
-  var ALIQUOTA_INPS = 0.2607;   // GS professionisti
-  var ACCONTO_INPS_PERC = 0.80; // 80% (in 2 rate uguali)
-  // Imposta: acconti 100% (in 2 rate uguali)
+  // ---- Costanti 2025 ----
+  var ALIQUOTA_INPS = 0.2607;   // Gestione Separata professionisti
+  var ACCONTO_INPS_PERC = 0.80; // 80% (due rate 40%+40%)
+  // Imposta: acconti 100% (due rate 50%+50%)
 
-  // --- Calcolo ---
+  // ---- Calcolo principale ----
   function calcola(){
-    // reset errore
-    hide(byId("err")); byId("err").textContent = "";
+    // 1) INPUT
+    var incassato  = valNum("incassato");
+    var coeff      = parseFloat(byId("coeff").value) || 0.78;
+    var impRate    = parseFloat(byId("imposta").value) || 0.05;
 
-    try{
-      var incassato = num("incassato");
-      var coeff = parseFloat(byId("coeff").value) || 0.78;
-      var impostaRate = parseFloat(byId("imposta").value) || 0.05;
+    var deducibili = valNum("deducibili"); // contributi già versati (deducibili per l'imposta)
+    var accImpPrev = valNum("accImpPrev"); // acconti imposta anno precedente (1790+1791)
+    var accInpsPrev= valNum("accInpsPrev");// acconti INPS anno precedente (somma)
 
-      var deducibili = num("deducibili");
-      var accImpPrev  = num("accImpPrev");
-      var accInpsPrev = num("accInpsPrev");
+    // 2) CALCOLI BASE
+    var imponibileForf   = incassato * coeff;                  // base sia per INPS che per imposta (prima della deduzione)
+    var inps             = imponibileForf * ALIQUOTA_INPS;     // contributi dovuti sull'imponibile forfettario
 
-      // Base forfettaria
-      var imponibileForf = incassato * coeff;
+    // DEDUZIONE: i contributi già versati si sottraggono SOLO per calcolare l'imposta
+    var imponibileFisc   = Math.max(0, imponibileForf - deducibili);
+    var imposta          = imponibileFisc * impRate;
 
-      // Contributi INPS
-      var inps = imponibileForf * ALIQUOTA_INPS;
+    // 3) SALDI attuali (dopo aver scalato acconti pagati l'anno prima)
+    var saldoImposta     = Math.max(0, imposta - accImpPrev);
+    var saldoInps        = Math.max(0, inps    - accInpsPrev);
+    var saldoTotale      = saldoImposta + saldoInps;
 
-      // Imposta sostitutiva (deduco contributi già versati)
-      var imponibileFisc = Math.max(0, imponibileForf - deducibili);
-      var imposta = imponibileFisc * impostaRate;
+    // 4) ACCONTI per l'anno prossimo (metodo storico)
+    var accImpostaTot    = imposta;                     // 100% (50/50)
+    var accImposta1      = accImpostaTot * 0.50;
+    var accImposta2      = accImpostaTot * 0.50;
 
-      // Saldi attuali (al netto degli acconti versati l'anno prima)
-      var saldoImposta = Math.max(0, imposta - accImpPrev);
-      var saldoInps    = Math.max(0, inps    - accInpsPrev);
-      var saldoTotale  = saldoImposta + saldoInps;
+    var accInpsTot       = inps * ACCONTO_INPS_PERC;    // 80% (40/40)
+    var accInps1         = accInpsTot * 0.50;           // 40%
+    var accInps2         = accInpsTot * 0.50;           // 40%
 
-      // Acconti per l'anno successivo (metodo storico)
-      var accImpostaTot = imposta;                 // 100% (due rate uguali)
-      var accInpsTot    = inps * ACCONTO_INPS_PERC;// 80%  (due rate uguali)
-      var accontiTotali = accImpostaTot + accInpsTot;
+    var accontiTotali    = accImpostaTot + accInpsTot;
+    var totale           = saldoTotale + accontiTotali;
 
-      // Totale anno corrente
-      var totale = saldoTotale + accontiTotali;
+    // 5) OUTPUT KPI
+    byId("outImponibile").textContent = €(imponibileForf);
+    byId("outInps").textContent       = €(inps);
+    byId("outImposta").textContent    = €(imposta);
+    byId("outSaldo").textContent      = €(saldoTotale);
+    byId("outAcconti").textContent    = €(accontiTotali);
+    byId("outTotale").textContent     = €(totale);
 
-      // Output numerico
-      byId("oImponibile").textContent = formatEuro(imponibileForf);
-      byId("oInps").textContent       = formatEuro(inps);
-      byId("oImposta").textContent    = formatEuro(imposta);
-      byId("oSaldo").textContent      = formatEuro(saldoTotale);
-      byId("oAcconti").textContent    = formatEuro(accontiTotali);
-      byId("oTotale").textContent     = formatEuro(totale);
-
-      // Soglie
-      var soglie = byId("soglieBox");
-      soglie.innerHTML = "";
-      if(incassato > 100000){
-        soglie.innerHTML = '<div class="danger">Incassato oltre 100.000€: uscita immediata dal forfettario nell’anno.</div>';
-      } else if(incassato > 85000){
-        soglie.innerHTML = '<div class="warn">Superata la soglia 85.000€: in genere si esce dal forfettario dall’anno successivo.</div>';
-      }
-
-      // Tabella rate (facoltativa)
-      var toggle = byId("toggleRate");
-      var tbl = byId("rateTable");
-      var tbody = byId("rateBody");
-      function buildRate(){
-        // Giugno = SALDO + 1/2 acconto imposta + 1/2 acconto INPS
-        var giugno = saldoTotale + (accImpostaTot/2) + (accInpsTot/2);
-        var rate = giugno/5;
-        var mesi = ["Giugno","Luglio","Agosto","Settembre","Ottobre"];
-        var html = "";
-        for(var i=0;i<5;i++){
-          html += "<tr><td>"+mesi[i]+"</td><td>"+formatEuro(rate)+"</td></tr>";
-        }
-        tbody.innerHTML = html;
-      }
-      // Aggiorna tabella in base al toggle
-      if(toggle.checked){ buildRate(); show(tbl); } else { hide(tbl); }
-
-      // Spiegazione (senza importi)
-      var msg = "";
-      msg += "Parti dai tuoi incassi dell’anno. Con il coefficiente che hai selezionato stimiamo il reddito su cui si fanno i conti.";
-      msg += " Su quel reddito calcoliamo i contributi INPS della Gestione Separata.";
-      msg += " Per l’imposta sostitutiva usiamo l’aliquota che hai scelto, dopo aver tolto i contributi che hai già pagato nell’anno.";
-      msg += " Dal risultato scaliamo gli acconti che hai indicato per l’anno precedente: così otteniamo il saldo da versare adesso.";
-      msg += " Poi calcoliamo gli acconti per l’anno successivo: l’imposta al 100% in due parti e l’INPS all’80% in due parti.";
-      msg += " Il totale dell’anno è dato dal saldo più i nuovi acconti. Se vuoi, quello che scade a giugno può essere diviso in cinque rate mensili uguali.";
-      byId("spiega").textContent = msg;
-
-      // Mostra la sezione risultati
-      show(byId("out"));
-      // scroll
-      window.scrollTo({ top: byId("out").getBoundingClientRect().top + window.scrollY - 10, behavior: "smooth" });
-
-      // (ri-lega il toggle ogni volta per rigenerare correttamente le rate)
-      toggle.onchange = function(){
-        if(toggle.checked){ buildRate(); show(tbl); } else { hide(tbl); }
-      };
-
-    }catch(e){
-      var er = byId("err");
-      er.textContent = "Si è verificato un errore nel calcolo: " + e.message;
-      show(er);
+    // Warnings soglie
+    var warn = byId("warnings"); warn.innerHTML = "";
+    if(incassato > 100000){
+      warn.innerHTML = '<div class="dangerbox">Incassato oltre <b>100.000€</b>: uscita <b>immediata</b> dal forfettario nell’anno.</div>';
+    } else if(incassato > 85000){
+      warn.innerHTML = '<div class="warnbox">Superata la soglia <b>85.000€</b>: in via ordinaria si esce dal forfettario <b>dall’anno successivo</b>.</div>';
     }
+
+    // 6) DETTAGLIO & SCADENZE
+    var det = '';
+    det += row('Incassato annuo', €(incassato));
+    det += row('Coefficiente di redditività', (Math.round(coeff*100))+'%');
+    det += row('Imponibile forfettario', €(imponibileForf));
+    det += row('Contributi già versati (deducibili solo per imposta)', €(deducibili));
+    det += row('Imponibile fiscale per imposta', €(imponibileFisc));
+    det += row('Aliquota imposta scelta', (Math.round(impRate*100))+'%');
+    det += row('Imposta calcolata', €(imposta));
+    det += row('Acconti imposta versati anno precedente', '− '+€(accImpPrev));
+    det += row('<b>Saldo imposta</b>', '<b>'+€(saldoImposta)+'</b>');
+    det += row('Contributi INPS dovuti (26,07%)', €(inps));
+    det += row('Acconti INPS versati anno precedente', '− '+€(accInpsPrev));
+    det += row('<b>Saldo INPS</b>', '<b>'+€(saldoInps)+'</b>');
+    det += row('<b>Saldo totale (imposta + INPS)</b>', '<b>'+€(saldoTotale)+'</b>');
+    det += '<tr><th colspan="2">Acconti per l’anno prossimo (metodo storico)</th></tr>';
+    det += row('Imposta – 1° acconto (50%)', €(accImposta1));
+    det += row('Imposta – 2° acconto (50%)', €(accImposta2));
+    det += row('INPS – 1° acconto (40%)',    €(accInps1));
+    det += row('INPS – 2° acconto (40%)',    €(accInps2));
+    det += row('<b>Acconti totali</b>', '<b>'+€(accontiTotali)+'</b>');
+    det += row('<b>Totale da versare quest’anno</b>', '<b>'+€(totale)+'</b>');
+    det += '<tr><th colspan="2">Scadenze sintetiche</th></tr>';
+    var giugnoTot = saldoTotale + accImposta1 + accInps1;
+    var novTot    = accImposta2 + accInps2;
+    det += row('Giugno — Saldo (imp.+INPS) + 1° acconti', €(giugnoTot));
+    det += row('Novembre — 2° acconti',                   €(novTot));
+    byId("tblDettaglio").innerHTML = det;
+
+    // 7) RATE DI GIUGNO (facoltative)
+    var giugno = giugnoTot;
+    var rata = giugno / 5;
+    var mesi = ['Giugno','Luglio','Agosto','Settembre','Ottobre'];
+    var rb = '';
+    for(var i=0;i<5;i++){ rb += '<tr><td>'+mesi[i]+'</td><td>'+€(rata)+'</td></tr>'; }
+    byId("rateBody").innerHTML = rb;
+
+    // 8) SPIEGAZIONE IN ITALIANO SEMPLICE (con i tuoi dati)
+    var s = '';
+    s += 'Hai indicato di aver incassato '+€(incassato)+'. ';
+    s += 'Con il coefficiente di redditività del '+Math.round(coeff*100)+'% calcoliamo un reddito “forfettario” di '+€(imponibileForf)+', che è la base su cui facciamo i conti. ';
+    s += 'Su questa base calcoliamo i contributi INPS della Gestione Separata al 26,07%, pari a '+€(inps)+'. ';
+    s += 'Per l’imposta sostitutiva hai scelto l’aliquota del '+Math.round(impRate*100)+'%. ';
+    s += 'Prima di applicarla togliamo solo i contributi che hai già versato nell’anno (cioè i '+€(deducibili)+'): infatti in forfettario i contributi si <b>deducono soltanto per il calcolo dell’imposta</b>, non riducono i contributi stessi. ';
+    s += 'La base fiscale diventa quindi '+€(imponibileFisc)+', e l’imposta risultante è '+€(imposta)+'. ';
+    s += 'Dato che l’anno scorso hai già versato '+€(accImpPrev)+' di acconti imposta e '+€(accInpsPrev)+' di acconti INPS, li scaliamo adesso: così otteniamo il tuo <b>saldo</b> (imposta + INPS) pari a '+€(saldoTotale)+'. ';
+    s += 'Inoltre calcoliamo anche gli <b>acconti per l’anno prossimo</b>: per l’imposta paghi il 100% (metà a giugno e metà a novembre), per l’INPS paghi l’80% (metà a giugno e metà a novembre). ';
+    s += 'La somma tra saldo e nuovi acconti è il <b>totale</b> che risulta per quest’anno: '+€(totale)+'. ';
+    s += 'A giugno, se preferisci, puoi dividere quanto dovuto in <b>5 rate uguali</b>, da giugno a ottobre. ';
+    if(incassato>100000){ s += 'Attenzione: con incassi oltre 100.000€ si esce dal forfettario subito nell’anno in corso.'; }
+    else if(incassato>85000){ s += 'Nota: con incassi oltre 85.000€ si esce dal forfettario dall’anno successivo (salvo regole particolari).'; }
+    byId("explanation").innerHTML = s;
+
+    // Mostra box risultati
+    show(byId("resultsBox"));
   }
 
-  // Bind sicuro dopo caricamento DOM
-  document.addEventListener("DOMContentLoaded", function(){
-    var btn = byId("btnCalc");
-    btn.addEventListener("click", calcola);
+  function row(a,b){ return '<tr><td style="text-align:left">'+a+'</td><td>'+b+'</td></tr>'; }
+
+  // ---- Event wiring ----
+  document.addEventListener('DOMContentLoaded', function(){
+    byId('btnCalc').addEventListener('click', calcola);
+    byId('btnReset').addEventListener('click', function(){
+      ['incassato','deducibili','accImpPrev','accInpsPrev'].forEach(function(id){ var el = byId(id); if(el) el.value = ''; });
+      byId('coeff').value = '0.78';
+      byId('imposta').value = '0.05';
+      hide(byId('resultsBox'));
+      byId('toggleRate').checked = false; hide(byId('tblRate'));
+    });
+    byId('toggleRate').addEventListener('change', function(e){
+      if(e.target.checked) show(byId('tblRate')); else hide(byId('tblRate'));
+    });
   });
 })();
 </script>
