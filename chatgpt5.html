@@ -42,27 +42,26 @@
   .coeff-wrap{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .coeff-input{width:80px}
 
-  .row-adv{display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px}
-
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;justify-content:center}
   .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border:0;border-radius:10px;font-weight:800;font-size:.98rem;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff}
   .btn.secondary{background:#fff;color:#111;border:1px solid var(--border)}
   .btn.dark{background:var(--accent-2);color:#fff}
 
-  /* Opzioni avanzate: pill + pannello FLOAT */
-  .adv{position:relative}
-  .adv > summary{
+  /* Opzioni avanzate: pulsante a destra + pannello inline che spinge i contenuti */
+  .adv-right{display:flex;justify-content:flex-end}
+  details.adv{max-width:100%}
+  details.adv > summary{
     cursor:pointer; list-style:none; padding:8px 12px; border:1px solid var(--border); border-radius:999px;
     font-weight:800; background:#fff; white-space:nowrap;
   }
-  .adv[open] > summary{background:#111827;color:#fff;border-color:#111827}
+  details.adv[open] > summary{background:#111827;color:#fff;border-color:#111827}
   .adv-panel{
-    display:none; position:absolute; right:0; top:120%;
-    width:min(760px, 86vw); background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);
-    padding:14px; z-index:50;
+    display:none; margin-top:10px; width:100%;
+    background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);
+    padding:14px;
   }
-  .adv[open] .adv-panel{display:block}
+  details.adv[open] .adv-panel{display:block}
   .adv-grid{display:grid;gap:10px}
   .adv-note{color:var(--muted);font-size:.9rem}
 
@@ -107,7 +106,7 @@
 
   #rateBlock{margin-top:6px}
 
-  @media print{.tab-bar,.adv,.actions,.viewtoggle{display:none!important}.card{box-shadow:none;border-radius:0}}
+  @media print{.tab-bar,.adv-right,.actions,.viewtoggle{display:none!important}.card{box-shadow:none;border-radius:0}}
 </style>
 </head>
 <body>
@@ -150,16 +149,17 @@
           </div>
         </div>
 
-        <!-- Imposta + Opzioni avanzate affiancate e stabili -->
-        <div class="row-adv">
-          <div class="field">
-            <label for="imposta">Imposta sostitutiva</label>
-            <select id="imposta">
-              <option value="0.05" selected>5% (startup)</option>
-              <option value="0.15">15% (ordinaria)</option>
-            </select>
-          </div>
+        <!-- Imposta (fissa) -->
+        <div class="field">
+          <label for="imposta">Imposta sostitutiva</label>
+          <select id="imposta">
+            <option value="0.05" selected>5% (startup)</option>
+            <option value="0.15">15% (ordinaria)</option>
+          </select>
+        </div>
 
+        <!-- Opzioni avanzate: pulsante a destra, pannello inline sotto -->
+        <div class="adv-right">
           <details class="adv">
             <summary>⚙︎ Opzioni avanzate</summary>
             <div class="adv-panel">
@@ -359,7 +359,7 @@
   let lastState=null;
   function compute(){
     const incassato=val('incassato');
-    let coeffPerc = document.getElementById('coeffCustom').value ? parseInt(document.getElementById('coeffCustom').value,10) : coeffFromChips;
+    let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
     if(!coeffPerc||coeffPerc<=0) coeffPerc=78;
     const coeff=coeffPerc/100;
 
@@ -588,7 +588,7 @@
       document.getElementById('aliqInps').value='26,07'; document.getElementById('accImpPerc').value='100'; document.getElementById('accInpsPerc').value='80';
       document.getElementById('toggleRate').checked=false;
       document.querySelectorAll('.chip[data-val]').forEach(c=>c.classList.remove('active'));
-      document.querySelector('input[name="accMode"][value="manual"]').checked=true; show('accManual'); hide('accStima');
+      document.querySelector('input[name="accMode"][value="manual"]').checked=true; document.getElementById('accManual').style.display=''; document.getElementById('accStima').style.display='none';
       hide('rateBlock'); hide('resultsBox'); window.scrollTo({top:0,behavior:'smooth'});
     });
     document.getElementById('toggleRate').addEventListener('change',e=>{if(e.target.checked)buildRate();else hide('rateBlock');});
