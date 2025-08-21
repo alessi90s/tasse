@@ -30,33 +30,32 @@
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
   .pad{padding:26px}
 
-  /* INPUT (verticale) */
+  /* FORM */
   .form-vertical{display:flex;flex-direction:column;gap:14px}
   .field{width:100%}
   label{display:block;margin:0 0 6px;font-weight:700}
   .hl{padding:0 .35em;border-radius:.5em}
   .y{background:var(--hl-y)} .g{background:var(--hl-g)} .b{background:var(--hl-b)} .p{background:var(--hl-p)}
-  input,select{width:100%;padding:14px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:1rem}
+  input,select{width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:1rem}
   input:disabled{background:#f8fafc;color:#334155}
   input:focus,select:focus{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;padding:13px 18px;border:0;border-radius:12px;
-    font-weight:800;font-size:1rem;cursor:pointer
-  }
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 18px;border:0;border-radius:12px;font-weight:800;font-size:1rem;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff}
   .btn.secondary{background:#fff;color:#111;border:1px solid var(--border)}
   .btn.dark{background:var(--accent-2);color:#fff}
 
-  /* callouts nel form */
-  .callouts{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
-  .tag{display:inline-block;border:1px dashed #f59e0b;background:var(--hl-y);padding:6px 10px;border-radius:999px;font-weight:800}
+  /* Chips importi rapidi */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .chip{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#fff;cursor:pointer;font-weight:700}
+  .chip:hover{border-color:#c7d2fe}
+  .chip.active{background:#111827;color:#fff;border-color:#111827}
 
-  /* Advanced */
-  details{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px}
-  summary{cursor:pointer;font-weight:800;color:#111}
-  .adv-grid{display:grid;gap:12px;grid-template-columns:1fr}
-  .note{color:var(--muted);font-size:.92rem}
+  /* Info bar */
+  .infobar{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(240px,1fr));margin-top:12px}
+  .infoitem{display:flex;align-items:center;gap:12px;border:1px dashed #f59e0b;background:var(--hl-y);padding:10px 12px;border-radius:14px}
+  .dot{width:12px;height:12px;border-radius:999px;background:#111}
+  .dot.blue{background:#2563eb} .dot.green{background:#16a34a}
 
   /* Tabs */
   .tabs{margin-top:16px}
@@ -84,6 +83,12 @@
   .muted{color:var(--muted)}
   .error{margin-top:12px;padding:12px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
 
+  /* Rate block */
+  #rateBlock{margin-top:8px}
+
+  @media(max-width:720px){
+    .infobar{grid-template-columns:1fr}
+  }
   @media print{
     .tab-bar,details,.actions{display:none !important}
     .card{box-shadow:none;border-radius:0}
@@ -94,7 +99,7 @@
 <div class="wrap">
   <header><h1>Simulatore Forfettario • Gestione Separata 2025</h1></header>
 
-  <!-- FORM VERTICALE -->
+  <!-- FORM -->
   <section class="card" id="inputCard" style="margin-top:16px">
     <div class="pad">
       <div class="form-vertical">
@@ -102,10 +107,20 @@
           <label for="anno">Anno di riferimento <span class="hl y">2025</span></label>
           <input id="anno" type="text" value="2025" disabled aria-disabled="true" />
         </div>
+
         <div class="field">
           <label for="incassato">Incassato annuo (€) <span class="hl y">importo in cassa dell’anno</span></label>
           <input id="incassato" type="text" inputmode="decimal" placeholder="es. 50.000" />
+          <div class="chips" aria-label="Importi rapidi">
+            <button class="chip" data-val="10000">10.000</button>
+            <button class="chip" data-val="20000">20.000</button>
+            <button class="chip" data-val="30000">30.000</button>
+            <button class="chip" data-val="50000">50.000</button>
+            <button class="chip" data-val="65000">65.000</button>
+            <button class="chip" data-val="85000">85.000</button>
+          </div>
         </div>
+
         <div class="field">
           <label for="coeff">Coefficiente di redditività</label>
           <select id="coeff">
@@ -114,6 +129,7 @@
             <option value="0.67">67%</option>
           </select>
         </div>
+
         <div class="field">
           <label for="imposta">Imposta sostitutiva</label>
           <select id="imposta">
@@ -122,9 +138,10 @@
           </select>
         </div>
 
-        <div class="callouts">
-          <span class="tag">INPS GS 2025: 26,07%</span>
-          <span class="tag">Acconti: imposta 100% • INPS 80%</span>
+        <!-- INFO BAR elegante -->
+        <div class="infobar" role="note" aria-label="Informazioni base">
+          <div class="infoitem"><span class="dot blue"></span><div><b>INPS – Gestione Separata</b><br><span class="muted">Aliquota 2025: <b>26,07%</b> (base: imponibile)</span></div></div>
+          <div class="infoitem"><span class="dot green"></span><div><b>Acconti</b><br><span class="muted">Imposta <b>100%</b> (50%+50%) • INPS <b>80%</b> (40%+40%)</span></div></div>
         </div>
 
         <div class="actions">
@@ -136,17 +153,17 @@
 
       <details>
         <summary>Opzioni avanzate</summary>
-        <div class="adv-grid" style="margin-top:10px">
-          <div>
+        <div class="form-vertical" style="margin-top:10px">
+          <div class="field">
             <label for="deducibili">Contributi previdenziali già versati nell’anno (€)</label>
             <input id="deducibili" type="text" inputmode="decimal" value="0" />
-            <div class="note"><span class="hl y"><b>Nota:</b> si deducono solo dall’imposta</span> (non riducono INPS).</div>
+            <div class="muted"><span class="hl y"><b>Nota:</b> si deducono solo dall’imposta</span> (non riducono INPS).</div>
           </div>
-          <div>
+          <div class="field">
             <label for="accImpPrev">Acconti IMPOSTA versati l’anno prima (€)</label>
             <input id="accImpPrev" type="text" inputmode="decimal" value="0" />
           </div>
-          <div>
+          <div class="field">
             <label for="accInpsPrev">Acconti INPS versati l’anno prima (€)</label>
             <input id="accInpsPrev" type="text" inputmode="decimal" value="0" />
           </div>
@@ -157,7 +174,7 @@
     </div>
   </section>
 
-  <!-- TABS RISULTATI -->
+  <!-- RISULTATI -->
   <section id="resultsBox" class="card" style="margin-top:16px; display:none">
     <div class="tabs">
       <div class="tab-bar">
@@ -168,56 +185,26 @@
 
       <!-- TAB 1 -->
       <div id="tab1" class="tab active">
-        <div class="pad">
-          <div id="explanation" class="explanation"></div>
-        </div>
+        <div class="pad"><div id="explanation" class="explanation"></div></div>
       </div>
 
       <!-- TAB 2 -->
       <div id="tab2" class="tab">
         <div class="pad">
           <div class="kpis">
-            <div class="kpi">
-              <h3>Reddito imponibile</h3>
-              <div class="big" id="outImponibile">€ 0,00</div>
-              <div class="muted" style="font-size:.85rem">Incassato × coefficiente</div>
-            </div>
-            <div class="kpi">
-              <h3>Contributi INPS (26,07%)</h3>
-              <div class="big" id="outInps">€ 0,00</div>
-              <div class="muted" style="font-size:.85rem">Base: imponibile</div>
-            </div>
-            <div class="kpi">
-              <h3>Imposta sostitutiva</h3>
-              <div class="big" id="outImposta">€ 0,00</div>
-              <div class="muted" style="font-size:.85rem">Su (imponibile − deducibili)</div>
-            </div>
+            <div class="kpi"><h3>Reddito imponibile</h3><div class="big" id="outImponibile">€ 0,00</div><div class="muted" style="font-size:.85rem">Incassato × coefficiente</div></div>
+            <div class="kpi"><h3>Contributi INPS (26,07%)</h3><div class="big" id="outInps">€ 0,00</div><div class="muted" style="font-size:.85rem">Base: imponibile</div></div>
+            <div class="kpi"><h3>Imposta sostitutiva</h3><div class="big" id="outImposta">€ 0,00</div><div class="muted" style="font-size:.85rem">Su (imponibile − deducibili)</div></div>
           </div>
-
           <div class="kpis" style="margin-top:8px">
-            <div class="kpi">
-              <h3>Saldo da versare ora</h3>
-              <div class="big" id="outSaldo">€ 0,00</div>
-              <div class="muted" style="font-size:.85rem">INPS + Imposta (netto acconti)</div>
-            </div>
-            <div class="kpi">
-              <h3>Acconti netti</h3>
-              <div class="big" id="outAcconti">€ 0,00</div>
-              <div class="muted" style="font-size:.85rem">Imposta 100% • INPS 80%</div>
-            </div>
-            <div class="kpi">
-              <h3>Totale anno</h3>
-              <div class="big" id="outTotale">€ 0,00</div>
-              <div class="muted" style="font-size:.85rem">Saldo + acconti</div>
-            </div>
+            <div class="kpi"><h3>Saldo da versare ora</h3><div class="big" id="outSaldo">€ 0,00</div><div class="muted" style="font-size:.85rem">INPS + Imposta (netto acconti)</div></div>
+            <div class="kpi"><h3>Acconti netti</h3><div class="big" id="outAcconti">€ 0,00</div><div class="muted" style="font-size:.85rem">Imposta 100% • INPS 80%</div></div>
+            <div class="kpi"><h3>Totale anno</h3><div class="big" id="outTotale">€ 0,00</div><div class="muted" style="font-size:.85rem">Saldo + acconti</div></div>
           </div>
-
           <div class="hr"></div>
           <div id="warnings" style="text-align:center"></div>
           <h3 style="margin:8px 0">Dettaglio</h3>
-          <table>
-            <tbody id="tblDettaglio"></tbody>
-          </table>
+          <table><tbody id="tblDettaglio"></tbody></table>
         </div>
       </div>
 
@@ -225,9 +212,7 @@
       <div id="tab3" class="tab">
         <div class="pad">
           <h3 style="margin:0 0 8px">Scadenze sintetiche</h3>
-          <table>
-            <tbody id="tblScadenze"></tbody>
-          </table>
+          <table><tbody id="tblScadenze"></tbody></table>
 
           <div style="margin:14px 0">
             <label style="user-select:none">
@@ -238,11 +223,7 @@
 
           <div id="rateBlock" style="display:none">
             <table>
-              <thead>
-                <tr>
-                  <th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata</th>
-                </tr>
-              </thead>
+              <thead><tr><th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata</th></tr></thead>
               <tbody id="rateBody"></tbody>
               <tfoot>
                 <tr><th colspan="4" style="text-align:right">Totale interessi giugno</th><th id="rateIntTot">€ 0,00</th><th id="rateTot">€ 0,00</th></tr>
@@ -296,6 +277,15 @@
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 
+  // Chips importi
+  document.addEventListener('click', function(e){
+    var chip=e.target.closest('.chip'); if(!chip) return;
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    var v=parseInt(chip.dataset.val,10)||0;
+    document.getElementById('incassato').value = v.toLocaleString('it-IT');
+  });
+
   function compute(){
     var incassato  = val('incassato');
     var coeff      = parseFloat(document.getElementById('coeff').value) || 0.78;
@@ -338,7 +328,7 @@
     var accImpTot   = Math.max(0, accImpBase  - creditoImp);
     var accInpsTot  = Math.max(0, accInpsBase - creditoInps);
 
-    // Credits residui se superano i nuovi acconti
+    // Crediti residui se superano gli acconti nuovi
     var creditoImpResid  = Math.max(0, creditoImp  - accImpBase);
     var creditoInpsResid = Math.max(0, creditoInps - accInpsBase);
 
@@ -351,7 +341,7 @@
     var novTot     = accImp2 + accInps2;
     var totale     = saldoTotale + accontiTot;
 
-    // KPI (tab 2)
+    // KPI
     setHTML('outImponibile', euro(imponibileForf));
     setHTML('outInps',       euro(inps));
     setHTML('outImposta',    euro(imposta));
@@ -365,7 +355,7 @@
     else if(incassato>85000) w='<div class="muted"><b>Nota:</b> oltre 85.000€ → uscita dal forfettario <b>dall’anno successivo</b>.</div>';
     setHTML('warnings', w);
 
-    // Dettaglio (tab 2)
+    // Dettaglio
     var det='';
     det+=tr('<b>Incassato</b>', euro(incassato));
     det+=tr('Coefficiente', Math.round(coeff*100)+'%');
@@ -399,18 +389,18 @@
     }
     setHTML('tblDettaglio', det);
 
-    // Scadenze (tab 3)
+    // Scadenze
     cacheGiugno=giugnoTot; cacheNov=novTot;
     var sc='';
     sc+=tr('Giugno — Saldo (imp.+INPS) + 1° acconti', euro(giugnoTot));
     sc+=tr('Novembre — 2° acconti',                   euro(novTot));
     setHTML('tblScadenze', sc);
 
-    // Rate block: aggiorna se toggle attivo
+    // Rate block
     var chk = document.getElementById('toggleRate');
     if(chk.checked){ buildRate(); } else { hide('rateBlock'); }
 
-    // Spiegazione semplice (tab 1)
+    // Spiegazione semplice
     function L(p){ return '<p class="line">'+p+'</p>'; }
     var S='';
     S+= L('Si parte da quanto hai <b>incassato</b> nell’anno e lo si moltiplica per il <b>coefficiente</b>. È il <b>reddito imponibile</b>: <span class="hl g"><b>'+euro(incassato)+'</b> × <b>'+Math.round(coeff*100)+'%</b> = <b>'+euro(imponibileForf)+'</b></span>.');
@@ -427,22 +417,14 @@
       S+= L('Nessuna deduzione: l’imposta al <b>'+Math.round(impRate*100)+'%</b> su <b>'+euro(imponibileForf)+'</b> è <span class="hl y"><b>'+euro(imposta)+'</b></span>.');
     }
     S+= '<h3>Saldi adesso</h3>';
-    if(accInpsPrev >= inps){
-      S+= L('<b>INPS</b>: dovuto <b>'+euro(inps)+'</b> − acconti <b>'+euro(accInpsPrev)+'</b> = <b>0 €</b>. Nasce un <b>credito</b> di <span class="hl g"><b>'+euro(accInpsPrev - inps)+'</b></span>.');
-    }else{
-      S+= L('<b>INPS</b>: dovuto <b>'+euro(inps)+'</b> − acconti <b>'+euro(accInpsPrev)+'</b> = saldo <span class="hl y"><b>'+euro(saldoInps)+'</b></span>.');
-    }
-    if(accImpPrev >= imposta){
-      S+= L('<b>Imposta</b>: dovuta <b>'+euro(imposta)+'</b> − acconti <b>'+euro(accImpPrev)+'</b> = <b>0 €</b>. Nasce un <b>credito</b> di <span class="hl g"><b>'+euro(accImpPrev - imposta)+'</b></span>.');
-    }else{
-      S+= L('<b>Imposta</b>: dovuta <b>'+euro(imposta)+'</b> − acconti <b>'+euro(accImpPrev)+'</b> = saldo <span class="hl y"><b>'+euro(saldoImposta)+'</b></span>.');
-    }
+    if(accInpsPrev >= inps){ S+= L('<b>INPS</b>: dovuto <b>'+euro(inps)+'</b> − acconti <b>'+euro(accInpsPrev)+'</b> = <b>0 €</b>. Nasce un <b>credito</b> di <span class="hl g"><b>'+euro(accInpsPrev - inps)+'</b></span>.'); }
+    else { S+= L('<b>INPS</b>: dovuto <b>'+euro(inps)+'</b> − acconti <b>'+euro(accInpsPrev)+'</b> = saldo <span class="hl y"><b>'+euro(saldoInps)+'</b></span>.'); }
+    if(accImpPrev >= imposta){ S+= L('<b>Imposta</b>: dovuta <b>'+euro(imposta)+'</b> − acconti <b>'+euro(accImpPrev)+'</b> = <b>0 €</b>. Nasce un <b>credito</b> di <span class="hl g"><b>'+euro(accImpPrev - imposta)+'</b></span>.'); }
+    else { S+= L('<b>Imposta</b>: dovuta <b>'+euro(imposta)+'</b> − acconti <b>'+euro(accImpPrev)+'</b> = saldo <span class="hl y"><b>'+euro(saldoImposta)+'</b></span>.'); }
     S+= L('Totale saldi da versare ora: <span class="hl g"><b>'+euro(saldoTotale)+'</b></span>.');
     S+= '<h3>Acconti per l’anno prossimo</h3>';
     S+= L('Gli acconti si calcolano sul dovuto di quest’anno: <b>imposta 100%</b> e <b>INPS 80%</b>. Eventuali crediti riducono prima questi acconti. Quindi paghi: imposta <b>'+euro(accImpTot)+'</b> (50% giugno, 50% novembre) e INPS <b>'+euro(accInpsTot)+'</b> (40% giugno, 40% novembre).');
-    if(creditoImpResid>0 || creditoInpsResid>0){
-      S+= L('Resta un <b>credito residuo</b> da riportare: '+(creditoImpResid? 'imposta <b>'+euro(creditoImpResid)+'</b>':'')+(creditoImpResid&&creditoInpsResid?' • ':'')+(creditoInpsResid? 'INPS <b>'+euro(creditoInpsResid)+'</b>':'')+'.');
-    }
+    if(creditoImpResid>0 || creditoInpsResid>0){ S+= L('Resta un <b>credito residuo</b> da riportare: '+(creditoImpResid? 'imposta <b>'+euro(creditoImpResid)+'</b>':'')+(creditoImpResid&&creditoInpsResid?' • ':'')+(creditoInpsResid? 'INPS <b>'+euro(creditoInpsResid)+'</b>':'')+'.'); }
     S+= '<h3>Scadenze</h3>';
     S+= L('<b>Giugno</b> = saldi + primi acconti → <span class="hl y"><b>'+euro(giugnoTot)+'</b></span>. <b>Novembre</b> = secondi acconti → <span class="hl y"><b>'+euro(novTot)+'</b></span>.');
     S+= '<h3>Totale e incidenza</h3>';
@@ -459,7 +441,7 @@
 
     for(var i=0;i<5;i++){
       var p = RATE_PERC[i]/100;
-      var interesse = totGiu * p; // % su totale giugno
+      var interesse = totGiu * p; // % sul totale di giugno
       var rata = quota + interesse;
       sumInt += interesse; sumTotGiu += rata;
       tbody += '<tr>'+
@@ -501,6 +483,7 @@
       document.getElementById('coeff').value='0.78';
       document.getElementById('imposta').value='0.05';
       document.getElementById('toggleRate').checked=false;
+      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
       hide('rateBlock'); hide('resultsBox');
       window.scrollTo({top:0,behavior:'smooth'});
     });
