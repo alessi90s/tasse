@@ -158,6 +158,17 @@
 
   #rateBlock{margin-top:6px}
   @media print{.tab-bar,.adv-right,.actions,.viewtoggle,.copy-btn{display:none!important}.card{box-shadow:none;border-radius:0}}
+  /* ——— Quaderno: mostra le righe anche sotto ai blocchi ——— */
+#tab1 .section{
+  background: transparent;          /* lascia passare le righe */
+}
+
+/* opzionale: un leggero “cartiglio” ma con righe visibili */
+#tab1 .section.soft{
+  background: rgba(255,255,255,.6); /* se vuoi un velo bianco */
+  border: 1px solid #e9eefb;
+}
+
 </style>
 </head>
 <body>
