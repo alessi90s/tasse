@@ -126,7 +126,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header><h1>Simulatore Forfettario • Gestione Separata 2025</h1></header>
+  <header><h1>Simulatore Forfettario per <u><span class="hl">Gestione Separata 2025</u></span></h1></header>
 
   <!-- ===== FORM ===== -->
   <section class="card" id="inputCard" style="margin-top:12px">
@@ -139,7 +139,7 @@
         </div>
 
         <div class="field">
-          <label for="incassato">Incassato annuo (€) <span class="hl">importo in cassa dell’anno</span></label>
+          <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
           <input id="incassato" type="text" inputmode="decimal" placeholder="es. 30.000" />
           <div class="chips" aria-label="Importi rapidi">
             <button class="chip" data-val="10000">10.000</button>
@@ -152,7 +152,7 @@
         </div>
 
         <div class="field">
-          <label>Coefficiente di redditività</label>
+          <label>Coefficiente di <span class="hl">redditività</span></label>
           <div class="coeff-wrap">
             <div class="chips" id="coeffChips">
               <button class="chip" data-coeff="78">78%</button>
@@ -165,9 +165,9 @@
         </div>
 
         <div class="field">
-          <label for="imposta">Imposta sostitutiva</label>
+          <label for="imposta">Percentuale <span class="hl">Imposta sostitutiva</span></label>
           <select id="imposta">
-            <option value="0.05" selected>5% (startup)</option>
+            <option value="0.05" selected>5% (primi 5 anni)</option>
             <option value="0.15">15% (ordinaria)</option>
           </select>
         </div>
