@@ -376,7 +376,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const c=e.target.closest('.chip'); if(!c||!c.dataset.val) return;
     document.querySelectorAll('.chip[data-val]').forEach(x=>x.classList.remove('active'));
     c.classList.add('active');
-    document.getElementById('incassato').value=(parseInt(c.dataset.val,10)||0).toLocaleString('it-IT');
+    document.getElementById('incassato').value = (parseNum(c.dataset.val) || 0).toLocaleString('it-IT');
   });
   // se scrivi a mano => deseleziona i chip
   document.getElementById('incassato').addEventListener('input',()=>{
