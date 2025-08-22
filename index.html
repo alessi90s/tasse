@@ -254,7 +254,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                 </div>
               </div>
 
-              <!-- NUOVO: Calcolo inverso -->
+              <!-- Calcolo inverso -->
               <div class="ibox">
                 <div class="bar">Calcolo inverso (netto desiderato → incassato)</div>
                 <div class="subgrid" style="align-items:end">
@@ -360,8 +360,21 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 <script>
 (function(){
   /* --- Utils --- */
-  function euro(n){const r=Math.round(n||0);try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);}catch(e){return '€ '+(r.toString().replace(/\B(?=(\\d{3})+(?!\\d))/g,'.'));}}
-  function parseNum(s){ if(s==null) return 0; let t=String(s).trim().replace(/\\s+/g,''); t=t.replace(/\\./g,'').replace(',', '.'); const n=parseFloat(t); return isNaN(n)?0:n; }
+  function euro(n){
+    const r = Math.round(n || 0);
+    try{
+      return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);
+    }catch(e){
+      return '€ ' + r.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    }
+  }
+  function parseNum(s){
+    if(s==null) return 0;
+    let t = String(s).trim().replace(/\s+/g,'');
+    t = t.replace(/\./g,'').replace(',', '.');
+    const n = parseFloat(t);
+    return isNaN(n) ? 0 : n;
+  }
   function val(id){return parseNum(document.getElementById(id).value)}
   function setHTML(id,html){const el=document.getElementById(id);if(el)el.innerHTML=html}
   function tr(a,b,right=false){return '<tr><td>'+a+'</td><td style="text-align:'+(right?'right':'center')+';font-variant-numeric:tabular-nums">'+b+'</td></tr>'}
@@ -386,18 +399,18 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   const incInput=document.getElementById('incassato');
   const incChips=document.getElementById('incChips');
 
-  // Non tocchiamo il contenuto mentre digita: niente più "0" che torna
+  // Non tocchiamo l’input mentre digita (niente 0 che riappare)
   incInput.addEventListener('input', () => {
     incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   });
 
-  // Chip: scrivono il numero PURO nell'input (es. 85000)
+  // Chip: scrivono il numero P U R O nell’input (es. 85000)
   incChips.addEventListener('click', (e) => {
     const chip=e.target.closest('.chip'); if(!chip) return;
     incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active');
     const raw = chip.dataset.valNum || chip.dataset.val || chip.textContent;
-    const clean = String(raw).replace(/\\./g,'').replace(/\\s/g,'');
+    const clean = String(raw).replace(/\./g,'').replace(/\s/g,'');
     incInput.value = clean;
     incInput.focus();
     try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
@@ -411,7 +424,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     document.getElementById('coeffCustom').value='';
   });
   document.getElementById('coeffCustom').addEventListener('input',function(){
-    this.value=this.value.replace(/\\D/g,'').slice(0,2);
+    this.value=this.value.replace(/\D/g,'').slice(0,2);
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
@@ -439,7 +452,6 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   });
 
   /* --- Calcolo --- */
-  let cacheNov=0, cacheGiugno=0;
   function compute(){
     const incassato=val('incassato');
     let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
@@ -552,9 +564,11 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     document.getElementById('ratesAcc').open=true; // mostra subito il dettaglio rate
     buildRate();
 
-    lastState={incassato,coeffPerc,coeff,impRate,aliqInps,imponibileForf,inps,deducibili,imponibileFisc,imposta,
+    lastState={
+      incassato,coeffPerc,coeff,impRate,aliqInps,imponibileForf,inps,deducibili,imponibileFisc,imposta,
       accImpPrev,accInpsPrev,saldoImposta,saldoInps,saldoTotale,accImpTot,accInpsTot,accImp1,accImp2,accInps1,accInps2,
-      giugnoTot,novTot,totale,creditoImp,creditoInps,creditoImpResid,creditoInpsResid};
+      giugnoTot,novTot,totale,creditoImp,creditoInps,creditoImpResid,creditoInpsResid
+    };
     buildExplanation();
 
     document.getElementById('resultsBox').style.display='';
@@ -748,7 +762,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').textContent='Vista Dettagliata';
       document.getElementById('resultsBox').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});
       setHTML('invOut',''); setHTML('warnings','');
-      const t=document.querySelector('.tab-btn[data-tab="tab1"]'); if(t) t.click();
+      const tb=document.querySelector('.tab-btn[data-tab="tab1"]'); if(tb) tb.click();
     });
   });
 })();
