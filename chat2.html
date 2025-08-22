@@ -11,18 +11,24 @@
 
 <style>
   :root{
-    --bg:#f6f8fb; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+    --bg:#f7f9fc; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e6e6e6;
     --accent:#2563eb; --accent-2:#111827; --radius:14px; --shadow:0 14px 28px rgba(2,6,23,.08);
-    --hl-y:#fff9c2; --hl-g:#d1fae5; --hl-b:#dbeafe; --green:#16a34a;
+    --hl-y:#fff8b8; --hl-g:#eafcf1; --hl-b:#e8f0ff; --green:#16a34a;
     --lineH:30px; --grid:28px; --dots:26px;
   }
   *{box-sizing:border-box}
   html{font-size:17px}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  body{
+    margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;
+    /* Tema quaderno a puntini SOLO sfondo pagina */
+    background:
+      radial-gradient(rgba(2,6,23,.15) 1px, transparent 1px) 0 0/ var(--dots) var(--dots),
+      #f7f9fc;
+  }
   .wrap{max-width:860px;margin:32px auto;padding:0 14px}
 
-  /* ===== Header con badge su 2 righe ===== */
-  header{display:flex;justify-content:center}
+  /* ===== Header su due righe con badge (peso 800 e margine) ===== */
+  header{display:flex;justify-content:center;margin-bottom:16px}
   .title{
     text-align:center; line-height:1.15; margin:0;
     font-size:2rem; font-weight:800; letter-spacing:-.01em;
@@ -33,12 +39,14 @@
     background:#eef2ff; color:#111827; border:1px solid #c7d2fe;
   }
 
-  .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
   .pad{padding:20px}
 
-  .form-vertical{display:flex;flex-direction:column;gap:18px} /* più spazio tra sezioni */
+  /* Spaziature principali 20–24px */
+  .form-vertical{display:flex;flex-direction:column;row-gap:20px}
   .field{width:100%}
   label{display:block;margin:0 0 6px;font-weight:700}
+  /* Evidenziazione gialla pastello + bordo (coerente ovunque) */
   .hl{padding:0 .35em;border-radius:.5em;background:var(--hl-y);border:1px solid rgba(234,179,8,.35)}
   .mark-b,.mark-g,.mark-y{padding:0 .35em;border-radius:.5em}
   .mark-b{background:var(--hl-b)} .mark-g{background:var(--hl-g)} .mark-y{background:var(--hl-y)}
@@ -46,11 +54,11 @@
   input:disabled{background:#f8fafc;color:#334155}
   input:focus,select:focus{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
 
-  /* Chips uniformi (importi + coefficienti) */
+  /* Chips (importi & coefficienti) UNIFORMI */
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
   .chip{
-    min-width:92px; text-align:center; padding:9px 12px;
-    border:1px solid var(--border); border-radius:999px; background:#fff;
+    height:40px; padding:0 14px; display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--border); border-radius:9999px; background:#fff;
     cursor:pointer; font-weight:800; font-size:.95rem; transition:border-color .15s, transform .05s;
   }
   .chip:hover{border-color:#bcd0ff}
@@ -60,16 +68,15 @@
   .coeff-wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .coeff-input{width:86px}
 
-  /* Azioni: Calcola grande, secondari sotto */
+  /* Pulsanti finali: Calcola principale (full width max 420), secondari sotto */
   .actions{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px}
   .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border:0;border-radius:10px;font-weight:800;font-size:1rem;cursor:pointer}
-  .btn.primary{background:var(--accent);color:#fff;padding:14px 18px;font-size:1.06rem;width:min(460px,100%)}
+  .btn.primary{background:var(--accent);color:#fff;padding:14px 18px;font-size:1.06rem;width:min(420px,100%)}
   .sub-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   .btn.secondary{background:#fff;color:#111;border:1px solid var(--border);padding:9px 12px}
   .btn.dark{background:var(--accent-2);color:#fff;padding:9px 12px}
 
-  /* Opzioni avanzate più “card” e freccia evidente */
-  .adv-right{display:block}
+  /* Opzioni avanzate (accordion) — card + freccia */
   details.adv{display:block;width:100%}
   details.adv > summary{
     cursor:pointer; list-style:none; padding:10px 14px; border:1px solid var(--border); border-radius:12px;
@@ -82,19 +89,31 @@
   details.adv[open] > summary{background:#111827;color:#fff;border-color:#111827}
   .adv-panel{
     display:none;margin-top:12px;width:100%;
-    background:#fbfcff;border:1px solid #e7e9ff;border-radius:16px;box-shadow:0 12px 24px rgba(2,6,23,.06);padding:16px
+    background:#fff;border:1px solid #E6E6E6;border-radius:16px;box-shadow:0 12px 24px rgba(2,6,23,.06);padding:16px
   }
   details.adv[open] .adv-panel{display:block}
-  .adv-grid{display:grid;gap:16px}
-  .subgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-  .ribbon{display:block;width:100%;padding:8px 12px;margin:4px 0 12px;border-radius:12px;font-weight:900}
-  .ribbon.y{background:var(--hl-y);border:1px dashed rgba(234,179,8,.4)}
-  .ribbon.g{background:var(--hl-g);border:1px dashed rgba(16,185,129,.35)}
+  .adv-grid{display:grid;row-gap:16px}
+  .subgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 
-  /* Sezioni + copia */
-  .section{position:relative;border-left:6px solid #e5e7eb;padding:12px 12px 10px;margin:10px 0 6px;border-radius:10px;background:transparent}
-  .section.inps{border-color:var(--accent)} .section.imp{border-color:var(--green)}
-  .section h3{margin:0 0 6px;font-size:1.05rem}
+  /* Box interni coerenti (card bianca + “barretta” titolo) */
+  .ibox{background:#fff;border:1px solid #E6E6E6;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 6px 16px rgba(2,6,23,.04)}
+  .ibox .bar{
+    display:flex;align-items:center;gap:8px;margin:-6px -6px 10px;padding:8px 10px;border-radius:8px;
+    background:#111827;color:#fff;font-weight:900
+  }
+  .ibox .bar.green{background:#065f46}
+  .ibox .bar.blue{background:#1e3a8a}
+
+  /* Pill toggle Manuale / Stima */
+  .pill-toggle{display:flex;justify-content:center;gap:8px;margin:8px 0 16px}
+  .pill{height:38px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
+  .pill.active{background:#111827;color:#fff;border-color:#111827}
+
+  /* Sezioni spiegazione + copia (callout) */
+  .section{position:relative;border-left:4px solid #e5e7eb;padding:14px 14px 12px;margin:12px 0 8px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
+  .section.inps{border-left-color:var(--accent)}
+  .section.imp{border-left-color:var(--green)}
+  .section h3{margin:0 0 6px;font-size:1.05rem;font-weight:700}
   .copy-btn{
     position:absolute; right:-10px; top:-10px; padding:6px 10px; font-size:.75rem; font-weight:900;
     border:0; border-radius:999px; background:#111827; color:#fff; box-shadow:0 6px 14px rgba(2,6,23,.18);
@@ -103,13 +122,15 @@
   .section:hover .copy-btn{opacity:1; transform:none}
   @media (max-width:900px){ .copy-btn{display:none} }
 
-  /* TABs con inkbar animata e toggle vista accanto */
+  /* Tabs moderni con underline animato */
   .tabs{margin-top:14px}
   .tabbar-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px}
   .tab-bar{position:relative;display:flex;gap:8px;flex-wrap:wrap}
-  .tab-btn{position:relative;border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:900}
+  .tab-btn{position:relative;border:1px solid var(--border);background:#fff;border-radius:9999px;padding:8px 14px;cursor:pointer;font-weight:900}
   .tab-btn.active{background:#eef2ff;color:#111827;border-color:#c7d2fe}
-  .inkbar{position:absolute;height:3px;background:#3b82f6;border-radius:3px;bottom:-6px;left:0;width:30px;transition:all .25s ease}
+  .inkbar{position:absolute;height:2px;background:#3b82f6;border-radius:2px;bottom:-6px;left:0;width:30px;transition:all .25s ease}
+
+  /* Toggle vista accanto ai tab */
   .viewctrl{display:flex;align-items:center;gap:10px}
   .viewctrl .tag{color:#64748b;font-weight:800}
   .switch{position:relative;display:inline-block;width:52px;height:28px}
@@ -121,48 +142,56 @@
 
   .tab{display:none} .tab.active{display:block}
 
-  /* KPI e tabelle (trasparenti per vedere gli sfondi) */
+  /* KPI e tabelle */
   .kpis{display:grid;gap:12px;margin-top:8px}
   @media(min-width:860px){.kpis{grid-template-columns:repeat(3,1fr)}}
-  .kpi{background:transparent;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-  .kpi h3{margin:0 0 4px;font-size:.78rem;color:#64748b;letter-spacing:.02em;text-transform:uppercase}
+  .kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:0 6px 16px rgba(2,6,23,.04)}
+  .kpi h3{margin:0 0 4px;font-size:.78rem;color:#64748b;letter-spacing:.02em;text-transform:uppercase;font-weight:700}
   .kpi .big{font-size:1.35rem;font-weight:900}
   .hr{height:1px;background:var(--border);margin:14px 0}
-  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:transparent}
-  th,td{border:1px solid var(--border);padding:12px 8px;background:transparent}
-  th{background:rgba(243,244,246,.65);color:#475569;font-weight:800}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
+  th,td{border:1px solid var(--border);padding:12px 8px}
+  th{background:#f7f7fb;color:#475569;font-weight:800}
   td:first-child{font-weight:600}
+  /* Tabella scadenze: hover + importi a destra monospace + riga Totale */
+  #tblScadenze tr:hover, #rateBody tr:hover{background:#fafbff}
+  #tblScadenze td:nth-child(2), #rateBody td:last-child, #rateBody td:nth-child(3), #rateBody td:nth-child(5), tfoot th:last-child{
+    text-align:right; font-family:ui-monospace,Consolas,Menlo,monospace;
+  }
+  .badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#eef2ff;border:1px solid #c7d2fe;font-weight:800}
 
-  /* Tab 1: quaderno a righe */
+  /* Spiegazione testo a righe (solo ritmo, non righe di sfondo nelle card) */
   .explanation{max-width:820px;margin:0 auto;text-align:left}
   .explanation .line{line-height:var(--lineH); margin:0}
-  #tab1 .pad{
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        rgba(0,0,0,0) 0,
-        rgba(0,0,0,0) calc(var(--lineH) - 1px),
-        #eef2ff calc(var(--lineH) - 1px),
-        #eef2ff var(--lineH)
-      );
-  }
-  /* Tab 2: quadretti */
-  #tab2 .pad{
-    background:
-      linear-gradient(to right,#eef2ff 1px,transparent 1px) 0 0/var(--grid) var(--grid),
-      linear-gradient(to bottom,#eef2ff 1px,transparent 1px) 0 0/var(--grid) var(--grid);
-  }
-  /* Tab 3: puntini */
-  #tab3 .pad{
-    background:radial-gradient(#e5e7eb 1px, transparent 1px) 0 0/ var(--dots) var(--dots);
-  }
 
   .mono{font-family:ui-monospace,Consolas,Menlo,Monaco,monospace}
   .muted{color:var(--muted)}
   .error{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
 
-  #rateBlock{margin-top:6px}
-  @media print{.tabbar-wrap,.adv-right,.actions,.copy-btn{display:none!important}.card{box-shadow:none;border-radius:0}}
+  /* Accordion “dettaglio rate” come link con chevron */
+  details.rates > summary{
+    list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px;
+    font-weight:800; color:#111827; padding:6px 0;
+  }
+  details.rates > summary::before{
+    content:""; width:8px;height:8px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s;
+  }
+  details.rates[open] > summary::before{transform:rotate(-135deg)}
+
+  /* PRINT: stampa SOLO i tab sotto, impaginati puliti */
+  @media print{
+    body{background:#fff}
+    header, #inputCard, .sub-actions, .actions, .tabbar-wrap .viewctrl, .copy-btn{display:none!important}
+    .wrap{max-width:1000px;margin:0;padding:0}
+    #resultsBox{border:none;box-shadow:none}
+    .tabbar-wrap{display:none!important}
+    /* mostra TUTTI i tab in stampa, uno sotto l’altro */
+    .tab{display:block !important; page-break-inside:avoid}
+    .print-title{display:block !important; font-size:1.25rem; font-weight:800; margin:8px 0}
+    /* pagina pulita, margini comodi */
+    @page{size:A4;margin:16mm}
+  }
+  .print-title{display:none}
 </style>
 </head>
 <body>
@@ -219,66 +248,62 @@
           </select>
         </div>
 
-        <div class="adv-right">
-          <details class="adv">
-            <summary>Opzioni avanzate</summary>
-            <div class="adv-panel">
-              <div class="adv-grid">
+        <!-- Opzioni avanzate -->
+        <details class="adv" style="margin-top:4px">
+          <summary>Opzioni avanzate</summary>
+          <div class="adv-panel">
+            <div class="adv-grid">
 
-                <div class="section inps">
-                  <span class="ribbon y">Parametri INPS & acconti</span>
-                  <div class="subgrid">
-                    <div><label>Aliquota INPS (%)</label><input id="aliqInps" type="text" value="26,07"></div>
-                    <div><label>Acconti imposta (%)</label><input id="accImpPerc" type="text" value="100"></div>
-                    <div><label>Acconti INPS (%)</label><input id="accInpsPerc" type="text" value="80"></div>
-                  </div>
-                  <div class="muted" style="font-size:.9rem;margin-top:6px">Puoi variare l’aliquota INPS e le percentuali di acconto (metodo storico).</div>
+              <div class="ibox">
+                <div class="bar blue">Parametri INPS & acconti</div>
+                <div class="subgrid">
+                  <div><label>Aliquota INPS (%)</label><input id="aliqInps" type="text" value="26,07"></div>
+                  <div><label>Acconti Imposta (%)</label><input id="accImpPerc" type="text" value="100"></div>
+                  <div><label>Acconti INPS (%)</label><input id="accInpsPerc" type="text" value="80"></div>
                 </div>
-
-                <div class="section imp">
-                  <span class="ribbon g">Come impostare gli acconti dell’anno precedente</span>
-
-                  <div class="seg" role="tablist" aria-label="Modalità inserimento acconti" style="display:flex;justify-content:center;gap:10px;margin:8px 0 18px">
-                    <input type="radio" id="mode-manuale" name="accMode" value="manual" checked style="position:absolute;opacity:0">
-                    <label for="mode-manuale" class="chip" style="min-width:auto;padding:8px 14px">Manuale</label>
-
-                    <input type="radio" id="mode-stima" name="accMode" value="stima" style="position:absolute;opacity:0">
-                    <label for="mode-stima" class="chip" style="min-width:auto;padding:8px 14px">Stima automatica da incasso 2024</label>
-                  </div>
-
-                  <div class="subgrid" id="accManual">
-                    <div><label>Acconti IMPOSTA versati anno prima (€)</label><input id="accImpPrev" type="text" inputmode="decimal" value="0"></div>
-                    <div><label>Acconti INPS versati anno prima (€)</label><input id="accInpsPrev" type="text" inputmode="decimal" value="0"></div>
-                  </div>
-
-                  <div id="accStima" style="display:none">
-                    <div class="subgrid">
-                      <div><label>Incassato 2024 (€)</label><input id="incasso2024" type="text" inputmode="decimal" value="0"></div>
-                      <div>
-                        <label>Imposta 2024</label>
-                        <select id="imp2024"><option value="0.05" selected>5%</option><option value="0.15">15%</option></select>
-                      </div>
-                      <div><label>Coefficiente 2024 (%)</label><input id="coeff2024" type="text" class="coeff-input" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="78"></div>
-                      <div><label>Aliquota INPS 2024 (%)</label><input id="inps2024" type="text" value="26,07"></div>
-                    </div>
-                    <div class="muted" style="margin-top:6px">Stima veloce: nessuna deduzione; acconti ≈ imposta×100% e INPS×80%.</div>
-                  </div>
-                </div>
-
-                <div class="section imp" style="margin-top:8px">
-                  <span class="ribbon y">Contributi deducibili (solo per l’imposta)</span>
-                  <div class="subgrid">
-                    <div style="grid-column:1/-1">
-                      <label for="deducibili">Contributi previdenziali già versati nell’anno (€)</label>
-                      <input id="deducibili" type="text" inputmode="decimal" value="0" />
-                    </div>
-                  </div>
-                </div>
-
+                <div class="muted" style="font-size:.9rem;margin-top:6px">Varia aliquota INPS e percentuali acconti (metodo storico).</div>
               </div>
+
+              <div class="ibox">
+                <div class="bar">Acconti versati l’anno precedente</div>
+
+                <div class="pill-toggle" role="tablist" aria-label="Modalità inserimento acconti">
+                  <button type="button" class="pill active" id="pillManuale">Manuale</button>
+                  <button type="button" class="pill" id="pillStima">Stima automatica da incasso 2024</button>
+                </div>
+
+                <div class="subgrid" id="accManual">
+                  <div><label>Acconti IMPOSTA versati (€)</label><input id="accImpPrev" type="text" inputmode="decimal" value="0"></div>
+                  <div><label>Acconti INPS versati (€)</label><input id="accInpsPrev" type="text" inputmode="decimal" value="0"></div>
+                </div>
+
+                <div id="accStima" style="display:none">
+                  <div class="subgrid">
+                    <div><label>Incassato 2024 (€)</label><input id="incasso2024" type="text" inputmode="decimal" value="0"></div>
+                    <div>
+                      <label>Imposta 2024</label>
+                      <select id="imp2024"><option value="0.05" selected>5%</option><option value="0.15">15%</option></select>
+                    </div>
+                    <div><label>Coeff. 2024 (%)</label><input id="coeff2024" type="text" class="coeff-input" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="78"></div>
+                    <div><label>Aliquota INPS 2024 (%)</label><input id="inps2024" type="text" value="26,07"></div>
+                  </div>
+                  <div class="muted" style="margin-top:6px">Stima veloce: nessuna deduzione; acconti ≈ imposta×100% e INPS×80%.</div>
+                </div>
+              </div>
+
+              <div class="ibox">
+                <div class="bar green">Contributi deducibili (per l’imposta)</div>
+                <div class="subgrid">
+                  <div style="grid-column:1/-1">
+                    <label for="deducibili">Contributi previdenziali versati nell’anno (€)</label>
+                    <input id="deducibili" type="text" inputmode="decimal" value="0" />
+                  </div>
+                </div>
+              </div>
+
             </div>
-          </details>
-        </div>
+          </div>
+        </details>
 
         <div class="actions">
           <button class="btn primary" id="btnCalc">Calcola</button>
@@ -300,7 +325,7 @@
       <div class="tab-bar" id="tabBar">
         <button class="tab-btn active" data-tab="tab1">Come si calcolano</button>
         <button class="tab-btn" data-tab="tab2">Risultati Tasse da pagare</button>
-        <button class="tab-btn" data-tab="tab3">Scadenza tasse da pagare</button>
+        <button class="tab-btn" data-tab="tab3">Scadenze da pagare</button>
         <span class="inkbar" id="inkbar"></span>
       </div>
       <div class="viewctrl">
@@ -311,12 +336,14 @@
     </div>
 
     <div id="tab1" class="tab active">
+      <h2 class="print-title">Come si calcolano</h2>
       <div class="pad">
         <div id="explanation" class="explanation"></div>
       </div>
     </div>
 
     <div id="tab2" class="tab">
+      <h2 class="print-title">Risultati Tasse da pagare</h2>
       <div class="pad">
         <div class="kpis">
           <div class="kpi"><h3>Reddito imponibile</h3><div class="big" id="outImponibile">€ 0</div><div class="muted" style="font-size:.85rem">Incassato × coefficiente</div></div>
@@ -331,29 +358,39 @@
         <div class="hr"></div>
         <div id="warnings" style="text-align:center"></div>
         <h3 style="margin:6px 0">Dettaglio</h3>
-        <table><tbody id="tblDettaglio"></tbody></table>
+        <table>
+          <tbody id="tblDettaglio"></tbody>
+          <tfoot>
+            <tr><th style="text-align:right" colspan="1">Totale</th><th id="detTot" style="text-align:center"></th></tr>
+          </tfoot>
+        </table>
       </div>
     </div>
 
     <div id="tab3" class="tab">
+      <h2 class="print-title">Scadenze da pagare</h2>
       <div class="pad">
         <h3 style="margin:0 0 6px">Scadenze sintetiche</h3>
-        <table><tbody id="tblScadenze"></tbody></table>
+        <table>
+          <tbody id="tblScadenze"></tbody>
+          <tfoot>
+            <tr><th style="text-align:right" colspan="1">Totale anno</th><th id="scadTot" style="text-align:right"></th></tr>
+          </tfoot>
+        </table>
 
-        <div style="margin:12px 0">
-          <label style="user-select:none"><input type="checkbox" id="toggleRate"> Mostra dettaglio rate di giugno (5 rate con interessi) + riga di novembre</label>
-        </div>
-
-        <div id="rateBlock" style="display:none">
-          <table>
-            <thead><tr><th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata</th></tr></thead>
-            <tbody id="rateBody"></tbody>
-            <tfoot>
-              <tr><th colspan="4" style="text-align:right">Totale interessi giugno</th><th id="rateIntTot">€ 0</th><th id="rateTot">€ 0</th></tr>
-              <tr><th colspan="5" style="text-align:right">Totale complessivo (giugno + novembre)</th><th id="rateTotAll">€ 0</th></tr>
-            </tfoot>
-          </table>
-        </div>
+        <details class="rates" id="ratesAcc" style="margin-top:12px">
+          <summary>Mostra dettaglio rate di giugno (5 rate con interessi) + riga di novembre</summary>
+          <div id="rateBlock" style="margin-top:8px">
+            <table>
+              <thead><tr><th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata</th></tr></thead>
+              <tbody id="rateBody"></tbody>
+              <tfoot>
+                <tr><th colspan="4" style="text-align:right">Totale interessi giugno</th><th id="rateIntTot">€ 0</th><th id="rateTot">€ 0</th></tr>
+                <tr><th colspan="5" style="text-align:right">Totale complessivo (giugno + novembre)</th><th id="rateTotAll">€ 0</th></tr>
+              </tfoot>
+            </table>
+          </div>
+        </details>
       </div>
     </div>
 
@@ -371,7 +408,7 @@
   function setHTML(id,html){const el=document.getElementById(id);if(el)el.innerHTML=html}
   function show(x){if(typeof x==='string')x=document.getElementById(x);x.style.display=''}
   function hide(x){if(typeof x==='string')x=document.getElementById(x);x.style.display='none'}
-  function tr(a,b){return '<tr><td>'+a+'</td><td style="text-align:center">'+b+'</td></tr>'}
+  function tr(a,b,tdStyleRight=false){return '<tr><td>'+a+'</td><td style="text-align:'+(tdStyleRight?'right':'center')+'">'+b+'</td></tr>'}
   function perc(n,b){return b>0?(Math.round((n/b*100))+'%'):'0%'}
 
   const RATE_PERC=[0.00,0.18,0.51,0.84,1.17];
@@ -383,11 +420,7 @@
   /* ---------- Tabs + Inkbar ---------- */
   const tabBar=document.getElementById('tabBar');
   const inkbar=document.getElementById('inkbar');
-  function moveInkbar(btn){
-    const r=btn.getBoundingClientRect(), p=tabBar.getBoundingClientRect();
-    inkbar.style.width = r.width+'px';
-    inkbar.style.left = (btn.offsetLeft)+'px';
-  }
+  function moveInkbar(btn){ if(!btn) return; inkbar.style.width = btn.offsetWidth+'px'; inkbar.style.left = btn.offsetLeft+'px'; }
   function activateTab(btn){
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
@@ -398,7 +431,7 @@
   document.addEventListener('click',e=>{
     const btn=e.target.closest('.tab-btn'); if(!btn) return; activateTab(btn);
   });
-  window.addEventListener('resize',()=>{ const active=document.querySelector('.tab-btn.active'); if(active) moveInkbar(active); });
+  window.addEventListener('resize',()=>{ const active=document.querySelector('.tab-btn.active'); moveInkbar(active); });
 
   /* ---------- Chips incasso ---------- */
   document.addEventListener('click',e=>{
@@ -421,16 +454,18 @@
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
-  /* ---------- Opzioni avanzate: switch Manuale/Stima ---------- */
+  /* ---------- Opzioni avanzate: pill toggle Manuale/Stima ---------- */
   function refreshAccMode(){
-    const manual = document.getElementById('mode-manuale').checked;
-    const lManual = document.querySelector('label[for="mode-manuale"]');
-    const lStima  = document.querySelector('label[for="mode-stima"]');
-    if(manual){ show('accManual'); hide('accStima'); lManual.classList.add('active'); lStima.classList.remove('active'); }
-    else{ hide('accManual'); show('accStima'); lStima.classList.add('active'); lManual.classList.remove('active'); }
+    const manualActive = document.getElementById('pillManuale').classList.contains('active');
+    if(manualActive){ show('accManual'); hide('accStima'); }
+    else { hide('accManual'); show('accStima'); }
   }
-  document.getElementById('mode-manuale').addEventListener('change',refreshAccMode);
-  document.getElementById('mode-stima').addEventListener('change',refreshAccMode);
+  document.getElementById('pillManuale').addEventListener('click',function(){
+    this.classList.add('active'); document.getElementById('pillStima').classList.remove('active'); refreshAccMode();
+  });
+  document.getElementById('pillStima').addEventListener('click',function(){
+    this.classList.add('active'); document.getElementById('pillManuale').classList.remove('active'); refreshAccMode();
+  });
 
   /* ---------- Toggle vista accanto ai tab ---------- */
   const viewLabel = document.getElementById('viewLabel');
@@ -464,8 +499,8 @@
 
     // acconti anno precedente
     let accImpPrev=0, accInpsPrev=0;
-    const manual = document.getElementById('mode-manuale').checked;
-    if(manual){
+    const manualActive = document.getElementById('pillManuale').classList.contains('active');
+    if(manualActive){
       accImpPrev=val('accImpPrev'); accInpsPrev=val('accInpsPrev');
     }else{
       const inc24=val('incasso2024');
@@ -512,7 +547,7 @@
     const novTot=accImp2+accInps2;
     const totale=saldoTotale+accontiTot;
 
-    // KPI
+    /* KPI */
     setHTML('outImponibile',euro(imponibileForf));
     setHTML('outInps',euro(inps));
     setHTML('outImposta',euro(imposta));
@@ -520,13 +555,13 @@
     setHTML('outAcconti',euro(accontiTot));
     setHTML('outTotale',euro(totale));
 
-    // Note soglia
+    /* Note soglia */
     let w='';
     if(incassato>100000) w='<div class="muted"><b>Attenzione:</b> oltre 100.000€ → uscita <b>immediata</b> dal forfettario nell’anno.</div>';
     else if(incassato>85000) w='<div class="muted"><b>Nota:</b> oltre 85.000€ → uscita dal forfettario <b>dall’anno successivo</b>.</div>';
     setHTML('warnings',w);
 
-    // Dettaglio tab 2
+    /* Dettaglio tab 2 + totale in fondo */
     let det='';
     det+=tr('<b>Incassato</b>',euro(incassato));
     det+=tr('Coefficiente', (coeffPerc)+'%');
@@ -559,20 +594,26 @@
       if(creditoInpsResid>0) det+=tr('Credito INPS residuo',euro(creditoInpsResid));
     }
     setHTML('tblDettaglio',det);
+    setHTML('detTot','');
 
-    // Scadenze tab 3
+    /* Scadenze tab 3 (+ riga totale) */
     cacheGiugno=giugnoTot; cacheNov=novTot;
-    let sc=''; sc+=tr('Giugno — Saldo (imp.+INPS) + 1° acconti',euro(giugnoTot)); sc+=tr('Novembre — 2° acconti',euro(novTot)); setHTML('tblScadenze',sc);
-    if(document.getElementById('toggleRate').checked) buildRate(); else hide('rateBlock');
+    let sc=''; 
+    sc+=tr('<span class="badge-month">Giugno</span> — Saldo (imp.+INPS) + 1° acconti',euro(giugnoTot),true);
+    sc+=tr('<span class="badge-month">Novembre</span> — 2° acconti',euro(novTot),true);
+    setHTML('tblScadenze',sc);
+    setHTML('scadTot',euro(giugnoTot+novTot));
 
-    // Stato per spiegazione (tab 1)
+    /* Rate (se aperto l’accordion) */
+    if(document.getElementById('ratesAcc').open) buildRate(); else { /* lascia chiuso */ }
+
+    /* Stato per spiegazione */
     lastState={incassato,coeffPerc,coeff,impRate,aliqInps,imponibileForf,inps,deducibili,imponibileFisc,imposta,
       accImpPrev,accInpsPrev,saldoImposta,saldoInps,saldoTotale,accImpTot,accInpsTot,accImp1,accImp2,accInps1,accInps2,
       giugnoTot,novTot,totale,creditoImp,creditoInps,creditoImpResid,creditoInpsResid};
     buildExplanation(); show('resultsBox');
 
-    // allinea inkbar al tab attivo (prima apertura)
-    moveInkbar(document.querySelector('.tab-btn.active'));
+    moveInkbar(document.querySelector('.tab-btn.active')); // allinea underline
   }
 
   /* ---------- Spiegazione (tab 1) ---------- */
@@ -585,7 +626,7 @@
       </div>
     </div>`;
   }
-  function P(t){ return `<p class="line">${t}</p>` }
+  function P(t){ return `<p class="line" style="font-weight:500">${t}</p>` }
 
   function buildExplanation(){
     if(!lastState) return;
@@ -663,20 +704,27 @@
     }
     tbody+='<tr><td>6</td><td><b>Novembre — 2° acconti</b></td><td>'+euro(cacheNov)+'</td><td>—</td><td>—</td><td><b>'+euro(cacheNov)+'</b></td></tr>';
     setHTML('rateBody',tbody); setHTML('rateIntTot',euro(sumInt)); setHTML('rateTot',euro(sumTotGiu)); setHTML('rateTotAll',euro(sumTotGiu+cacheNov));
-    show('rateBlock');
   }
+
+  /* ---------- Stampa PDF (solo risultati) ---------- */
+  document.getElementById('btnPrint').addEventListener('click',()=>{
+    // assicura che il box risultati sia visibile
+    const rb=document.getElementById('resultsBox');
+    if(rb.style.display==='none'){ alert('Prima clicca su CALCOLA per generare i risultati da stampare.'); return; }
+    // espandi i tre tab in stampa tramite CSS @media print (già impostato)
+    window.print();
+  });
 
   /* ---------- Bind iniziali ---------- */
   document.addEventListener('DOMContentLoaded',function(){
     // 78% già attivo e inkbar iniziale
     document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
     coeffFromChips=78;
-    moveInkbar(document.querySelector('.tab-btn.active'));
+    const firstTab=document.querySelector('.tab-btn.active'); if(firstTab) setTimeout(()=>{const r=firstTab.getBoundingClientRect(); document.getElementById('inkbar').style.width=r.width+'px'; document.getElementById('inkbar').style.left=firstTab.offsetLeft+'px';},0);
 
     document.getElementById('btnCalc').addEventListener('click',compute);
     ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','accImpPerc','accInpsPerc','inps2024']
       .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();compute();}})});
-    document.getElementById('btnPrint').addEventListener('click',()=>window.print());
     document.getElementById('btnReset').addEventListener('click',function(){
       ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
       document.getElementById('coeffCustom').value='';
@@ -685,14 +733,16 @@
       coeffFromChips=78;
       document.getElementById('imposta').value='0.05';
       document.getElementById('aliqInps').value='26,07'; document.getElementById('accImpPerc').value='100'; document.getElementById('accInpsPerc').value='80';
-      document.getElementById('toggleRate').checked=false;
-      document.getElementById('mode-manuale').checked=true; refreshAccMode();
+      document.getElementById('ratesAcc').open=false;
       document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').innerHTML='<b>Dettagliata</b>';
-      hide('rateBlock'); hide('resultsBox'); window.scrollTo({top:0,behavior:'smooth'});
-      moveInkbar(document.querySelector('.tab-btn[data-tab="tab1"]'));
+      hide('resultsBox'); window.scrollTo({top:0,behavior:'smooth'});
+      const first=document.querySelector('.tab-btn[data-tab="tab1"]'); if(first){first.click();}
     });
-    document.getElementById('toggleRate').addEventListener('change',e=>{if(e.target.checked)buildRate();else hide('rateBlock');});
-    refreshAccMode();
+
+    // Aprendo/chiudendo l’accordion rate, rigenera tabella se già calcolato
+    document.getElementById('ratesAcc').addEventListener('toggle',()=>{
+      if(document.getElementById('ratesAcc').open && lastState){ buildRate(); }
+    });
   });
 })();
 </script>
