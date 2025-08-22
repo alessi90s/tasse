@@ -20,19 +20,16 @@
   html{font-size:17px}
   body{
     margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;
-    /* quaderno a puntini SOLO sfondo pagina, opacità ~25% */
+    /* pattern puntini solo su sfondo pagina, opacità ~20% */
     background:
-      radial-gradient(rgba(2,6,23,.12) 1px, transparent 1px) 0 0/ var(--dots) var(--dots),
+      radial-gradient(rgba(2,6,23,.08) 1px, transparent 1px) 0 0/ var(--dots) var(--dots),
       #f7f9fc;
   }
   .wrap{max-width:860px;margin:32px auto;padding:0 14px}
 
-  /* ===== Header su 2 righe con badge (peso 800; mb 16px) ===== */
+  /* ===== Header su 2 righe con badge ===== */
   header{display:flex;justify-content:center;margin-bottom:16px}
-  .title{
-    text-align:center; line-height:1.15; margin:0;
-    font-size:2rem; font-weight:800; letter-spacing:-.01em;
-  }
+  .title{ text-align:center; line-height:1.15; margin:0; font-size:2rem; font-weight:800; letter-spacing:-.01em; }
   .title .sub{display:block; margin-top:6px}
   .badge{
     display:inline-block; padding:6px 12px; border-radius:999px; font-weight:900;
@@ -43,24 +40,19 @@
   .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
   .pad{padding:20px}
 
-  /* ===== Form: gerarchia & spazi (margin-block ~24) ===== */
+  /* ===== Form verticale con respiro ===== */
   .form-vertical{display:flex;flex-direction:column;row-gap:24px}
   .field{width:100%}
   label{display:block;margin:0 0 6px;font-weight:700}
-  /* Evidenziazione gialla pastello + bordo (coerenza) */
-  .hl{
-    padding:0 .35em;border-radius:.5em;background:var(--hl-y);
-    border:1px solid #f3e89a; cursor:help;
-  }
-  .mark-b,.mark-g,.mark-y{padding:0 .35em;border-radius:.5em}
-  .mark-b{background:var(--hl-b)} .mark-g{background:var(--hl-g)} .mark-y{background:var(--hl-y)}
+  .hl{ padding:0 .35em;border-radius:.5em;background:var(--hl-y); border:1px solid #f3e89a; }
+
   input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
   input:disabled{background:#f8fafc;color:#334155}
   input:focus,select:focus,.btn:focus-visible,.chip:focus-visible,.pill:focus-visible{
     outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff;
   }
 
-  /* ===== Chips (importi & coefficienti) UNIFORMI ===== */
+  /* ===== Chips uniformi (importi & coeff) ===== */
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
   .chip{
     height:40px; padding:0 14px; display:inline-flex; align-items:center; justify-content:center;
@@ -70,92 +62,103 @@
   .chip:hover{border-color:#bcd0ff; box-shadow:inset 0 0 0 1px #bcd0ff}
   .chip:active{transform:translateY(1px)}
   .chip.active{background:#111827;color:#fff;border-color:#111827}
-
   .coeff-wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .coeff-input{width:86px}
 
-  /* ===== Pulsanti finali ===== */
-  .actions{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border:0;border-radius:10px;font-weight:800;font-size:1rem;cursor:pointer}
-  .btn.primary{background:var(--accent);color:#fff;padding:14px 18px;font-size:1.06rem;width:min(420px,100%)}
+  /* ===== Pulsanti finali (1. Calcola centrato 400–450px; 2. secondari sotto) ===== */
+  .actions{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:8px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;font-weight:800;font-size:1rem;cursor:pointer}
+  .btn.primary{
+    background:var(--accent);color:#fff;
+    height:50px; padding:0 18px;
+    width:100%; max-width:450px; min-width:280px;
+    justify-content:center;
+  }
   .sub-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-  .btn.secondary{background:#fff;color:#111;border:1px solid var(--border);padding:9px 12px}
-  .btn.dark{background:var(--accent-2);color:#fff;padding:9px 12px}
+  .btn.secondary{background:#fff;color:#111;border:1px solid var(--border);height:40px;padding:0 12px}
+  .btn.dark{background:var(--accent-2);color:#fff;height:40px;padding:0 12px}
 
-  /* ===== Opzioni avanzate (accordion in card) ===== */
+  /* ===== Opzioni avanzate (accordion) ===== */
   details.adv{display:block;width:100%}
   details.adv > summary{
     cursor:pointer; list-style:none; padding:10px 14px; border:1px solid var(--border); border-radius:12px;
     font-weight:900; background:#fff; display:flex; align-items:center; gap:10px;
   }
+  /* chevron rotazione 180° */
   details.adv > summary::before{
     content:""; width:10px;height:10px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s;
   }
   details.adv[open] > summary::before{transform:rotate(-135deg)}
   details.adv[open] > summary{background:#111827;color:#fff;border-color:#111827}
+
   .adv-panel{
     display:none;margin-top:12px;width:100%;
     background:#fff;border:1px solid #E6E6E6;border-radius:16px;box-shadow:0 12px 24px rgba(2,6,23,.06);padding:16px
   }
   details.adv[open] .adv-panel{display:block}
-  .adv-grid{display:grid;row-gap:16px}
+  .adv-grid{display:grid;row-gap:22px} /* più spazio verticale tra i box */
   .subgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 
-  /* Box interni coerenti con barretta titolo blu scuro */
-  .ibox{background:#fff;border:1px solid #E6E6E6;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 6px 16px rgba(2,6,23,.04)}
+  /* Intestazioni box UNIFORMI (blu/grigio scuro + testo bianco) */
+  .ibox{background:#fff;border:1px solid #E6E6E6;border-radius:12px;padding:16px;margin-bottom:0;box-shadow:0 6px 16px rgba(2,6,23,.04)}
   .ibox .bar{
-    display:flex;align-items:center;gap:8px;margin:-6px -6px 10px;padding:8px 10px;border-radius:8px;
+    display:flex;align-items:center;gap:8px;margin:-6px -6px 12px;padding:8px 10px;border-radius:8px;
     background:#0F1D40;color:#fff;font-weight:900
   }
-  .ibox .bar.green{background:#065f46}
-  .ibox .bar.blue{background:#1e3a8a}
   .desc{font-size:12px;color:#6B7280;margin-top:6px}
 
-  /* Pill toggle Manuale / Stima */
+  /* Pill toggle Manuale / Stima (pill + stato attivo) */
   .pill-toggle{display:flex;justify-content:center;gap:8px;margin:8px 0 16px}
-  .pill{height:38px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
+  .pill{height:36px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
   .pill.active{background:#111827;color:#fff;border-color:#111827}
 
-  /* ===== Tabs moderni con underline animato e scroll-snap ===== */
+  /* ===== Tabs moderni (solo scroll orizzontale; pill leggere; underline stabile) ===== */
   .tabs{margin-top:14px}
   .tabbar-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px}
-  .tab-bar{position:relative;display:flex;gap:8px;flex-wrap:nowrap;overflow:auto;scroll-snap-type:x mandatory}
+  .tab-bar{
+    position:relative;display:flex;gap:8px;flex-wrap:nowrap;
+    overflow-x:auto; overflow-y:hidden; /* niente scrollbar verticale */
+    scroll-snap-type:x mandatory;
+  }
   .tab-bar::-webkit-scrollbar{height:6px}
   .tab-bar::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:9999px}
-  .tab-btn{scroll-snap-align:start; position:relative;border:1px solid var(--border);background:#fff;border-radius:9999px;padding:8px 14px;cursor:pointer;font-weight:900;height:38px;display:inline-flex;align-items:center}
+  .tab-btn{
+    scroll-snap-align:start;
+    position:relative;border:1px solid var(--border);background:#fff;border-radius:9999px;
+    padding:6px 12px; /* pill più compatte */
+    cursor:pointer;font-weight:900;height:34px;display:inline-flex;align-items:center
+  }
   .tab-btn.active{background:#e8f0ff;color:#111827;border-color:#c7d2fe}
-  .inkbar{position:absolute;height:2px;background:#3b82f6;border-radius:2px;bottom:-6px;left:0;width:30px;transition:all .25s ease}
-
-  /* Toggle vista accanto ai tab */
-  .viewctrl{display:flex;align-items:center;gap:10px}
-  .viewctrl .tag{color:#64748b;font-weight:800}
-  .switch{position:relative;display:inline-block;width:52px;height:28px}
-  .switch input{opacity:0;width:0;height:0}
-  .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#e5e7eb;transition:.2s;border-radius:999px}
-  .slider:before{position:absolute;content:"";height:22px;width:22px;left:3px;top:3px;background:white;transition:.2s;border-radius:50%}
-  .switch input:checked + .slider{background:#111827}
-  .switch input:checked + .slider:before{transform:translateX(24px)}
+  .inkbar{
+    position:absolute;height:2px;background:#3b82f6;border-radius:2px;bottom:-6px;left:0;width:30px;transition:all .25s ease
+  }
   .tab{display:none} .tab.active{display:block}
 
-  /* ===== KPI con icone e numeri tabulari ===== */
+  /* ===== KPI coerenti (stessa altezza, icone, tabular nums) ===== */
   .kpis{display:grid;gap:12px;margin-top:8px}
   @media(min-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
   @media(min-width:860px){.kpis{grid-template-columns:repeat(3,1fr)}}
-  .kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(2,6,23,.04)}
-  .kpi h3{margin:0 0 4px;font-size:.78rem;color:#64748b;letter-spacing:.02em;text-transform:uppercase;font-weight:700;display:flex;gap:6px;align-items:center;justify-content:center}
-  .kpi h3 .ico{font-size:.9rem;opacity:.8}
+  .kpi{
+    background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;
+    box-shadow:0 6px 16px rgba(2,6,23,.04);
+    display:flex;flex-direction:column;justify-content:center;min-height:120px;
+  }
+  .kpi h3{margin:0 0 6px;font-size:.78rem;color:#64748b;letter-spacing:.02em;text-transform:uppercase;font-weight:700;display:flex;gap:6px;align-items:center;justify-content:center}
+  .kpi h3 .ico{font-size:.9rem;opacity:.85}
   .kpi .big{font-size:1.35rem;font-weight:900;font-variant-numeric:tabular-nums}
 
-  /* Tabelle risultati & scadenze */
+  /* Tabelle (totale anno evidenziato) */
   table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04);page-break-inside:avoid}
   th,td{border:1px solid var(--border);padding:12px 8px}
   th{background:#f7f7fb;color:#475569;font-weight:800}
   td:first-child{font-weight:600}
   tr:hover{background:#f8faff}
-  .badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#eef2ff;border:1px solid #c7d2fe;font-weight:800}
-  tfoot tr th{background:#fafbff}
+  tfoot tr th{background:#f1f5f9;font-weight:800}
+  /* Scadenze: importi a destra + badge coerenti */
+  #tblScadenze td:nth-child(2), #rateBody td:nth-child(3), #rateBody td:nth-child(5), #rateBody td:nth-child(6), #scadTot{ text-align:right; font-variant-numeric:tabular-nums; }
+  .badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#eef2ff;border:1px solid #c7d2fe;font-weight:800;font-size:.85em}
 
-  /* Sezioni spiegazione con callout + copia */
+  /* Sezioni spiegazione (copy) */
   .section{position:relative;border-left:4px solid #e5e7eb;padding:14px 14px 12px;margin:12px 0 8px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
   .section.inps{border-left-color:var(--accent)}
   .section.imp{border-left-color:var(--green)}
@@ -170,10 +173,10 @@
   .explanation{max-width:820px;margin:0 auto;text-align:left}
   .explanation .line{line-height:30px; margin:0; font-weight:500}
 
-  /* Accessibility helpers */
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .muted{color:var(--muted)}
+  .error{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
 
-  /* Accordion “rate” come link con chevron */
+  /* Accordion “rate” */
   details.rates > summary{
     list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px;
     font-weight:800; color:#111827; padding:6px 0;
@@ -183,7 +186,7 @@
   }
   details.rates[open] > summary::before{transform:rotate(-135deg)}
 
-  /* ===== PRINT: solo risultati, intestazione con data/ora, no page-break in tabelle ===== */
+  /* ===== PRINT: solo risultati ===== */
   @media print{
     body{background:#fff}
     header, #inputCard, .sub-actions, .actions, .tabbar-wrap .viewctrl, .copy-btn{display:none!important}
@@ -192,7 +195,6 @@
     .tabbar-wrap{display:none!important}
     .print-head{display:block !important; border-bottom:1px solid #ddd; padding:6px 0; margin-bottom:8px}
     .print-title{display:block !important; font-size:1.15rem; font-weight:800; margin:6px 0}
-    /* mostra TUTTI i tab in stampa, uno sotto l’altro */
     .tab{display:block !important; page-break-inside:avoid}
     table, tr, td, th{page-break-inside:avoid}
     @page{size:A4;margin:16mm}
@@ -216,12 +218,12 @@
       <div class="form-vertical" style="max-width:720px;margin:0 auto">
 
         <div class="field">
-          <label for="anno">Anno di riferimento <span class="hl" title="L’anno fiscale di calcolo">2025</span></label>
+          <label for="anno">Anno di riferimento <span class="hl">2025</span></label>
           <input id="anno" type="text" value="2025" disabled aria-disabled="true" />
         </div>
 
         <div class="field">
-          <label for="incassato">Incassato annuo (€) <span class="hl" title="Importo incassato dell’anno">importo incassato dell’anno</span></label>
+          <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
           <input id="incassato" type="text" inputmode="decimal" placeholder="es. 30.000" />
           <div class="chips" aria-label="Importi rapidi">
             <button class="chip" data-val="10000">10.000</button>
@@ -234,7 +236,7 @@
         </div>
 
         <div class="field">
-          <label>Coefficiente di <span class="hl" title="Percentuale di redditività applicata">redditività</span></label>
+          <label>Coefficiente di <span class="hl">redditività</span></label>
           <div class="coeff-wrap">
             <div class="chips" id="coeffChips">
               <button class="chip active" data-coeff="78">78%</button>
@@ -247,7 +249,7 @@
         </div>
 
         <div class="field">
-          <label for="imposta">Percentuale <span class="hl" title="Aliquota dell’imposta sostitutiva">Imposta sostitutiva</span></label>
+          <label for="imposta">Percentuale <span class="hl">Imposta sostitutiva</span></label>
           <select id="imposta">
             <option value="0.05" selected>5% (primi 5 anni)</option>
             <option value="0.15">15% (ordinaria)</option>
@@ -271,7 +273,7 @@
               </div>
 
               <div class="ibox">
-                <div class="bar blue">Acconti versati l’anno precedente</div>
+                <div class="bar">Acconti versati l’anno precedente</div>
 
                 <div class="pill-toggle" role="tablist" aria-label="Modalità inserimento acconti">
                   <button type="button" class="pill active" id="pillManuale" aria-pressed="true">Manuale</button>
@@ -298,7 +300,7 @@
               </div>
 
               <div class="ibox">
-                <div class="bar green">Contributi deducibili (per l’imposta)</div>
+                <div class="bar">Contributi deducibili (per l’imposta)</div>
                 <div class="subgrid">
                   <div style="grid-column:1/-1">
                     <label for="deducibili">Contributi previdenziali versati nell’anno (€)</label>
@@ -322,7 +324,6 @@
       </div>
 
       <div id="err" class="error" style="display:none"></div>
-      <!-- aria-live per annunci sintetici dei risultati -->
       <div id="liveResult" class="sr-only" aria-live="polite"></div>
     </div>
   </section>
@@ -339,8 +340,8 @@
         <span class="inkbar" id="inkbar"></span>
       </div>
       <div class="viewctrl">
-        <span class="tag">Vista</span>
-        <span id="viewLabel" class="tag"><b>Dettagliata</b></span>
+        <span class="muted" style="font-weight:800">Vista</span>
+        <span id="viewLabel" class="muted" style="font-weight:800"><b>Dettagliata</b></span>
         <label class="switch" title="Cambia tra dettagliata e semplificata"><input type="checkbox" id="simpToggle"><span class="slider"></span></label>
       </div>
     </div>
@@ -377,7 +378,7 @@
           <div class="kpi"><h3>Acconti netti</h3><div class="big" id="outAcconti">€ 0</div><div class="muted" style="font-size:.85rem">Imposta 100% • INPS 80%</div></div>
           <div class="kpi"><h3>Totale anno</h3><div class="big" id="outTotale">€ 0</div><div class="muted" style="font-size:.85rem">Saldo + acconti</div></div>
         </div>
-        <div class="hr"></div>
+        <div class="hr" style="height:1px;background:var(--border);margin:14px 0"></div>
         <div id="warnings" style="text-align:center"></div>
         <h3 style="margin:6px 0">Dettaglio</h3>
         <table>
@@ -440,7 +441,7 @@
   let cacheGiugno=0, cacheNov=0, lastState=null;
   let coeffFromChips=78; // default 78%
 
-  /* ---------- Tabs + Inkbar (scroll-snap) ---------- */
+  /* ---------- Tabs + Inkbar (solo scroll orizzontale; underline stabile) ---------- */
   const tabBar=document.getElementById('tabBar');
   const inkbar=document.getElementById('inkbar');
   function moveInkbar(btn){ if(!btn) return; inkbar.style.width = btn.offsetWidth+'px'; inkbar.style.left = btn.offsetLeft+'px'; }
@@ -477,7 +478,7 @@
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
-  /* ---------- Opzioni avanzate: pill toggle Manuale/Stima ---------- */
+  /* ---------- Opzioni avanzate: pill toggle ---------- */
   function refreshAccMode(){
     const manualActive = document.getElementById('pillManuale').classList.contains('active');
     if(manualActive){ show('accManual'); hide('accStima'); document.getElementById('pillManuale').setAttribute('aria-pressed','true'); document.getElementById('pillStima').setAttribute('aria-pressed','false'); }
@@ -578,9 +579,8 @@
     setHTML('outAcconti',euro(accontiTot));
     setHTML('outTotale',euro(totale));
 
-    /* Live ARIA breve */
-    const live=`Aggiornato. Saldo ${euro(saldoTotale)}, acconti ${euro(accontiTot)}, totale ${euro(totale)}.`;
-    setHTML('liveResult', live);
+    /* ARIA breve */
+    setHTML('liveResult', `Aggiornato. Saldo ${euro(saldoTotale)}, acconti ${euro(accontiTot)}, totale ${euro(totale)}.`);
 
     /* Note soglia */
     let w='';
@@ -625,7 +625,7 @@
 
     /* Scadenze tab 3 (+ riga totale) */
     cacheGiugno=giugnoTot; cacheNov=novTot;
-    let sc=''; 
+    let sc='';
     sc+=tr('<span class="badge-month">Giugno</span> — Saldo (imp.+INPS) + 1° acconti',euro(giugnoTot),true);
     sc+=tr('<span class="badge-month">Novembre</span> — 2° acconti',euro(novTot),true);
     setHTML('tblScadenze',sc);
@@ -643,13 +643,10 @@
     /* Inkbar */
     moveInkbar(document.querySelector('.tab-btn.active'));
 
-    /* Intestazione stampa con data/ora + riepilogo input */
+    /* Intestazione stampa */
     const head = `
       <div><strong>Simulatore Forfettario – Gestione Separata 2025</strong></div>
-      <div style="font-size:12px;color:#6b7280;margin-top:2px">Stampa generata il ${nowIt()}</div>
-      <div style="font-size:12px;margin-top:6px">
-        Incassato: <b>${euro(incassato)}</b> • Coeff.: <b>${coeffPerc}%</b> • Imposta: <b>${Math.round(impRate*100)}%</b> • INPS: <b>${(aliqInps*100).toFixed(2)}%</b> • Deducibili: <b>${euro(deducibili)}</b>
-      </div>`;
+      <div style="font-size:12px;color:#6b7280;margin-top:2px">Stampa generata il ${nowIt()}</div>`;
     setHTML('printHead', head);
   }
 
@@ -752,10 +749,10 @@
 
   /* ---------- Bind iniziali ---------- */
   document.addEventListener('DOMContentLoaded',function(){
-    // 78% selezionato di default + inkbar
+    // 78% selezionato di default + underline allineata
     document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
     coeffFromChips=78;
-    const firstTab=document.querySelector('.tab-btn.active'); if(firstTab) setTimeout(()=>moveInkbar(firstTab),0);
+    const firstTab=document.querySelector('.tab-btn.active'); if(firstTab) setTimeout(()=>{const r=firstTab.getBoundingClientRect(); document.getElementById('inkbar').style.width=r.width+'px'; document.getElementById('inkbar').style.left=firstTab.offsetLeft+'px';},0);
 
     document.getElementById('btnCalc').addEventListener('click',compute);
     ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','accImpPerc','accInpsPerc','inps2024']
