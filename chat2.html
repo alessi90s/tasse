@@ -13,12 +13,12 @@
   :root{
     --bg:#f6f8fb; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
     --accent:#2563eb; --accent-2:#111827; --radius:14px; --shadow:0 14px 28px rgba(2,6,23,.08);
-    --hl-y:#fff7b3; --hl-g:#d1fae5; --hl-b:#dbeafe; --green:#16a34a;
+    --hl-y:#fff9c2; --hl-g:#d1fae5; --hl-b:#dbeafe; --green:#16a34a;
 
     /* pattern carta */
-    --lineH: 30px;   /* altezza riga tab 1 */
-    --grid: 28px;    /* passo quadretti tab 2 */
-    --dots: 26px;    /* passo puntini tab 3 */
+    --lineH: 30px;   /* righe tab 1 */
+    --grid: 28px;    /* quadretti tab 2 */
+    --dots: 26px;    /* puntini tab 3 */
   }
   *{box-sizing:border-box}
   html{font-size:17px}
@@ -29,10 +29,10 @@
   .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
   .pad{padding:18px}
 
-  .form-vertical{display:flex;flex-direction:column;gap:10px}
+  .form-vertical{display:flex;flex-direction:column;gap:14px}
   .field{width:100%}
   label{display:block;margin:0 0 6px;font-weight:700}
-  .hl{padding:0 .35em;border-radius:.5em;background:var(--hl-y)}
+  .hl{padding:0 .35em;border-radius:.5em;background:var(--hl-y);border:1px solid rgba(234,179,8,.25)}
   .mark-b,.mark-g,.mark-y{padding:0 .35em;border-radius:.5em}
   .mark-b{background:var(--hl-b)} .mark-g{background:var(--hl-g)} .mark-y{background:var(--hl-y)}
   input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
@@ -40,8 +40,8 @@
   input:focus,select:focus{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
 
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-  .chip{padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:#fff;cursor:pointer;font-weight:700;font-size:.95rem}
-  .chip:hover{border-color:#c7d2fe}
+  .chip{min-width:82px;text-align:center;padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:#fff;cursor:pointer;font-weight:700;font-size:.95rem}
+  .chip:hover{border-color:#bcd0ff}
   .chip.active{background:#111827;color:#fff;border-color:#111827}
 
   .coeff-wrap{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
@@ -52,27 +52,29 @@
   .btn.primary{background:var(--accent);color:#fff}
   .btn.secondary{background:#fff;color:#111;border:1px solid var(--border)}
   .btn.dark{background:var(--accent-2);color:#fff}
+  .actions .btn.primary{flex:1 1 320px;padding:14px 18px;font-size:1.05rem}
 
-  /* Opzioni avanzate: piena larghezza */
+  /* Opzioni avanzate full-width + freccia */
   .adv-right{display:block}
   details.adv{display:block;width:100%}
   details.adv > summary{
     cursor:pointer; list-style:none; padding:8px 12px; border:1px solid var(--border); border-radius:999px;
     font-weight:800; background:#fff; display:inline-flex; align-items:center; margin-left:auto;
   }
+  details.adv > summary::after{content:"▾";margin-left:8px;transition:transform .2s ease}
   details.adv[open] > summary{background:#111827;color:#fff;border-color:#111827}
+  details.adv[open] > summary::after{transform:rotate(180deg)}
   .adv-panel{display:none;margin-top:10px;width:100%;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px}
   details.adv[open] .adv-panel{display:block}
   .adv-grid{display:grid;gap:14px}
   .adv-panel label{font-weight:600;color:#111}
   .subgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-
   .ribbon{display:block;width:100%;padding:8px 12px;margin:2px 0 10px;border-radius:10px;font-weight:800}
   .ribbon.y{background:var(--hl-y)}
   .ribbon.g{background:var(--hl-g)}
 
-  /* Sezioni spiegazione + tasto copia */
-  .section{position:relative;border-left:6px solid #e5e7eb;padding:12px 12px 10px;margin:10px 0 6px;border-radius:8px;background:#fff}
+  /* Sezioni spiegazione + copia */
+  .section{position:relative;border-left:6px solid #e5e7eb;padding:12px 12px 10px;margin:10px 0 6px;border-radius:8px;background:transparent}
   .section.inps{border-color:var(--accent)}
   .section.imp{border-color:var(--green)}
   .section h3{margin:0 0 6px;font-size:1.05rem}
@@ -82,21 +84,9 @@
     cursor:pointer; opacity:0; transition:opacity .15s, transform .15s; transform:translateY(2px);
   }
   .section:hover .copy-btn{opacity:1; transform:none}
-  @media (max-width:900px){ .copy-btn{display:none} } /* SOLO DESKTOP */
+  @media (max-width:900px){ .copy-btn{display:none} } /* solo desktop */
 
-  /* Segmented control Manuale / Stima */
-  .seg{display:flex;justify-content:center;gap:10px;margin:10px 0 22px}
-  .seg input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-  .seg label{
-    padding:10px 14px;border:1.5px solid var(--border);border-radius:999px;background:#fff;
-    font-weight:800;cursor:pointer;user-select:none;transition:.15s ease;
-    box-shadow:inset 0 -2px 0 rgba(0,0,0,.03);
-  }
-  .seg label:hover{border-color:#c7d2fe}
-  .seg input:focus + label{box-shadow:0 0 0 3px #e0e7ff}
-  .seg input:checked + label{background:#111827;color:#fff;border-color:#111827}
-
-  /* Tabs, sfondi carta e tabelle */
+  /* Tabs + indicatori vista */
   .tabs{margin-top:12px}
   .tab-bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px}
   .tab-btn{border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:800}
@@ -104,7 +94,6 @@
   .tab{display:none}
   .tab.active{display:block}
 
-  /* Vista toggle (bug fix: solo un’etichetta dinamica) */
   .viewtoggle{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin:-6px 0 10px}
   .viewtoggle .tag{color:#64748b;font-weight:700}
   .switch{position:relative;display:inline-block;width:52px;height:28px}
@@ -117,18 +106,18 @@
   /* KPI e tabelle */
   .kpis{display:grid;gap:12px;margin-top:8px}
   @media(min-width:860px){.kpis{grid-template-columns:repeat(3,1fr)}}
-  .kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+  .kpi{background:transparent;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
   .kpi h3{margin:0 0 4px;font-size:.78rem;color:#64748b;letter-spacing:.02em;text-transform:uppercase}
   .kpi .big{font-size:1.35rem;font-weight:900}
   .hr{height:1px;background:var(--border);margin:14px 0}
-  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff}
-  th,td{border:1px solid var(--border);padding:12px 8px}
-  th{background:#f3f4f6;color:#475569;font-weight:800}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:transparent}
+  th,td{border:1px solid var(--border);padding:12px 8px;background:transparent}
+  th{background:rgba(243,244,246,.65);color:#475569;font-weight:800}
   td:first-child{font-weight:600}
 
-  /* Spiegazione con “quaderno a righe” */
+  /* Tab 1: quaderno a righe (allineato alle righe di testo) */
   .explanation{max-width:820px;margin:0 auto;text-align:left}
-  .explanation .line{line-height:var(--lineH); margin:0}  /* allineamento perfetto alle righe */
+  .explanation .line{line-height:var(--lineH); margin:0}
   #tab1 .pad{
     background:
       repeating-linear-gradient(
@@ -140,12 +129,13 @@
       );
   }
 
-  /* Tab 2: quadretti */
+  /* Tab 2: carta a quadretti */
   #tab2 .pad{
     background:
       linear-gradient(to right,#eef2ff 1px,transparent 1px) 0 0/var(--grid) var(--grid),
       linear-gradient(to bottom,#eef2ff 1px,transparent 1px) 0 0/var(--grid) var(--grid);
   }
+
   /* Tab 3: puntini */
   #tab3 .pad{
     background:
@@ -158,33 +148,17 @@
 
   #rateBlock{margin-top:6px}
   @media print{.tab-bar,.adv-right,.actions,.viewtoggle,.copy-btn{display:none!important}.card{box-shadow:none;border-radius:0}}
-  /* ——— Quaderno: mostra le righe anche sotto ai blocchi ——— */
-#tab1 .section{
-  background: transparent;          /* lascia passare le righe */
-}
-  #tab2 .section{
-  background: transparent;          /* lascia passare le righe */
-}
-  #tab3 .section{
-  background: transparent;          /* lascia passare le righe */
-}
-
-/* opzionale: un leggero “cartiglio” ma con righe visibili */
-#tab1 .section.soft{
-  background: rgba(255,255,255,.6); /* se vuoi un velo bianco */
-  border: 1px solid #e9eefb;
-}
-
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header><h1>Simulatore Forfettario per <u><span class="hl">Gestione Separata 2025</u></span></h1></header>
+  <!-- header richiesto -->
+  <header><h1>Simulatore Forfettario per <u><span class="hl">Gestione Separata 2025</span></u></h1></header>
 
   <!-- ===== FORM ===== -->
   <section class="card" id="inputCard" style="margin-top:12px">
     <div class="pad">
-      <div class="form-vertical">
+      <div class="form-vertical" style="max-width:720px;margin:0 auto">
 
         <div class="field">
           <label for="anno">Anno di riferimento <span class="hl">2025</span></label>
@@ -382,7 +356,7 @@
   let cacheGiugno=0, cacheNov=0, lastState=null;
   let coeffFromChips=78; // default 78% selezionato
 
-  // ----- Tabs -----
+  // Tabs
   document.addEventListener('click',e=>{
     const btn=e.target.closest('.tab-btn'); if(!btn) return;
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -391,7 +365,7 @@
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
 
-  // ----- Chips incasso -----
+  // Chips incasso
   document.addEventListener('click',e=>{
     const chip=e.target.closest('.chip'); if(!chip||!chip.dataset.val) return;
     document.querySelectorAll('.chip[data-val]').forEach(c=>c.classList.remove('active'));
@@ -400,7 +374,7 @@
     document.getElementById('incassato').value=v.toLocaleString('it-IT');
   });
 
-  // ----- Coeff chips + custom -----
+  // Coeff chips + custom
   document.getElementById('coeffChips').addEventListener('click',e=>{
     const c=e.target.closest('.chip'); if(!c) return;
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
@@ -412,7 +386,7 @@
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
-  // ----- Opzioni avanzate: switch Manuale/Stima -----
+  // Opzioni avanzate: switch Manuale/Stima
   function refreshAccMode(){
     const mode = document.querySelector('input[name="accMode"]:checked').value;
     if(mode==='manual'){ show('accManual'); hide('accStima'); }
@@ -420,14 +394,14 @@
   }
   document.querySelectorAll('input[name="accMode"]').forEach(r=>r.addEventListener('change',refreshAccMode));
 
-  // ----- Toggle vista (fix doppia scritta) -----
+  // Toggle vista
   const viewLabel = document.getElementById('viewLabel');
   document.getElementById('simpToggle').addEventListener('change',function(){
     viewLabel.textContent = this.checked ? 'Semplificata' : 'Dettagliata';
     if(document.getElementById('resultsBox').style.display!=='none') buildExplanation();
   });
 
-  // ----- Copy buttons (desktop) -----
+  // Copy buttons (desktop)
   document.addEventListener('click',async (e)=>{
     const btn=e.target.closest('.copy-btn'); if(!btn) return;
     const box=btn.closest('.section');
@@ -437,7 +411,7 @@
     catch(err){ const old=btn.textContent; btn.textContent='Errore'; setTimeout(()=>btn.textContent=old,1200); }
   });
 
-  // ----- Calcolo -----
+  // Calcolo
   function compute(){
     const incassato=val('incassato');
     let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
@@ -502,7 +476,7 @@
     const novTot=accImp2+accInps2;
     const totale=saldoTotale+accontiTot;
 
-    // KPI arrotondati
+    // KPI
     setHTML('outImponibile',euro(imponibileForf));
     setHTML('outInps',euro(inps));
     setHTML('outImposta',euro(imposta));
@@ -519,7 +493,7 @@
     // Dettaglio
     let det='';
     det+=tr('<b>Incassato</b>',euro(incassato));
-    det+=tr('Coefficiente',coeffPerc+'%');
+    det+=tr('Coefficiente', (coeffPerc)+'%');
     det+=tr('<b>Imponibile</b>',euro(imponibileForf));
     det+=tr('Deducibili per imposta','− '+euro(deducibili));
     det+=tr('Base per imposta',euro(imponibileFisc));
@@ -556,14 +530,14 @@
 
     if(document.getElementById('toggleRate').checked) buildRate(); else hide('rateBlock');
 
-    // Memo per spiegazione
+    // Stato per spiegazione
     lastState={incassato,coeffPerc,coeff,impRate,aliqInps,imponibileForf,inps,deducibili,imponibileFisc,imposta,
       accImpPrev,accInpsPrev,saldoImposta,saldoInps,saldoTotale,accImpTot,accInpsTot,accImp1,accImp2,accInps1,accInps2,
       giugnoTot,novTot,totale,creditoImp,creditoInps,creditoImpResid,creditoInpsResid};
     buildExplanation(); show('resultsBox');
   }
 
-  // ----- Spiegazione con sezioni copiabili -----
+  // Spiegazione (sezioni + copia)
   function wrapSection(title, inner, cls){
     return `<div class="section ${cls||''}">
       <button type="button" class="copy-btn" title="Copia" aria-label="Copia">Copia</button>
@@ -586,7 +560,6 @@
           accINPS1=euro(s.accInps1), accIMP1=euro(s.accImp1);
 
     let html='';
-
     if(!simple){
       let intro=P(`Hai incassato <span class="mark-y"><b>${inc}</b></span>. Con coefficiente <span class="mark-y"><b>${s.coeffPerc}%</b></span> il reddito imponibile diventa:`)+P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>`);
       html+=wrapSection('Imponibile',intro,'');
@@ -641,10 +614,12 @@
     setHTML('explanation', html);
   }
 
-  // ----- Rate -----
+  // Rate
   function buildRate(){
     const totGiu=cacheGiugno, quota=totGiu/5;
     let tbody='', sumInt=0, sumTotGiu=0;
+    const RATE_PERC=[0.00,0.18,0.51,0.84,1.17];
+    const RATE_DATE=["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
     for(let i=0;i<5;i++){
       const p=RATE_PERC[i]/100, interesse=totGiu*p, rata=quota+interesse;
       sumInt+=interesse; sumTotGiu+=rata;
@@ -655,11 +630,11 @@
     show('rateBlock');
   }
 
-  // ----- Bind iniziali -----
+  // Bind iniziali
   document.addEventListener('DOMContentLoaded',function(){
-    // 78% già attivo (anche nel JS)
+    // 78% già attivo
     document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
-    coeffFromChips = 78;
+    coeffFromChips=78;
 
     document.getElementById('btnCalc').addEventListener('click',compute);
     ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','accImpPerc','accInpsPerc','inps2024']
