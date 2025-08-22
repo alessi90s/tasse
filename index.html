@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Simulatore Forfettario • Gestione Separata 2025</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -171,7 +171,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
         <div class="field">
           <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
-          <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50000" value=""/>
+          <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50000" value="">
           <div class="chips" id="incChips" aria-label="Importi rapidi">
             <button class="chip" data-val="10.000" data-val-num="10000">10.000</button>
             <button class="chip" data-val="20.000" data-val-num="20000">20.000</button>
@@ -204,7 +204,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         </div>
 
         <!-- Opzioni avanzate -->
-        <details class="adv" style="margin-top:4px">
+        <details class="adv" style="margin-top:4px" id="advBox">
           <summary>Opzioni avanzate</summary>
           <div class="adv-panel">
             <div class="adv-grid">
@@ -359,32 +359,19 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
 <script>
 (function(){
-  /* Utils */
+  /* --- Utils --- */
   function euro(n){const r=Math.round(n||0);try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);}catch(e){return '€ '+(r.toString().replace(/\B(?=(\\d{3})+(?!\\d))/g,'.'));}}
-  function parseNum(s){if(s==null)return 0;let t=String(s).trim().replace(/\\s+/g,'');t=t.replace(/\\./g,'');t=t.replace(',', '.');const n=parseFloat(t);return isNaN(n)?0:n}
+  function parseNum(s){ if(s==null) return 0; let t=String(s).trim().replace(/\\s+/g,''); t=t.replace(/\\./g,'').replace(',', '.'); const n=parseFloat(t); return isNaN(n)?0:n; }
   function val(id){return parseNum(document.getElementById(id).value)}
   function setHTML(id,html){const el=document.getElementById(id);if(el)el.innerHTML=html}
   function tr(a,b,right=false){return '<tr><td>'+a+'</td><td style="text-align:'+(right?'right':'center')+';font-variant-numeric:tabular-nums">'+b+'</td></tr>'}
   function perc(n,b){return b>0?(Math.round((n/b*100))+'%'):'0%'}
   function nowIt(){return new Intl.DateTimeFormat('it-IT',{dateStyle:'medium',timeStyle:'short'}).format(new Date())}
 
-  /* Parsing sicuro per chip */
-  function getChipNumber(el){
-    const raw = el.dataset.valNum ?? el.dataset.val ?? el.textContent;
-    const cleaned = String(raw)
-      .replace(/\\s/g,'')
-      .replace(/[^\\d,\\.]/g,'')
-      .replace(/\\./g,'')
-      .replace(',', '.');
-    return Math.round(Number(cleaned) || 0);
-  }
-
-  const RATE_PERC=[0.00,0.18,0.51,0.84,1.17];
-  const RATE_DATE=["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
-
+  /* --- Stato --- */
   let coeffFromChips=78,lastState=null,cacheGiugno=0,cacheNov=0;
 
-  /* Tabs underline */
+  /* --- Tab underline --- */
   const inkbar=document.getElementById('inkbar');
   function moveInkbar(btn){if(!btn)return;inkbar.style.width=btn.offsetWidth+'px';inkbar.style.left=btn.offsetLeft+'px';}
   document.addEventListener('click',e=>{
@@ -395,35 +382,28 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   });
   window.addEventListener('resize',()=>moveInkbar(document.querySelector('.tab-btn.active')));
 
-  /* CHIP & INPUT INCASSATO — FIX */
+  /* --- Input Incassato --- */
   const incInput=document.getElementById('incassato');
   const incChips=document.getElementById('incChips');
-  let fromChipSet=false;
 
-  // digitazione: solo cifre, e disattivo i chip attivi
-  incInput.addEventListener('input', (e) => {
-    if (fromChipSet) return;
-    const caret = e.target.selectionStart || 0;
-    const digits = e.target.value.replace(/\\D/g,'');
-    e.target.value = digits;
-    try{ e.target.setSelectionRange(caret, caret); }catch{}
-    [...incChips.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+  // Non tocchiamo il contenuto mentre digita: niente più "0" che torna
+  incInput.addEventListener('input', () => {
+    incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   });
 
-  // click sui chip: scrivo il numero "puro" e NON lo tocco più
+  // Chip: scrivono il numero PURO nell'input (es. 85000)
   incChips.addEventListener('click', (e) => {
     const chip=e.target.closest('.chip'); if(!chip) return;
-    [...incChips.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+    incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active');
-    const v=getChipNumber(chip);
-    fromChipSet=true;
-    incInput.value=String(v);
+    const raw = chip.dataset.valNum || chip.dataset.val || chip.textContent;
+    const clean = String(raw).replace(/\\./g,'').replace(/\\s/g,'');
+    incInput.value = clean;
     incInput.focus();
     try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
-    setTimeout(()=>{fromChipSet=false;},0);
   });
 
-  /* Coeff chips + custom */
+  /* --- Coefficiente --- */
   document.getElementById('coeffChips').addEventListener('click',e=>{
     const c=e.target.closest('.chip'); if(!c) return;
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
@@ -435,7 +415,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
-  /* Opzioni avanzate: pill toggle */
+  /* --- Opzioni avanzate: pill toggle --- */
   function refreshAccMode(){
     const man=document.getElementById('pillManuale'), sti=document.getElementById('pillStima');
     const manual=man.classList.contains('active');
@@ -447,18 +427,19 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   document.getElementById('pillManuale').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillStima').classList.remove('active');refreshAccMode();});
   document.getElementById('pillStima').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillManuale').classList.remove('active');refreshAccMode();});
 
-  /* Vista dettagliata/semplificata */
+  /* --- Vista dettagliata/semplificata --- */
   const simp=document.getElementById('simpToggle'), viewLabel=document.getElementById('viewLabel');
   simp.addEventListener('change',()=>{viewLabel.textContent = simp.checked ? 'Vista Semplificata' : 'Vista Dettagliata'; if(document.getElementById('resultsBox').style.display!=='none') buildExplanation();});
 
-  /* Copy */
+  /* --- Copy singolo blocco --- */
   document.addEventListener('click',async e=>{
     const btn=e.target.closest('.copy-btn'); if(!btn) return;
     const box=btn.closest('.section'); const payload=(box.querySelector('.copy-content')||box).innerText.trim();
     try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
   });
 
-  /* Calcolo principale */
+  /* --- Calcolo --- */
+  let cacheNov=0, cacheGiugno=0;
   function compute(){
     const incassato=val('incassato');
     let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
@@ -503,8 +484,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const creditoImp=Math.max(0,accImpPrev-imposta);
     const creditoInps=Math.max(0,accInpsPrev-inps);
 
-    const accImpBase=imposta*(parseNum(document.getElementById('accImpPerc').value)/100||1.00);
-    const accInpsBase=inps*(parseNum(document.getElementById('accInpsPerc').value)/100||0.80);
+    const accImpBase=imposta*accImpPerc;
+    const accInpsBase=inps*accInpsPerc;
 
     const accImpTot=Math.max(0,accImpBase-creditoImp);
     const accInpsTot=Math.max(0,accInpsBase-creditoInps);
@@ -651,13 +632,13 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       html+=wrapSection('Imponibile',
         P(`Incassato <b>${inc}</b> → con coefficiente <b>${s.coeffPerc}%</b> l’imponibile è <b>${impForf}</b>.`),'');
       let inpsS=P(`INPS su imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
-      if(credInps>0) inpsS+=P(`Acconti superano il dovuto: <b>saldo 0 €</b>, credito <b>${euro(credInps)}</b> che riduce i nuovi acconti${s.creditoInpsResid>0?`, residuo ${euro(credInpsRes)}`:''}.`);
+      if(s.creditoInps>0) inpsS+=P(`Acconti superano il dovuto: <b>saldo 0 €</b>, credito <b>${euro(s.creditoInps)}</b> che riduce i nuovi acconti${s.creditoInpsResid>0?`, residuo ${euro(s.creditoInpsResid)}`:''}.`);
       else if(s.accInpsPrev>0) inpsS+=P(`Acconti già versati scalati ⇒ saldo INPS: <b>${saldoINPS}</b>.`);
       else inpsS+=P(`Saldo INPS: <b>${saldoINPS}</b>.`);
       html+=wrapSection('Contributi INPS', inpsS,'inps');
 
       let impS=P(`Base per imposta: <b>${baseImp}</b>. Calcolo: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
-      if(credImp>0) impS+=P(`Acconti superano il dovuto: <b>saldo 0 €</b>, credito <b>${euro(credImp)}</b> che riduce i nuovi acconti${s.creditoImpResid>0?`, residuo ${euro(credImpRes)}`:''}.`);
+      if(s.creditoImp>0) impS+=P(`Acconti superano il dovuto: <b>saldo 0 €</b>, credito <b>${euro(s.creditoImp)}</b> che riduce i nuovi acconti${s.creditoImpResid>0?`, residuo ${euro(s.creditoImpResid)}`:''}.`);
       else if(s.accImpPrev>0) impS+=P(`Acconti già versati scalati ⇒ saldo imposta: <b>${saldoIMP}</b>.`);
       else impS+=P(`Saldo imposta: <b>${saldoIMP}</b>.`);
       html+=wrapSection('Imposta sostitutiva', impS,'imp');
@@ -682,7 +663,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     setHTML('rateBody',tbody); setHTML('rateIntTot',euro(sumInt)); setHTML('rateTot',euro(sumTotGiu)); setHTML('rateTotAll',euro(sumTotGiu+cacheNov));
   }
 
-  /* Net after saldi for inverse */
+  /* Netto dopo saldi — per calcolo inverso */
   function netAfterSaldi(inc){
     const coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
     const coeff=(coeffPerc>0?coeffPerc:78)/100;
@@ -712,16 +693,14 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const saldoIMP=Math.max(0,imposta-accImpPrev);
     const saldi=saldoINPS+saldoIMP;
 
-    return inc - saldi; // netto dopo i saldi
+    return inc - saldi;
   }
 
-  /* Ricerca binaria per "netto desiderato" */
+  /* Ricerca binaria: netto target -> incassato */
   function findIncassatoForNet(target){
     target=Math.max(0,target||0);
     let lo=0, hi=Math.max(20000, target*3+10000);
-    // alza hi finché il netto non supera il target
     for(let i=0;i<40 && netAfterSaldi(hi)<target;i++) hi*=1.6;
-    // binary search
     for(let k=0;k<64;k++){
       const mid=(lo+hi)/2;
       if(netAfterSaldi(mid)>=target) hi=mid; else lo=mid;
@@ -736,12 +715,11 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     window.print();
   });
 
-  /* Inverti: netto → incasso */
+  /* Inverti */
   document.getElementById('btnInverti').addEventListener('click',()=>{
     const target=val('nettoTarget');
     if(target<=0){setHTML('invOut','Inserisci un netto desiderato valido.');return;}
     const inc=findIncassatoForNet(target);
-    // imposta l'incassato "puro", disattiva chip attivi
     incInput.value=String(inc);
     [...incChips.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
     setHTML('invOut',`Per avere circa <b>${euro(target)}</b> netti (dopo i <b>saldi</b>), ti servono circa <b>${euro(inc)}</b> di incassato.`);
@@ -751,10 +729,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
   /* Init */
   document.addEventListener('DOMContentLoaded',()=>{
-    // assicura input incassato vuoto (niente "0" di default)
-    incInput.value='';
-    document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
-    coeffFromChips=78;
+    incInput.value=''; // niente 0 di default
+    document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active'); // 78% pre-selezionato
     const t=document.querySelector('.tab-btn.active'); if(t) setTimeout(()=>{document.getElementById('inkbar').style.width=t.offsetWidth+'px';document.getElementById('inkbar').style.left=t.offsetLeft+'px';},0);
 
     document.getElementById('btnCalc').addEventListener('click',compute);
