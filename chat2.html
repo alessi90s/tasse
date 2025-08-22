@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Simulatore Forfettario • Gestione Separata 2025</title>
 
-<!-- Inter -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -65,7 +64,7 @@ input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visi
 .btn.dark{background:#111827;color:#fff;height:38px;padding:0 12px}
 .btn.secondary{background:#fff;border:1px solid var(--border);height:38px;padding:0 12px}
 
-/* Opzioni avanzate (accordion full width) */
+/* Opzioni avanzate */
 details.adv{display:block;width:100%}
 details.adv>summary{cursor:pointer;list-style:none;padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-weight:900;background:#fff;display:flex;align-items:center;gap:10px}
 details.adv>summary::before{content:"";width:10px;height:10px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s}
@@ -137,9 +136,7 @@ details.rates>summary::before{content:"";width:8px;height:8px;border:2px solid #
 details.rates[open]>summary::before{transform:rotate(-135deg)}
 
 /* ARIA only */
-.sr-only{
-  position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap;border:0!important
-}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap;border:0!important}
 
 /* Print */
 @media print{
@@ -160,7 +157,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 <body>
 <div class="wrap">
   <header>
-    <h1>Simulatore Forfettario per <span class="sub"><span class="badge">Gestione Separata 2025</span></span></h1>
+    <h1>Simulatore Forfettario per <u><span class="hl">Gestione Separata 2025</span></u></h1>
   </header>
 
   <!-- FORM -->
@@ -176,13 +173,13 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         <div class="field">
           <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
           <input id="incassato" type="text" inputmode="decimal" placeholder="es. 30.000"/>
-          <div class="chips" aria-label="Importi rapidi">
-            <button class="chip" data-val="10.000">10.000</button>
-            <button class="chip" data-val="20.000">20.000</button>
-            <button class="chip" data-val="30.000">30.000</button>
-            <button class="chip" data-val="50.000">50.000</button>
-            <button class="chip" data-val="65.000">65.000</button>
-            <button class="chip" data-val="85.000">85.000</button>
+          <div class="chips" id="incChips" aria-label="Importi rapidi">
+            <button class="chip" data-val="10.000" data-val-num="10000">10.000</button>
+            <button class="chip" data-val="20.000" data-val-num="20000">20.000</button>
+            <button class="chip" data-val="30.000" data-val-num="30000">30.000</button>
+            <button class="chip" data-val="50.000" data-val-num="50000">50.000</button>
+            <button class="chip" data-val="65.000" data-val-num="65000">65.000</button>
+            <button class="chip" data-val="85.000" data-val-num="85000">85.000</button>
           </div>
         </div>
 
@@ -252,7 +249,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                 <div class="bar">Contributi deducibili (per l’imposta)</div>
                 <div class="subgrid">
                   <div style="grid-column:1/-1">
-                    <label for="deducibili">Contributi previdenziali versati nell’anno (€)</label>
+                    <label for="deducibili">Contributi previdenziali già versati nell’anno (€) — deducibili solo per l’imposta</label>
                     <input id="deducibili" type="text" inputmode="decimal" value="0"/>
                   </div>
                 </div>
@@ -356,6 +353,17 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   function perc(n,b){return b>0?(Math.round((n/b*100))+'%'):'0%'}
   function nowIt(){return new Intl.DateTimeFormat('it-IT',{dateStyle:'medium',timeStyle:'short'}).format(new Date())}
 
+  /* >>> FIX robusto per i chip importo */
+  function getChipNumber(el){
+    const raw = el.dataset.valNum ?? el.dataset.val ?? el.textContent;
+    const cleaned = String(raw)
+      .replace(/\s/g,'')           // spazi
+      .replace(/[^\d,\.]/g,'')     // solo cifre/., 
+      .replace(/\./g,'')           // toglie punti mille
+      .replace(',', '.');          // virgola -> punto
+    return Math.round(Number(cleaned) || 0);
+  }
+
   const RATE_PERC=[0.00,0.18,0.51,0.84,1.17];
   const RATE_DATE=["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
 
@@ -372,20 +380,17 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   });
   window.addEventListener('resize',()=>moveInkbar(document.querySelector('.tab-btn.active')));
 
-  /* Chips importi — FIX: sanifica i mille separatori (mai parseInt/parseFloat diretto) */
-  document.addEventListener('click',e=>{
-    const c=e.target.closest('.chip'); 
-    if(!c || !c.dataset.val) return;
-    document.querySelectorAll('.chip[data-val]').forEach(x=>x.classList.remove('active'));
+  /* Chips importi — usa getChipNumber + incChips */
+  document.getElementById('incChips').addEventListener('click',(e)=>{
+    const c=e.target.closest('.chip'); if(!c) return;
+    document.querySelectorAll('#incChips .chip').forEach(x=>x.classList.remove('active'));
     c.classList.add('active');
-
-    // >>> FIX: rimozione punti + gestione virgola
-    const cleaned = parseNum(c.dataset.val);     // "50.000" -> 50000
-    document.getElementById('incassato').value = (cleaned || 0).toLocaleString('it-IT');
+    const v=getChipNumber(c);                 // "50.000" -> 50000 ✅
+    document.getElementById('incassato').value = v.toLocaleString('it-IT');
   });
-  // Scrittura manuale => deseleziona i chip
+  // scrittura manuale -> deseleziona i chip importo
   document.getElementById('incassato').addEventListener('input',()=>{
-    document.querySelectorAll('.chip[data-val]').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('#incChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
   /* Coeff chips + custom */
@@ -572,11 +577,9 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
     let html='';
     if(!simple){
-      // IMPONIBILE
       html+=wrapSection('Imponibile',
         P(`Hai incassato <span class="hl"><b>${inc}</b></span>. Con coefficiente <span class="hl"><b>${s.coeffPerc}%</b></span> il reddito imponibile diventa:`) +
         P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>`),'');
-      // INPS
       let inpsTxt=P(`Aliquota <b>${(s.aliqInps*100).toFixed(2)}%</b> sull’imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
       if(s.accInpsPrev>0){
         if(credInps>0){
@@ -588,7 +591,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       }
       inpsTxt+=P(`👉 <b>Saldo INPS</b> da versare ora: <b>${saldoINPS}</b>.`);
       html+=wrapSection('Contributi INPS', inpsTxt,'inps');
-      // IMPOSTA
+
       let impTxt=(s.deducibili>0)
         ? P(`Prima togliamo i <b>contributi deducibili</b> (${euro(s.deducibili)}): <span class="mono">${impForf} − ${euro(s.deducibili)} = ${baseImp}</span>.`)
         : P(`Base imposta: <b>${baseImp}</b> (nessuna deduzione).`);
@@ -604,10 +607,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       impTxt+=P(`👉 <b>Saldo imposta</b> da versare ora: <b>${saldoIMP}</b>.`);
       html+=wrapSection('Imposta sostitutiva', impTxt,'imp');
 
-      // SALDI
       html+=wrapSection('Totale saldi ora',
         P(`<span class="mono"><b>${saldoINPS}</b> (INPS) + <b>${saldoIMP}</b> (imposta) = <b>${saldoTot}</b></span>.`),'');
-      // ACCONTI
       let accTxt=P(`Calcolati sul dovuto di quest’anno e <b>già ridotti dei crediti</b> (se presenti).`) +
                   P(`<b>Imposta</b>: ${accIMPtot} (50% giugno, 50% novembre).`) +
                   P(`<b>INPS</b>: ${accINPStot} (40% giugno, 40% novembre).`);
@@ -617,15 +618,12 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       }
       html+=wrapSection('Acconti per l’anno successivo', accTxt,'');
 
-      // SCADENZE
       html+=wrapSection('Scadenze',
         P(`<b>Giugno</b> = saldi (<b>${saldoINPS}</b> + <b>${saldoIMP}</b>) + primi acconti (<b>${accIMP1}</b> imposta + <b>${euro(s.accInps1)}</b> INPS) = <b>${giu}</b>.`) +
         P(`<b>Novembre</b> = secondi acconti = <b>${nov}</b>.`),'');
-      // TOTALE
       html+=wrapSection('Totale anno e incidenza',
         P(`<span class="mono">${giu} + ${nov} = ${tot}</span>. Incidenza: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; totale <b>${perc(s.totale,s.incassato)}</b>.`),'');
     }else{
-      // Versione semplificata – comunque con crediti
       html+=wrapSection('Imponibile',
         P(`Incassato <b>${inc}</b> → con coefficiente <b>${s.coeffPerc}%</b> l’imponibile è <b>${impForf}</b>.`),'');
       let inpsS=P(`INPS su imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
