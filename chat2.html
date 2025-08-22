@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Simulatore Forfettario • Gestione Separata 2025</title>
 
+<!-- Inter -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -64,7 +65,7 @@ input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visi
 .btn.dark{background:#111827;color:#fff;height:38px;padding:0 12px}
 .btn.secondary{background:#fff;border:1px solid var(--border);height:38px;padding:0 12px}
 
-/* Opzioni avanzate */
+/* Opzioni avanzate (accordion full width) */
 details.adv{display:block;width:100%}
 details.adv>summary{cursor:pointer;list-style:none;padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-weight:900;background:#fff;display:flex;align-items:center;gap:10px}
 details.adv>summary::before{content:"";width:10px;height:10px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s}
@@ -371,12 +372,15 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   });
   window.addEventListener('resize',()=>moveInkbar(document.querySelector('.tab-btn.active')));
 
-  /* Chips importi — FIX: sanifica i mille separatori (mai parseInt) */
+  /* Chips importi — FIX: sanifica i mille separatori (mai parseInt/parseFloat diretto) */
   document.addEventListener('click',e=>{
-    const c=e.target.closest('.chip'); if(!c||!c.dataset.val) return;
+    const c=e.target.closest('.chip'); 
+    if(!c || !c.dataset.val) return;
     document.querySelectorAll('.chip[data-val]').forEach(x=>x.classList.remove('active'));
     c.classList.add('active');
-    const cleaned = parseNum(c.dataset.val);
+
+    // >>> FIX: rimozione punti + gestione virgola
+    const cleaned = parseNum(c.dataset.val);     // "50.000" -> 50000
     document.getElementById('incassato').value = (cleaned || 0).toLocaleString('it-IT');
   });
   // Scrittura manuale => deseleziona i chip
@@ -488,7 +492,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     setHTML('outSaldo',euro(saldoTotale));
     setHTML('outAcconti',euro(accontiTot));
     setHTML('outTotale',euro(totale));
-    setHTML('liveResult',`Aggiornato. Saldo ${euro(saldoTotale)}, acconti ${euro(accontiTot)}, totale ${euro(totale)}.`); // solo ARIA
+    setHTML('liveResult',`Aggiornato. Saldo ${euro(saldoTotale)}, acconti ${euro(accontiTot)}, totale ${euro(totale)}.`); // solo ARIA (sr-only)
 
     /* Note */
     let w=''; if(incassato>100000) w='<div class="muted"><b>Attenzione:</b> oltre 100.000€ → uscita <b>immediata</b> dal forfettario.</div>';
@@ -529,7 +533,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     sc+=tr('<span class="badge-month">Novembre</span> — 2° acconti',euro(novTot),true);
     setHTML('tblScadenze',sc); setHTML('scadTot',euro(giugnoTot+novTot));
 
-    /* Rate */
+    /* Rate aperte di default */
     document.getElementById('ratesAcc').open=true;
     buildRate();
 
