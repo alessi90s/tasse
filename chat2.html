@@ -154,7 +154,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 </head>
 <body>
 <div class="wrap">
-  <!-- TITOLO come richiesto -->
+  <!-- TITOLO -->
   <header>
     <h1>Simulatore Forfettario per<br><u><span class="hl">Gestione Separata 2025</span></u></h1>
   </header>
@@ -171,15 +171,14 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
         <div class="field">
           <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
-          <!-- input “puro”: niente punti/virgole, solo cifre -->
           <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50000" value=""/>
           <div class="chips" id="incChips" aria-label="Importi rapidi">
-            <button class="chip" data-val="10000">10.000</button>
-            <button class="chip" data-val="20000" data-val-num="20000">20.000</button>
-            <button class="chip" data-val="30000" data-val-num="30000">30.000</button>
-            <button class="chip" data-val="50000" data-val-num="50000">50.000</button>
-            <button class="chip" data-val="65000" data-val-num="65000">65.000</button>
-            <button class="chip" data-val="85000" data-val-num="85000">85.000</button>
+            <button class="chip" data-val="10.000" data-val-num="10000">10.000</button>
+            <button class="chip" data-val="20.000" data-val-num="20000">20.000</button>
+            <button class="chip" data-val="30.000" data-val-num="30000">30.000</button>
+            <button class="chip" data-val="50.000" data-val-num="50000">50.000</button>
+            <button class="chip" data-val="65.000" data-val-num="65000">65.000</button>
+            <button class="chip" data-val="85.000" data-val-num="85000">85.000</button>
           </div>
         </div>
 
@@ -253,6 +252,22 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                     <input id="deducibili" type="text" inputmode="decimal" value="0"/>
                   </div>
                 </div>
+              </div>
+
+              <!-- NUOVO: Calcolo inverso -->
+              <div class="ibox">
+                <div class="bar">Calcolo inverso (netto desiderato → incassato)</div>
+                <div class="subgrid" style="align-items:end">
+                  <div>
+                    <label for="nettoTarget">Netto annuo desiderato (€)</label>
+                    <input id="nettoTarget" type="text" inputmode="decimal" placeholder="es. 20000" value="">
+                  </div>
+                  <div>
+                    <button type="button" id="btnInverti" class="btn dark" style="width:100%">Calcola incassato necessario</button>
+                  </div>
+                </div>
+                <div id="invOut" class="desc" style="margin-top:8px"></div>
+                <div class="desc">Nota: il lordo calcolato copre i <b>saldi</b> (imposta + INPS) dell’anno, <b>non</b> i nuovi acconti.</div>
               </div>
 
             </div>
@@ -380,34 +395,32 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   });
   window.addEventListener('resize',()=>moveInkbar(document.querySelector('.tab-btn.active')));
 
-  /* >>> CHIP & INPUT INCASSATO — FIX DEFINITIVA */
+  /* CHIP & INPUT INCASSATO — FIX */
   const incInput=document.getElementById('incassato');
   const incChips=document.getElementById('incChips');
   let fromChipSet=false;
 
-  // Digitazione: mantieni solo cifre
+  // digitazione: solo cifre, e disattivo i chip attivi
   incInput.addEventListener('input', (e) => {
     if (fromChipSet) return;
     const caret = e.target.selectionStart || 0;
     const digits = e.target.value.replace(/\\D/g,'');
     e.target.value = digits;
     try{ e.target.setSelectionRange(caret, caret); }catch{}
-    // quando si digita manualmente, rimuovi lo stato "active" dai chip
     [...incChips.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
   });
 
-  // Click sui chip: scrivi valore puro e non far intervenire l'handler input
+  // click sui chip: scrivo il numero "puro" e NON lo tocco più
   incChips.addEventListener('click', (e) => {
     const chip=e.target.closest('.chip'); if(!chip) return;
     [...incChips.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
     chip.classList.add('active');
-
-    const v = getChipNumber(chip); // es. “50.000” -> 50000
-    fromChipSet = true;
-    incInput.value = String(v);     // input sempre "puro" (solo cifre)
+    const v=getChipNumber(chip);
+    fromChipSet=true;
+    incInput.value=String(v);
     incInput.focus();
-    try{ incInput.setSelectionRange(incInput.value.length, incInput.value.length); }catch{}
-    setTimeout(()=>{ fromChipSet=false; },0);
+    try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
+    setTimeout(()=>{fromChipSet=false;},0);
   });
 
   /* Coeff chips + custom */
@@ -445,6 +458,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
   });
 
+  /* Calcolo principale */
   function compute(){
     const incassato=val('incassato');
     let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
@@ -457,7 +471,6 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const accInpsPerc=parseNum(document.getElementById('accInpsPerc').value)/100||0.80;
     const deducibili=val('deducibili');
 
-    // acconti anno precedente
     let accImpPrev=0, accInpsPrev=0;
     const manual=document.getElementById('pillManuale').classList.contains('active');
     if(manual){
@@ -474,7 +487,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     }
 
     const err=document.getElementById('err');
-    if(incassato<=0){err.style.display='block';err.textContent='Inserisci un incassato annuo valido (> 0).';document.getElementById('resultsBox').style.display='none';return}
+    if(incassato<=0){err.style.display='block';err.textContent='Inserisci un incassato annuo valido (> 0) o usa il calcolo inverso nelle Opzioni avanzate.';document.getElementById('resultsBox').style.display='none';return}
     err.style.display='none';
 
     const imponibileForf=incassato*coeff;
@@ -490,8 +503,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const creditoImp=Math.max(0,accImpPrev-imposta);
     const creditoInps=Math.max(0,accInpsPrev-inps);
 
-    const accImpBase=imposta*accImpPerc;
-    const accInpsBase=inps*accInpsPerc;
+    const accImpBase=imposta*(parseNum(document.getElementById('accImpPerc').value)/100||1.00);
+    const accInpsBase=inps*(parseNum(document.getElementById('accInpsPerc').value)/100||0.80);
 
     const accImpTot=Math.max(0,accImpBase-creditoImp);
     const accInpsTot=Math.max(0,accInpsBase-creditoInps);
@@ -541,8 +554,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     if(creditoInpsResid>0) det+=tr('Credito INPS residuo',euro(creditoInpsResid));
     det+=tr('<b>Saldo totale</b>','<b>'+euro(saldoTotale)+'</b>');
     det+='<tr><th colspan="2">Acconti per l’anno prossimo (netti dei crediti)</th></tr>';
-    det+=tr('Imposta – totale acconti ('+(accImpPerc*100).toFixed(0)+'%)',euro(accImpTot));
-    det+=tr('INPS – totale acconti ('+(accInpsPerc*100).toFixed(0)+'%)',euro(accInpsTot));
+    det+=tr('Imposta – totale acconti',euro(accImpTot));
+    det+=tr('INPS – totale acconti',euro(accInpsTot));
     det+=tr('Imposta – 1° acconto (50%)',euro(accImp1));
     det+=tr('Imposta – 2° acconto (50%)',euro(accImp2));
     det+=tr('INPS – 1° acconto (40%)',euro(accInps1));
@@ -596,8 +609,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       let inpsTxt=P(`Aliquota <b>${(s.aliqInps*100).toFixed(2)}%</b> sull’imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
       if(s.accInpsPrev>0){
         if(credInps>0){
-          inpsTxt+=P(`Avevi già versato acconti INPS per <b>${euro(s.accInpsPrev)}</b>: superano il dovuto, quindi il <b>saldo INPS</b> ora è <b>0 €</b> e resta un <b>credito</b> di <b>${euro(credInps)}</b>. Questo credito riduce i <b>nuovi acconti INPS</b>.`);
-          if(credInpsRes>0) inpsTxt+=P(`Dopo aver ridotto i nuovi acconti, resta ancora un <b>credito INPS residuo</b> di <b>${euro(credInpsRes)}</b> da riportare.`);
+          inpsTxt+=P(`Avevi già versato acconti INPS per <b>${euro(s.accInpsPrev)}</b>: superano il dovuto, quindi il <b>saldo INPS</b> ora è <b>0 €</b> e resta un <b>credito</b> di <b>${euro(credInps)}</b>. Questo credito riduce i <b>nuovi acconti INPS</b> (eventuale residuo: ${euro(credInpsRes)}).`);
         }else{
           inpsTxt+=P(`Acconti INPS già versati: <b>${euro(s.accInpsPrev)}</b>. Quindi saldo ora: <span class="mono">${inps} − ${euro(s.accInpsPrev)} = ${saldoINPS}</span>.`);
         }
@@ -611,8 +623,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       impTxt+=P(`Aliquota <b>${Math.round(s.impRate*100)}%</b>: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
       if(s.accImpPrev>0){
         if(credImp>0){
-          impTxt+=P(`Avevi già versato acconti imposta per <b>${euro(s.accImpPrev)}</b>: superano il dovuto, quindi il <b>saldo imposta</b> ora è <b>0 €</b> e resta un <b>credito</b> di <b>${euro(credImp)}</b>. Questo credito riduce i <b>nuovi acconti di imposta</b>.`);
-          if(credImpRes>0) impTxt+=P(`Dopo aver ridotto i nuovi acconti, resta ancora un <b>credito imposta residuo</b> di <b>${euro(credImpRes)}</b> da riportare.`);
+          impTxt+=P(`Avevi già versato acconti imposta per <b>${euro(s.accImpPrev)}</b>: superano il dovuto, quindi il <b>saldo imposta</b> ora è <b>0 €</b> e resta un <b>credito</b> di <b>${euro(credImp)}</b> che riduce i nuovi acconti (eventuale residuo: ${euro(credImpRes)}).`);
         }else{
           impTxt+=P(`Acconti imposta già versati: <b>${euro(s.accImpPrev)}</b>. Quindi saldo ora: <span class="mono">${imposta} − ${euro(s.accImpPrev)} = ${saldoIMP}</span>.`);
         }
@@ -660,6 +671,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   function buildRate(){
     const totGiu=cacheGiugno, quota=totGiu/5;
     let tbody='',sumInt=0,sumTotGiu=0;
+    const RATE_PERC=[0.00,0.18,0.51,0.84,1.17];
+    const RATE_DATE=["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
     for(let i=0;i<5;i++){
       const p=RATE_PERC[i]/100, interesse=totGiu*p, rata=quota+interesse;
       sumInt+=interesse; sumTotGiu+=rata;
@@ -669,6 +682,53 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     setHTML('rateBody',tbody); setHTML('rateIntTot',euro(sumInt)); setHTML('rateTot',euro(sumTotGiu)); setHTML('rateTotAll',euro(sumTotGiu+cacheNov));
   }
 
+  /* Net after saldi for inverse */
+  function netAfterSaldi(inc){
+    const coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
+    const coeff=(coeffPerc>0?coeffPerc:78)/100;
+    const impRate=parseFloat(document.getElementById('imposta').value)||0.05;
+    const aliqInps=parseNum(document.getElementById('aliqInps').value)/100||0.2607;
+    const deducibili=val('deducibili');
+
+    let accImpPrev=0, accInpsPrev=0;
+    if(document.getElementById('pillManuale').classList.contains('active')){
+      accImpPrev=val('accImpPrev'); accInpsPrev=val('accInpsPrev');
+    }else{
+      const inc24=val('incasso2024');
+      const coeff24=(parseNum(document.getElementById('coeff2024').value)||78)/100;
+      const imp24rate=parseFloat(document.getElementById('imp2024').value)||0.05;
+      const inps24rate=parseNum(document.getElementById('inps2024').value)/100||0.2607;
+      const impon24=inc24*coeff24;
+      const inps24=impon24*inps24rate;
+      const imp24=impon24*imp24rate;
+      accImpPrev=imp24*1.00; accInpsPrev=inps24*0.80;
+    }
+
+    const impon=inc*coeff;
+    const inps=impon*aliqInps;
+    const imposta=Math.max(0,impon-deducibili)*impRate;
+
+    const saldoINPS=Math.max(0,inps-accInpsPrev);
+    const saldoIMP=Math.max(0,imposta-accImpPrev);
+    const saldi=saldoINPS+saldoIMP;
+
+    return inc - saldi; // netto dopo i saldi
+  }
+
+  /* Ricerca binaria per "netto desiderato" */
+  function findIncassatoForNet(target){
+    target=Math.max(0,target||0);
+    let lo=0, hi=Math.max(20000, target*3+10000);
+    // alza hi finché il netto non supera il target
+    for(let i=0;i<40 && netAfterSaldi(hi)<target;i++) hi*=1.6;
+    // binary search
+    for(let k=0;k<64;k++){
+      const mid=(lo+hi)/2;
+      if(netAfterSaldi(mid)>=target) hi=mid; else lo=mid;
+    }
+    return Math.round(hi);
+  }
+
   /* Stampa */
   document.getElementById('btnPrint').addEventListener('click',()=>{
     const vis=document.getElementById('resultsBox').style.display!=='none';
@@ -676,18 +736,33 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     window.print();
   });
 
+  /* Inverti: netto → incasso */
+  document.getElementById('btnInverti').addEventListener('click',()=>{
+    const target=val('nettoTarget');
+    if(target<=0){setHTML('invOut','Inserisci un netto desiderato valido.');return;}
+    const inc=findIncassatoForNet(target);
+    // imposta l'incassato "puro", disattiva chip attivi
+    incInput.value=String(inc);
+    [...incChips.querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+    setHTML('invOut',`Per avere circa <b>${euro(target)}</b> netti (dopo i <b>saldi</b>), ti servono circa <b>${euro(inc)}</b> di incassato.`);
+    compute();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
   /* Init */
   document.addEventListener('DOMContentLoaded',()=>{
+    // assicura input incassato vuoto (niente "0" di default)
+    incInput.value='';
     document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
     coeffFromChips=78;
     const t=document.querySelector('.tab-btn.active'); if(t) setTimeout(()=>{document.getElementById('inkbar').style.width=t.offsetWidth+'px';document.getElementById('inkbar').style.left=t.offsetLeft+'px';},0);
 
     document.getElementById('btnCalc').addEventListener('click',compute);
-    ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','accImpPerc','accInpsPerc','inps2024']
-      .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();compute();}})});
+    ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','accImpPerc','accInpsPerc','inps2024','nettoTarget']
+      .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();id==='nettoTarget'?document.getElementById('btnInverti').click():compute();}})});
 
     document.getElementById('btnReset').addEventListener('click',()=>{
-      ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','nettoTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
       document.getElementById('coeffCustom').value='';
       document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
       document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active'); coeffFromChips=78;
@@ -696,6 +771,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       document.getElementById('ratesAcc').open=true;
       document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').textContent='Vista Dettagliata';
       document.getElementById('resultsBox').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});
+      setHTML('invOut',''); setHTML('warnings','');
       const t=document.querySelector('.tab-btn[data-tab="tab1"]'); if(t) t.click();
     });
   });
