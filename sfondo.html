@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulatore GS INPS — Pattern Freelance Soft</title>
+  <style>
+    :root{
+      --page-bg:#fbfcff;
+      --card-bg:#ffffff;
+      --text:#1d2330;
+      --pattern-size:96px;   /* densità del pattern: 64/80/96/120 */
+      --pattern-alpha:.62;   /* intensità del pattern: 0.3-0.8 */
+      --stroke:#dfe5ee;      /* colore linee icone (chiaro, neutro) */
+    }
+
+    /* ---------- PAGE BACKGROUND WITH SOFT PATTERN ---------- */
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: var(--page-bg);
+      min-height:100dvh;
+      position:relative;
+    }
+    /* Pattern come overlay (controlliamo opacità facilmente) */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:var(--pattern-alpha);
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96' fill='none' stroke='%23dfe5ee' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' opacity='1'><g transform='translate(10,10)'><path d='M8 16a16 16 0 0 1 32 0'/><rect x='6' y='16' width='8' height='14' rx='3'/><rect x='34' y='16' width='8' height='14' rx='3'/></g><g transform='translate(60,8)'><rect x='0' y='0' width='24' height='16' rx='2'/><path d='M0 2l12 8L24 2'/></g><g transform='translate(8,56)'><circle cx='12' cy='10' r='8'/><path d='M12 18v6'/><rect x='8' y='24' width='8' height='4' rx='1'/></g><g transform='translate(60,60)'><line x1='0' y1='24' x2='24' y2='24'/><rect x='2' y='12' width='4' height='12' rx='1'/><rect x='10' y='6' width='4' height='18' rx='1'/><rect x='18' y='2' width='4' height='22' rx='1'/></g><g transform='translate(34,36)'><rect x='0' y='0' width='28' height='18' rx='2'/><rect x='-4' y='18' width='36' height='4' rx='1'/></g></svg>");
+      background-size: var(--pattern-size) var(--pattern-size);
+      background-repeat: repeat;
+      z-index:0;
+    }
+
+    /* ---------- DEMO CARD (il tuo simulatore) ---------- */
+    .wrap{
+      display:grid;
+      place-items:center;
+      padding:24px;
+      min-height:100dvh;
+      position:relative;
+      z-index:1; /* sopra al pattern */
+    }
+    .card{
+      width:min(920px, 92vw);
+      background:var(--card-bg);
+      border-radius:18px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.06);
+      border:1px solid rgba(0,0,0,.05);
+      padding:28px 28px 22px;
+    }
+    .card h1{
+      margin:0 0 12px;
+      font-size:clamp(22px, 2.6vw, 30px);
+      letter-spacing:.2px;
+    }
+    .card p{
+      margin:0 0 18px;
+      line-height:1.55;
+      color:#344052;
+    }
+    .row{
+      display:grid;
+      gap:12px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top:14px;
+    }
+    label{
+      font-size:14px;
+      color:#475267;
+      display:block;
+      margin:0 0 6px;
+    }
+    input, select, button{
+      font:inherit;
+    }
+    input, select{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid #e7ebf2;
+      border-radius:12px;
+      background:#fff;
+      outline:none;
+    }
+    .actions{
+      display:flex;
+      gap:12px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid #e7ebf2;
+      background:#0f62fe;
+      color:#fff;
+      cursor:pointer;
+    }
+    .btn.secondary{
+      background:#fff;
+      color:#0f62fe;
+      border-color:#d8e1f2;
+    }
+
+    /* ---------- Dark mode (opzionale) ---------- */
+    @media (prefers-color-scheme: dark){
+      :root{
+        --page-bg:#0b0e12;
+        --card-bg:#12161d;
+        --text:#e9edf6;
+      }
+      body::before{
+        /* colore pattern più scuro per dark mode */
+        background-image:
+          url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96' fill='none' stroke='%233a4354' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' opacity='1'><g transform='translate(10,10)'><path d='M8 16a16 16 0 0 1 32 0'/><rect x='6' y='16' width='8' height='14' rx='3'/><rect x='34' y='16' width='8' height='14' rx='3'/></g><g transform='translate(60,8)'><rect x='0' y='0' width='24' height='16' rx='2'/><path d='M0 2l12 8L24 2'/></g><g transform='translate(8,56)'><circle cx='12' cy='10' r='8'/><path d='M12 18v6'/><rect x='8' y='24' width='8' height='4' rx='1'/></g><g transform='translate(60,60)'><line x1='0' y1='24' x2='24' y2='24'/><rect x='2' y='12' width='4' height='12' rx='1'/><rect x='10' y='6' width='4' height='18' rx='1'/><rect x='18' y='2' width='4' height='22' rx='1'/></g><g transform='translate(34,36)'><rect x='0' y='0' width='28' height='18' rx='2'/><rect x='-4' y='18' width='36' height='4' rx='1'/></g></svg>");
+      }
+      input, select{ background:#0f141b; border-color:#1a2230; color:#e9edf6; }
+      .btn.secondary{ background:#0f141b; color:#7aa2ff; border-color:#253045; }
+      .card p{ color:#c7d2e4; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Simulatore Gestione Separata INPS</h1>
+      <p>Pattern soft a tema freelance (cuffie, lampadina, mail, grafico, laptop). Puoi regolare densità e intensità con le variabili CSS <code>--pattern-size</code> e <code>--pattern-alpha</code>.</p>
+
+      <!-- Demo form (sostituiscilo col tuo simulatore) -->
+      <div class="row">
+        <div>
+          <label for="incassi">Incassi annui (€)</label>
+          <input id="incassi" type="text" placeholder="Es. 30.000" />
+        </div>
+        <div>
+          <label for="aliquota">Imposta sostitutiva</label>
+          <select id="aliquota">
+            <option value="5">5%</option>
+            <option value="15">15%</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn">Calcola</button>
+        <button class="btn secondary" onclick="document.documentElement.style.setProperty('--pattern-size','64px')">Più fitto</button>
+        <button class="btn secondary" onclick="document.documentElement.style.setProperty('--pattern-size','120px')">Più largo</button>
+        <button class="btn secondary" onclick="document.documentElement.style.setProperty('--pattern-alpha','0.42')">Più soft</button>
+        <button class="btn secondary" onclick="document.documentElement.style.setProperty('--pattern-alpha','0.7')">Più visibile</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
