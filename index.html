@@ -160,6 +160,31 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   <header>
     <h1>Simulatore Forfettario per<br><u><span class="hl">Gestione Separata 2025</span></u></h1>
   </header>
+  
+  
+<div class="menu-toggle" id="menuToggle">
+  <span></span><span></span><span></span>
+</div>
+<div class="menu" id="menuBox">
+  <a href="index.html">Gestione Separata INPS</a>
+  <a href="inps.html">INPS Commercianti / Artigiani</a>
+  <a href="enpap.html">ENPAP – Tasse e contributi</a>
+</div>
+
+<script>
+const menuT=document.getElementById('menuToggle');
+const menuB=document.getElementById('menuBox');
+menuT.addEventListener('click',()=>{
+  menuT.classList.toggle('active');
+  menuB.classList.toggle('show');
+});
+// Chiudi se clicchi fuori
+document.addEventListener('click',e=>{
+  if(!menuB.contains(e.target)&&!menuT.contains(e.target)){
+    menuB.classList.remove('show');menuT.classList.remove('active');
+  }
+});
+</script>
 
   <!-- FORM -->
   <section class="card" id="inputCard" style="margin-top:14px">
