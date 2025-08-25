@@ -8,93 +8,42 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* ===== Tema ENPAP (ispirazione: blu petrolio + azzurri chiari) ===== */
 :root{
-  --bg:#f4f8fb;            /* sfondo pagina */
-  --paper:#ffffff;         /* card base */
-  --text:#0b1b2b;          /* testo principale (blu molto scuro) */
-  --muted:#5c718a;         /* testo secondario */
-  --border:#e2e8f0;        /* bordi leggeri */
-
-  --brand:#0e6a88;         /* petrolio principale */
-  --brand-2:#138aa3;       /* azzurro acceso */
-  --brand-ink:#0e6a88;     /* inkbar/tab */
-  --brand-soft:#e6f4f7;    /* soft fill brand */
-  --brand-grad1:#0e6a88;   /* gradient header */
-  --brand-grad2:#2cb1bc;   /* gradient header */
-
-  --radius:16px;
-  --shadow:0 18px 36px rgba(3,25,47,.08);
-
-  --hl-y:#fff8c8;          /* evidenzia */
-  --grid-dot:26px;         /* quadrettatura leggera */
+  --bg:#f4f8fb; --paper:#fff; --text:#0b1b2b; --muted:#5c718a; --border:#e2e8f0;
+  --brand:#0e6a88; --brand-2:#138aa3; --brand-soft:#e6f4f7; --brand-ink:#0e6a88;
+  --radius:16px; --shadow:0 18px 36px rgba(3,25,47,.08); --hl-y:#fff8c8; --grid-dot:26px;
 }
-
-/* ===== Reset & layout ===== */
-*{box-sizing:border-box}
-html{font-size:17px}
+*{box-sizing:border-box} html{font-size:17px}
 body{
   margin:0;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  background:
-    radial-gradient(rgba(14,106,136,.06) 1px, transparent 1px) 0 0/ var(--grid-dot) var(--grid-dot),
-    var(--bg);
+  -webkit-font-smoothing:antialiased;
+  background:radial-gradient(rgba(14,106,136,.06) 1px, transparent 1px) 0 0/ var(--grid-dot) var(--grid-dot), var(--bg);
 }
 .wrap{max-width:980px;margin:28px auto;padding:0 16px}
 
-/* ===== Header brand ===== */
-header{
-  position:relative;
-  margin:18px 0 12px;
-  border-radius:22px;
-  overflow:hidden;
-  box-shadow:0 16px 38px rgba(14,106,136,.15);
-}
-.headbg{
-  background:linear-gradient(135deg,var(--brand-grad1),var(--brand-grad2));
-  padding:28px 20px;
-}
-.brand-row{display:flex;align-items:center;gap:14px;justify-content:center}
-.logo{
-  width:44px;height:44px;min-width:44px;border-radius:10px;
-  background:#fff; display:grid; place-items:center; font-weight:900; color:var(--brand);
-  box-shadow:0 6px 16px rgba(255,255,255,.35) inset;
-}
-.logo span{transform:translateY(1px)}
-h1{margin:0;color:#fff;font-size:1.85rem;line-height:1.2;letter-spacing:.2px;font-weight:900;text-align:center}
-h1 .sub{display:block;font-size:.92rem;font-weight:700;opacity:.95;margin-top:4px}
-.ribbon{
-  display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px;
-  color:#e8fbff;font-weight:700;font-size:.9rem
-}
-.badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:6px 10px;border-radius:999px}
+/* Header */
+header{border-radius:22px;overflow:hidden;box-shadow:0 16px 38px rgba(14,106,136,.15);margin:14px 0}
+.headbg{background:linear-gradient(135deg,#0e6a88,#2cb1bc);padding:26px 18px;text-align:center}
+.h-title{margin:0;color:#fff;font-weight:900;font-size:1.8rem}
+.h-sub{color:#e8fbff;font-weight:700;margin-top:4px}
 
-/* ===== Card / form ===== */
+/* Cards + form */
 .card{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .pad{padding:20px}
-
 .form-vertical{display:flex;flex-direction:column;row-gap:22px}
 .field{width:100%}
 label{display:block;margin:0 0 6px;font-weight:800}
+input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:1rem}
+input:disabled{background:#f8fafc}
+input:focus,select:focus,.chip:focus-visible,.btn:focus-visible{outline:none;border-color:#b9e5ee;box-shadow:0 0 0 3px #dbf4f8}
 .muted{color:var(--muted)}
-input,select{
-  width:100%;padding:12px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:1rem
-}
-input:disabled{background:#f8fafc;color:#334155}
-input:focus,select:focus,.chip:focus-visible,.btn:focus-visible{
-  outline:none;border-color:#b9e5ee;box-shadow:0 0 0 3px #dbf4f8
-}
+.hl{padding:.05em .35em;border-radius:.45em;background:var(--hl-y);border:1px solid #f3e89a}
 
-/* Chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{
-  height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;
-  border:1px solid var(--border);border-radius:9999px;background:#fff;cursor:pointer;font-weight:900
-}
+.chip{height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:9999px;background:#fff;cursor:pointer;font-weight:900}
 .chip:hover{border-color:#cde6f0}
 .chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
 
-/* Buttons */
 .actions{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:8px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;font-weight:900;cursor:pointer;transition:transform .05s}
 .btn:active{transform:translateY(1px)}
@@ -104,30 +53,19 @@ input:focus,select:focus,.chip:focus-visible,.btn:focus-visible{
 .btn.dark{background:#0b1b2b;color:#fff;height:38px;padding:0 12px}
 .btn.secondary{background:#fff;border:1px solid var(--border);height:38px;padding:0 12px}
 
-/* Adv box */
-details.adv>summary{
-  cursor:pointer;list-style:none;padding:12px 14px;border:1px solid var(--border);border-radius:14px;font-weight:900;background:#fff;display:flex;align-items:center;gap:10px
-}
-details.adv>summary::before{content:"";width:10px;height:10px;border:2px solid #0b1b2b;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s}
-details.adv[open]>summary::before{transform:rotate(-135deg)}
-details.adv[open]>summary{background:var(--brand);color:#fff;border-color:var(--brand)}
-.adv-panel{display:none;margin-top:12px;width:100%;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 24px rgba(2,6,23,.06);padding:16px}
-details.adv[open] .adv-panel{display:block}
-.adv-grid{display:grid;row-gap:20px}
-.subgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-.ibox{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 6px 16px rgba(2,6,23,.04)}
-.ibox .bar{display:flex;align-items:center;gap:8px;margin:-6px -6px 12px;padding:10px 12px;border-radius:10px;background:var(--brand);color:#fff;font-weight:900}
-.desc{font-size:12px;color:var(--muted);margin-top:6px}
+/* Section bars */
+.block{border:1px solid var(--border);border-radius:14px;padding:14px}
+.block .bar{display:flex;align-items:center;gap:8px;margin:-4px -4px 10px;padding:10px 12px;border-radius:10px;background:var(--brand);color:#fff;font-weight:900}
+.block .subgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.help{font-size:.88rem;color:var(--muted);margin-top:6px}
 
-/* Tabbar */
+/* Tabs */
 .tabbar-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px}
 .tab-bar{position:relative;display:flex;gap:8px;overflow:auto hidden}
 .tab-btn{position:relative;border:1px solid var(--border);background:#fff;border-radius:9999px;padding:6px 12px;height:34px;cursor:pointer;font-weight:900;white-space:nowrap}
 .tab-btn.active{background:var(--brand-soft);border-color:#cfe7ef}
 .inkbar{position:absolute;height:2px;background:var(--brand-ink);border-radius:2px;bottom:-6px;left:0;width:0;transition:all .25s}
 .tab{display:none}.tab.active{display:block}
-
-/* View toggle */
 .viewctrl{display:flex;align-items:center;gap:8px}
 #viewLabel{font-weight:800;color:#395a77}
 .switch{position:relative;display:inline-block;width:44px;height:24px}
@@ -137,37 +75,31 @@ details.adv[open] .adv-panel{display:block}
 .switch input:checked + .slider{background:#9ee3ec}
 .switch input:checked + .slider:before{transform:translateX(20px)}
 
-/* KPIs & table */
+/* KPI & tabelle */
 .kpis{display:grid;gap:12px;margin-top:8px}
 @media(min-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:980px){.kpis{grid-template-columns:repeat(3,1fr)}}
-.kpi{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;box-shadow:0 6px 16px rgba(2,6,23,.04);display:flex;flex-direction:column;justify-content:center;min-height:120px}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;box-shadow:0 6px 16px rgba(2,6,23,.04)}
 .kpi h3{margin:0 0 6px;font-size:.78rem;color:#426686;text-transform:uppercase;font-weight:800}
 .kpi .big{font-size:1.35rem;font-weight:900;font-variant-numeric:tabular-nums}
-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04);page-break-inside:avoid}
+table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
 th,td{border:1px solid var(--border);padding:12px 8px}
 th{background:#f1f7fb;color:#3a5879;font-weight:800}
-tr:hover{background:#f6fbfd}
 tfoot tr th{background:#edf5fb;font-weight:800}
-#tblScadenze td:nth-child(2),#scadTot{text-align:right;font-variant-numeric:tabular-nums}
 .badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#e8f7fa;border:1px solid #cfe7ef;font-weight:800;font-size:.85em}
+#tblScadenze td:nth-child(2),#scadTot{text-align:right;font-variant-numeric:tabular-nums}
 
-/* Sections + copy */
-.section{position:relative;border-left:4px solid #cfe7ef;padding:14px;margin:12px 0 8px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
+.section{position:relative;border-left:4px solid #cfe7ef;padding:14px;margin:12px 0 8px;border-radius:10px;background:#fff;border:1px solid var(--border)}
 .section.enpap{border-left-color:var(--brand)}
 .section.imp{border-left-color:#16a34a}
 .section h3{margin:0 0 6px;font-size:1.05rem;font-weight:800}
 .copy-btn{position:absolute;right:-10px;top:-10px;padding:6px 10px;font-size:.75rem;font-weight:900;border:0;border-radius:999px;background:#0b1b2b;color:#fff;box-shadow:0 6px 14px rgba(2,6,23,.18);cursor:pointer;opacity:0;transition:opacity .15s,transform .15s;transform:translateY(2px)}
 .section:hover .copy-btn{opacity:1;transform:none}
-@media (max-width:900px){.copy-btn{display:none}}
 .explanation{max-width:860px;margin:0 auto;text-align:left}
 .explanation .line{line-height:30px;margin:0;font-weight:500}
-.mono{font-variant-numeric:tabular-nums}
 .error{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
 
-/* Print */
 @media print{
-  body{background:#fff}
   header,#inputCard,.tabbar-wrap .viewctrl,.copy-btn{display:none!important}
   .wrap{max-width:1000px;margin:0;padding:0}
   #resultsBox{margin-top:0!important;border:none;box-shadow:none}
@@ -179,24 +111,15 @@ tfoot tr th{background:#edf5fb;font-weight:800}
   @page{size:A4;margin:12mm}
 }
 .print-head,.print-title{display:none}
-.hl{padding:.05em .35em;border-radius:.45em;background:var(--hl-y);border:1px solid #f3e89a}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- Header brand -->
   <header>
     <div class="headbg">
-      <div class="brand-row">
-        <div class="logo" aria-hidden="true"><span>EP</span></div>
-        <h1>Simulatore Forfettario <span class="sub">ENPAP • Anno 2025</span></h1>
-      </div>
-      <div class="ribbon">
-        <span class="badge">Coefficiente forfettario 78%</span>
-        <span class="badge">Integrativo 2% (rivalsa)</span>
-        <span class="badge">Scadenze: 3 marzo • 1 ottobre</span>
-      </div>
+      <h1 class="h-title">Simulatore Forfettario ENPAP</h1>
+      <div class="h-sub">Anno 2025 • coeff. 78% • Integrativo 2% (rivalsa) • Scadenze 3 marzo / 1 ottobre</div>
     </div>
   </header>
 
@@ -207,7 +130,7 @@ tfoot tr th{background:#edf5fb;font-weight:800}
 
         <div class="field">
           <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
-          <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50000" value="">
+          <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50000">
           <div class="chips" id="incChips" aria-label="Importi rapidi">
             <button class="chip" data-val-num="20000">20.000</button>
             <button class="chip" data-val-num="30000">30.000</button>
@@ -216,71 +139,61 @@ tfoot tr th{background:#edf5fb;font-weight:800}
             <button class="chip" data-val-num="65000">65.000</button>
             <button class="chip" data-val-num="85000">85.000</button>
           </div>
+          <div class="help">Se l’incassato <b>include</b> la rivalsa ENPAP 2%, i compensi usati nel calcolo saranno <b>incassato ÷ 1,02</b>.</div>
+          <label class="muted" style="display:flex;gap:10px;align-items:center;margin-top:6px">
+            <input id="incIncludeIntegr" type="checkbox" checked> L’incassato include già la rivalsa del 2%
+          </label>
         </div>
 
         <div class="field">
-          <label>Coefficiente di <span class="hl">redditività</span></label>
+          <label>Coefficiente di redditività</label>
           <input type="text" value="Fisso 78% — si paga sul 78% di ciò che incassi (forfettario)" disabled>
         </div>
 
         <div class="field">
-          <label for="imposta">Percentuale <span class="hl">Imposta sostitutiva</span></label>
+          <label for="imposta">Imposta sostitutiva</label>
           <select id="imposta">
             <option value="0.05" selected>5% (primi 5 anni)</option>
             <option value="0.15">15% (ordinaria)</option>
           </select>
         </div>
 
-        <!-- Opzioni avanzate semplificate -->
-        <details class="adv" id="advBox" style="margin-top:4px" open>
-          <summary>Opzioni avanzate</summary>
-          <div class="adv-panel">
-            <div class="adv-grid">
-
-              <div class="ibox">
-                <div class="bar">Contributo soggettivo</div>
-                <div class="subgrid">
-                  <div>
-                    <label>Aliquota soggettivo (10% → 30%)</label>
-                    <div class="chips" id="soggChips"></div>
-                    <div class="desc">Puoi elevarla in step del 2% (12, 14, 16, …, 30).</div>
-                  </div>
-                  <div>
-                    <label>Minimo soggettivo (profilo)</label>
-                    <select id="minSoggSel">
-                      <option value="856">Senza riduzioni – € 856</option>
-                      <option value="428">Riduzioni fino al 50% – € 428</option>
-                      <option value="286">Iscritto ENPAP da non oltre 3 anni – € 286</option>
-                      <option value="172">Reddito netto &lt; € 1.712 – € 172</option>
-                    </select>
-                    <div class="desc">Se il 10–30% su imponibile è inferiore al minimo, si applica il minimo selezionato.</div>
-                  </div>
-                </div>
+        <!-- >>> Contributo soggettivo (ora nelle opzioni normali) -->
+        <div class="block">
+          <div class="bar">Contributo soggettivo</div>
+          <div class="subgrid">
+            <div>
+              <label>Aliquota soggettivo (10% → 30%)</label>
+              <div class="chips" id="soggChips"></div>
+              <div class="help">Puoi elevarla in step del 2% (12, 14, 16, …, 30).</div>
+            </div>
+            <div>
+              <label>Profilo / minimo soggettivo</label>
+              <select id="profiloSogg">
+                <option value="std">Senza riduzioni — minimo € 856</option>
+                <option value="rid50">Riduzioni fino al 50% — minimo € 428</option>
+                <option value="neo3">Iscritto ENPAP da non oltre 3 anni — minimo € 286</option>
+                <option value="reddito1712">Reddito netto professionale < € 1.712 — € 172</option>
+              </select>
+              <div class="help">
+                <b>Come funziona la riduzione 50%:</b> paghi un <b>minimo ridotto a € 428</b> finché il tuo reddito netto è ≤ <b>€ 4.280</b>.
+                Oltre tale soglia si applica la tua <b>percentuale</b> (10–30%). Gli altri profili funzionano in modo analogo:
+                € 286 fino a € 2.860 (neo‑iscritti) • € 856 fino a € 8.560 (senza riduzioni) • € 172 solo se reddito ≤ € 1.712.
               </div>
-
-              <div class="ibox">
-                <div class="bar">Integrativo & Maternità</div>
-                <div class="subgrid">
-                  <div><label>Integrativo (%)</label><input id="aliqIntegr" type="text" inputmode="decimal" value="2"></div>
-                  <div><label>Minimo integrativo (€)</label><input id="minIntegr" type="text" inputmode="decimal" value="66"></div>
-                  <div><label>Maternità (€)</label><input id="maternita" type="text" inputmode="decimal" value="110"></div>
-                </div>
-                <div class="desc">L’integrativo è rivalsa in fattura: non riduce il netto, ma è dovuto all’ente.</div>
-              </div>
-
-              <div class="ibox">
-                <div class="bar">Assunzione sull’incassato</div>
-                <div class="subgrid">
-                  <label class="muted" style="display:flex;gap:10px;align-items:center">
-                    <input id="incIncludeIntegr" type="checkbox" checked>
-                    L’incassato <b>include</b> già la rivalsa del 2% (compensi = incassato / 1,02)
-                  </label>
-                </div>
-              </div>
-
             </div>
           </div>
-        </details>
+        </div>
+        <!-- <<< -->
+
+        <div class="block">
+          <div class="bar">Integrativo & maternità</div>
+          <div class="subgrid">
+            <div><label>Integrativo (%)</label><input id="aliqIntegr" type="text" inputmode="decimal" value="2"></div>
+            <div><label>Minimo integrativo (€)</label><input id="minIntegr" type="text" inputmode="decimal" value="66"></div>
+            <div><label>Maternità (€)</label><input id="maternita" type="text" inputmode="decimal" value="110"></div>
+          </div>
+          <div class="help">L’integrativo è rivalsa in fattura: non riduce il netto ma è dovuto all’Ente.</div>
+        </div>
 
         <div class="actions">
           <button class="btn primary" id="btnCalc">Calcola</button>
@@ -291,6 +204,7 @@ tfoot tr th{background:#edf5fb;font-weight:800}
         </div>
 
       </div>
+
       <div id="err" class="error" style="display:none"></div>
       <div id="liveResult" class="sr-only" aria-live="polite"></div>
     </div>
@@ -303,7 +217,7 @@ tfoot tr th{background:#edf5fb;font-weight:800}
     <div class="tabbar-wrap">
       <div class="tab-bar" id="tabBar">
         <button class="tab-btn active" data-tab="tab1">Come si calcolano</button>
-        <button class="tab-btn" data-tab="tab2">Risultati da pagare</button>
+        <button class="tab-btn" data-tab="tab2">Risultati</button>
         <button class="tab-btn" data-tab="tab3">Scadenze</button>
         <span class="inkbar" id="inkbar"></span>
       </div>
@@ -321,19 +235,18 @@ tfoot tr th{background:#edf5fb;font-weight:800}
     </div>
 
     <div id="tab2" class="tab">
-      <h2 class="print-title">Risultati da pagare</h2>
+      <h2 class="print-title">Risultati</h2>
       <div class="pad">
         <div class="kpis">
-          <div class="kpi"><h3>Reddito imponibile</h3><div class="big" id="outImponibile">€ 0</div><div class="muted" style="font-size:.85rem">Compensi × 78%</div></div>
-          <div class="kpi"><h3>ENPAP – Soggettivo</h3><div class="big" id="outSoggettivo">€ 0</div><div class="muted" style="font-size:.85rem">% scelto su imponibile (minimo)</div></div>
-          <div class="kpi"><h3>Imposta sostitutiva</h3><div class="big" id="outImposta">€ 0</div><div class="muted" style="font-size:.85rem">Su (imponibile)</div></div>
+          <div class="kpi"><h3>Imponibile forfettario</h3><div class="big" id="outImponibile">€ 0</div><div class="muted" style="font-size:.85rem">Compensi × 78%</div></div>
+          <div class="kpi"><h3>ENPAP – Soggettivo</h3><div class="big" id="outSoggettivo">€ 0</div><div class="muted" style="font-size:.85rem">% scelto con minimi & soglie</div></div>
+          <div class="kpi"><h3>Imposta sostitutiva</h3><div class="big" id="outImposta">€ 0</div></div>
         </div>
         <div class="kpis" style="margin-top:6px">
           <div class="kpi"><h3>ENPAP – Integrativo</h3><div class="big" id="outIntegrativo">€ 0</div><div class="muted" style="font-size:.85rem">2% su compensi (minimo)</div></div>
-          <div class="kpi"><h3>Maternità</h3><div class="big" id="outMaternita">€ 0</div><div class="muted" style="font-size:.85rem">Quota fissa</div></div>
+          <div class="kpi"><h3>Maternità</h3><div class="big" id="outMaternita">€ 0</div></div>
           <div class="kpi"><h3>Totale anno</h3><div class="big" id="outTotale">€ 0</div></div>
         </div>
-
         <div class="hr" style="height:1px;background:var(--border);margin:14px 0"></div>
         <h3 style="margin:6px 0">Dettaglio</h3>
         <table><tbody id="tblDettaglio"></tbody></table>
@@ -352,15 +265,14 @@ tfoot tr th{background:#edf5fb;font-weight:800}
 
 <script>
 (function(){
-  /* ===== Utils ===== */
-  function euro(n){const r=Math.round(n||0);try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);}catch(e){return '€ '+r.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}}
+  function euro(n){const r=Math.round(n||0);try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);}catch(e){return '€ '+(r||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}}
   function parseNum(s){if(s==null)return 0;let t=String(s).trim().replace(/\s+/g,'');t=t.replace(/\./g,'').replace(',', '.');const n=parseFloat(t);return isNaN(n)?0:n}
   function val(id){return parseNum(document.getElementById(id).value)}
   function setHTML(id,html){const el=document.getElementById(id);if(el)el.innerHTML=html}
   function tr(a,b,right=false){return '<tr><td>'+a+'</td><td style="text-align:'+(right?'right':'center')+';font-variant-numeric:tabular-nums">'+b+'</td></tr>'}
   function nowIt(){return new Intl.DateTimeFormat('it-IT',{dateStyle:'medium',timeStyle:'short'}).format(new Date())}
 
-  /* ===== Tab underline ===== */
+  /* Tab underline */
   const inkbar=document.getElementById('inkbar');
   function moveInkbar(btn){if(!btn)return;inkbar.style.width=btn.offsetWidth+'px';inkbar.style.left=btn.offsetLeft+'px';}
   document.addEventListener('click',e=>{
@@ -371,14 +283,10 @@ tfoot tr th{background:#edf5fb;font-weight:800}
   });
   window.addEventListener('resize',()=>moveInkbar(document.querySelector('.tab-btn.active')));
 
-  /* ===== Chips soggettivo 10→30 step 2 ===== */
+  /* Chips aliquote 10→30 step 2 */
   const soggChipsHost=document.getElementById('soggChips');
-  const soggVals=Array.from({length:11},(_,i)=>10+i*2); // 10..30
-  soggVals.forEach((p,idx)=>{
-    const b=document.createElement('button');
-    b.className='chip'+(idx===0?' active':''); b.dataset.val=String(p); b.textContent=p+'%';
-    soggChipsHost.appendChild(b);
-  });
+  const soggVals=Array.from({length:11},(_,i)=>10+i*2);
+  soggVals.forEach((p,i)=>{const b=document.createElement('button');b.className='chip'+(i===0?' active':'');b.dataset.val=p;b.textContent=p+'%';soggChipsHost.appendChild(b);});
   let soggAliqSel=10;
   document.addEventListener('click',e=>{
     const chip=e.target.closest('#soggChips .chip'); if(!chip) return;
@@ -386,7 +294,7 @@ tfoot tr th{background:#edf5fb;font-weight:800}
     chip.classList.add('active'); soggAliqSel=parseInt(chip.dataset.val,10)||10;
   });
 
-  /* ===== Incassato: chip helper ===== */
+  /* Incassato shortcuts */
   const incInput=document.getElementById('incassato');
   const incChips=document.getElementById('incChips');
   incInput.addEventListener('input',()=>{incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));});
@@ -397,13 +305,8 @@ tfoot tr th{background:#edf5fb;font-weight:800}
     try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
   });
 
-  /* ===== Vista semplice/dettaglio ===== */
-  const simp=document.getElementById('simpToggle'), viewLabel=document.getElementById('viewLabel');
-  simp.addEventListener('change',()=>{viewLabel.textContent = simp.checked ? 'Vista Semplificata' : 'Vista Dettagliata'; if(document.getElementById('resultsBox').style.display!=='none') buildExplanation();});
-
-  /* ===== Calcolo ===== */
+  /* Compute */
   let last=null;
-
   function compute(){
     const incassato=val('incassato');
     const err=document.getElementById('err');
@@ -414,73 +317,85 @@ tfoot tr th{background:#edf5fb;font-weight:800}
     const aliqIntegr=(val('aliqIntegr')||2)/100;
     const minIntegr=val('minIntegr')||66;
 
-    // Compensi base: se l'incassato include la rivalsa 2% → dividiamo per (1+2%)
+    // Base compensi: togli la rivalsa se inclusa
     const compensi = includeIntegr ? incassato / (1+aliqIntegr) : incassato;
 
-    // Forfettario coeff fisso 78%
-    const imponibileForf = compensi * 0.78;
+    // Forfettario coeff 78%
+    const imponibile = compensi * 0.78;
 
-    // Soggettivo
-    const minSoggettivo = val('minSoggSel');
-    const soggAliq = (soggAliqSel||10)/100;
-    const soggettivoCalc = Math.max(minSoggettivo, imponibileForf * soggAliq);
+    // Profilo soggettivo -> minimi e soglie
+    const prof=document.getElementById('profiloSogg').value;
+    let min=856, soglia=8560;
+    if(prof==='rid50'){min=428; soglia=4280;}
+    else if(prof==='neo3'){min=286; soglia=2860;}
+    else if(prof==='reddito1712'){min=172; soglia=1712;}
+
+    // Soggettivo: percentuale scelta vs minimo legato allo scaglione
+    const soggPerc=(soggAliqSel||10)/100;
+    let soggettivoPerc = imponibile * soggPerc;
+
+    // Regola ENPAP: il minimo vale finché il REDDITO netto professionale (qui: imponibile forfettario) è entro la soglia
+    // caso speciale "reddito<1712": il minimo 172 si applica solo se entro soglia; altrimenti usa la percentuale
+    let soggettivoCalc;
+    if(imponibile <= soglia){
+      soggettivoCalc = Math.max(min, soggettivoPerc);
+      // per i profili con importo fisso sotto soglia il max() garantisce il minimo
+    }else{
+      // oltre soglia: si applica sempre la percentuale scelta (niente minimo)
+      soggettivoCalc = soggettivoPerc;
+    }
 
     // Integrativo (rivalsa)
-    const integrativoCalc = Math.max(minIntegr, compensi * aliqIntegr);
+    const integrativo = Math.max(minIntegr, compensi * aliqIntegr);
 
     // Maternità
     const matern = val('maternita')||110;
 
-    // Imposta sostitutiva (forfettario)
+    // Imposta sostitutiva
     const impRate=parseFloat(document.getElementById('imposta').value)||0.05;
-    const imponibileFisc = imponibileForf;
-    const imposta = imponibileFisc * impRate;
+    const imposta = imponibile * impRate;
 
-    // Totale (solo anno corrente)
-    const totale = soggettivoCalc + integrativoCalc + matern + imposta;
+    const totale = soggettivoCalc + integrativo + matern + imposta;
 
-    // KPI
-    setHTML('outImponibile',euro(imponibileForf));
+    /* KPI */
+    setHTML('outImponibile',euro(imponibile));
     setHTML('outSoggettivo',euro(soggettivoCalc));
-    setHTML('outIntegrativo',euro(integrativoCalc));
+    setHTML('outIntegrativo',euro(integrativo));
     setHTML('outMaternita',euro(matern));
     setHTML('outImposta',euro(imposta));
     setHTML('outTotale',euro(totale));
-    setHTML('liveResult',`Aggiornato. Totale ${euro(totale)}.`);
 
-    // Dettaglio
+    /* Dettaglio */
     let det='';
     det+=tr('<b>Incassato</b>',euro(incassato));
     det+=tr('Assunzione incassato', includeIntegr ? 'include rivalsa 2%' : 'non include rivalsa 2%');
     det+=tr('Compensi (base senza rivalsa)',euro(compensi));
     det+=tr('Coefficiente forfettario','78%');
-    det+=tr('<b>Imponibile</b>',euro(imponibileForf));
-    det+=tr('Aliquota soggettivo scelta',Math.round(soggAliq*100)+'%');
-    det+=tr('Minimo soggettivo applicato',euro(minSoggettivo));
+    det+=tr('<b>Imponibile</b>',euro(imponibile));
+    det+=tr('Profilo soggettivo selezionato',document.getElementById('profiloSogg').selectedOptions[0].textContent);
+    det+=tr('Aliquota soggettivo',Math.round(soggPerc*100)+'%');
+    det+=tr('Soglia minimo (reddito ≤)',euro(soglia));
     det+=tr('<b>Soggettivo dovuto</b>',euro(soggettivoCalc));
-    det+=tr('Integrativo ('+(aliqIntegr*100).toFixed(2)+'%, minimo '+euro(minIntegr)+')',euro(integrativoCalc));
+    det+=tr('Integrativo ('+(aliqIntegr*100).toFixed(2)+'%, min '+euro(minIntegr)+')',euro(integrativo));
     det+=tr('Maternità',euro(matern));
     det+=tr('Imposta sostitutiva ('+Math.round(impRate*100)+'%)',euro(imposta));
     setHTML('tblDettaglio',det);
 
-    // Scadenze ENPAP tipiche: 3 marzo (acconti) • entro 1 ottobre (saldo)
-    const accontoMarzo = soggettivoCalc*0.70 + integrativoCalc*0.70 + matern*1.00;
-    const saldoOttobre = (soggettivoCalc*0.30) + (integrativoCalc*0.30) + 0 + imposta;
-
+    /* Scadenze */
+    const accontoMarzo = soggettivoCalc*0.70 + integrativo*0.70 + matern*1.00;
+    const saldoOttobre = (soggettivoCalc - soggettivoCalc*0.70) + (integrativo - integrativo*0.70) + (matern - matern*1.00) + imposta;
     let sc='';
     sc+=tr('<span class="badge-month">3 marzo</span> — Acconto ENPAP (70% sogg. + 70% integr. + maternità intera)',euro(accontoMarzo),true);
     sc+=tr('<span class="badge-month">entro 1 ottobre</span> — Saldo ENPAP + imposta',euro(saldoOttobre),true);
     setHTML('tblScadenze',sc); setHTML('scadTot',euro(accontoMarzo+saldoOttobre));
 
-    last={incassato,compensi,imponibileForf,soggettivoCalc,integrativoCalc,matern,imposta,totale,includeIntegr,soggAliqSel,minSoggettivo};
+    last={incassato,compensi,imponibile,soggettivoCalc,integrativo,matern,imposta,totale,includeIntegr,soggAliqSel,prof,min,soglia};
     buildExplanation();
     document.getElementById('resultsBox').style.display='';
-    const t=document.querySelector('.tab-btn.active'); moveInkbar(t);
-    setHTML('printHead', `<div><strong>Simulatore Forfettario – ENPAP 2025</strong></div>
-      <div style="font-size:12px;color:#6b7280;margin-top:2px">Stampa generata il ${nowIt()}</div>`);
+    moveInkbar(document.querySelector('.tab-btn.active'));
+    setHTML('printHead', `<div><strong>Simulatore Forfettario – ENPAP 2025</strong></div><div style="font-size:12px;color:#6b7280;margin-top:2px">Stampa generata il ${nowIt()}</div>`);
   }
 
-  /* ===== Spiegazione ===== */
   function P(t){return `<p class="line">${t}</p>`}
   function wrapSection(title,inner,cls){return `<div class="section ${cls||''}"><button type="button" class="copy-btn" title="Copia" aria-label="Copia">Copia</button><div class="copy-content">${title?`<h3>${title}</h3>`:''}${inner}</div></div>`}
   let lastState=null;
@@ -488,56 +403,57 @@ tfoot tr th{background:#edf5fb;font-weight:800}
     const s=last; if(!s) return; lastState=s;
     const simple=document.getElementById('simpToggle').checked;
     document.getElementById('viewLabel').textContent=simple?'Vista Semplificata':'Vista Dettagliata';
-
-    const inc=euro(s.incassato), comp=euro(s.compensi), impf=euro(s.imponibileForf),
-          sogg=euro(s.soggettivoCalc), integ=euro(s.integrativoCalc), mat=euro(s.matern),
-          imp=euro(s.imposta), tot=euro(s.totale);
+    const inc=euro(s.incassato), comp=euro(s.compensi), impf=euro(s.imponibile),
+          sogg=euro(s.soggettivoCalc), integ=euro(s.integrativo), mat=euro(s.matern), imp=euro(s.imposta), tot=euro(s.totale);
 
     let html='';
     if(!simple){
       html+=wrapSection('Base di calcolo',
         P(`Parto da <span class="hl"><b>${inc}</b></span> incassati. ${s.includeIntegr?'Tolgo la rivalsa 2% (divido per 1,02) →':''} compensi <b>${comp}</b>.`)+
         P(`Forfettario con coefficiente <b>78%</b>: <span class="mono">${comp} × 78% = ${impf}</span>.`),'enpap');
+      const profTxt = {
+        std:'Senza riduzioni: minimo €856 finché reddito ≤ €8.560, poi percentuale.',
+        rid50:'Riduzione 50%: minimo €428 finché reddito ≤ €4.280, poi percentuale.',
+        neo3:'Iscritto da non oltre 3 anni: minimo €286 finché reddito ≤ €2.860, poi percentuale.',
+        reddito1712:'Caso speciale: €172 solo se reddito ≤ €1.712.'
+      }[s.prof]||'';
       html+=wrapSection('Contributi ENPAP',
-        P(`Soggettivo al <b>${s.soggAliqSel}%</b> con minimo profilo: <b>${sogg}</b>.`)+
-        P(`Integrativo <b>2%</b> su compensi (minimo): <b>${integ}</b>. È rivalsa (non riduce il netto).`)+
-        P(`Maternità: <b>${mat}</b>.`),'enpap');
-      html+=wrapSection('Imposta sostitutiva', P(`Calcolata su imponibile forfettario → <b>${imp}</b>.`),'imp');
+        P(`${profTxt}`)+
+        P(`Soggettivo al <b>${s.soggAliqSel}%</b> ⇒ <b>${sogg}</b>. Integrativo <b>2%</b> (rivalsa) ⇒ <b>${integ}</b>. Maternità ⇒ <b>${mat}</b>.`),'enpap');
+      html+=wrapSection('Imposta sostitutiva',P(`Calcolata sull’imponibile forfettario ⇒ <b>${imp}</b>.`),'imp');
       html+=wrapSection('Totale & scadenze',
-        P(`Totale anno (acconti + saldo): <b>${tot}</b>.`)+
-        P(`<b>3 marzo</b>: acconti ENPAP (70% sogg. + 70% integr.) + maternità intera. <b>1 ottobre</b>: saldo ENPAP + imposta.`),'');
+        P(`Totale anno (acconti + saldo): <b>${tot}</b>. Scadenze: <b>3 marzo</b> acconti + maternità, <b>1 ottobre</b> saldo + imposta.`),'');
     }else{
-      html+=wrapSection('Sintesi',
-        P(`Imponibile ${impf}. Soggettivo ${sogg}. Integrativo ${integ}. Maternità ${mat}. Imposta ${imp}. Totale ${tot}.`),'');
+      html+=wrapSection('Sintesi',P(`Imponibile ${impf}. Soggettivo ${sogg}. Integrativo ${integ}. Maternità ${mat}. Imposta ${imp}. Totale ${tot}.`),'');
     }
     setHTML('explanation',html);
   }
 
-  /* ===== Stampa ===== */
+  /* Bind */
+  document.getElementById('btnCalc').addEventListener('click',compute);
   document.getElementById('btnPrint').addEventListener('click',()=>{
     const vis=document.getElementById('resultsBox').style.display!=='none';
     if(!vis){alert('Prima clicca su CALCOLA.');return;}
     window.print();
   });
+  document.getElementById('btnReset').addEventListener('click',()=>{
+    document.getElementById('incassato').value='';
+    document.getElementById('imposta').value='0.05';
+    document.getElementById('profiloSogg').value='std';
+    document.getElementById('aliqIntegr').value='2';
+    document.getElementById('minIntegr').value='66';
+    document.getElementById('maternita').value='110';
+    document.getElementById('incIncludeIntegr').checked=true;
+    document.querySelectorAll('#soggChips .chip').forEach((c,i)=>c.classList.toggle('active',i===0)); soggAliqSel=10;
+    document.getElementById('resultsBox').style.display='none';
+    window.scrollTo({top:0,behavior:'smooth'});
+    const tb=document.querySelector('.tab-btn[data-tab="tab1"]'); if(tb) tb.click();
+  });
 
-  /* ===== Init ===== */
+  // init sogg chips inkbar
   document.addEventListener('DOMContentLoaded',()=>{
     const t=document.querySelector('.tab-btn.active'); setTimeout(()=>{moveInkbar(t)},0);
-    document.getElementById('btnCalc').addEventListener('click',compute);
     ['incassato'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();compute();}})});
-    document.getElementById('btnReset').addEventListener('click',()=>{
-      document.getElementById('incassato').value='';
-      document.getElementById('imposta').value='0.05';
-      document.getElementById('minSoggSel').value='856';
-      document.getElementById('aliqIntegr').value='2';
-      document.getElementById('minIntegr').value='66';
-      document.getElementById('maternita').value='110';
-      document.getElementById('incIncludeIntegr').checked=true;
-      document.querySelectorAll('#soggChips .chip').forEach((c,i)=>c.classList.toggle('active',i===0)); soggAliqSel=10;
-      document.getElementById('resultsBox').style.display='none';
-      window.scrollTo({top:0,behavior:'smooth'});
-      const tb=document.querySelector('.tab-btn[data-tab="tab1"]'); if(tb) tb.click();
-    });
   });
 })();
 </script>
