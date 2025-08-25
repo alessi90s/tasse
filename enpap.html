@@ -8,9 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f5f9f7; --paper:#ffffff; --text:#2d2d2d; --muted:#5e6a66; --border:#e6e6e6; --line:#dddddd;
+  --bg:#f5f9f7; --paper:#fff; --text:#2d2d2d; --muted:#5e6a66; --border:#e6e6e6; --line:#dddddd;
   --enpap:#00795c; --enpap-dark:#005944; --enpap-lite:#009c77; --enpap-soft:#e7f3ef;
-  --info-bg:#eef8f4; --radius:8px; --shadow:0 8px 18px rgba(0,0,0,.04);
+  --info-bg:#eef8f4; --warn:#b45309; --err:#b91c1c;
+  --radius:8px; --shadow:0 8px 18px rgba(0,0,0,.04);
 }
 *{box-sizing:border-box}
 html{font-size:17px}
@@ -22,16 +23,17 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui
 .topbar h1{margin:0;font-size:1.6rem;font-weight:900;letter-spacing:.2px;text-transform:uppercase}
 .topbar .sub{font-weight:700;opacity:.95;font-size:.95rem}
 
-/* Cards / form */
+/* Card / form */
 .card{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .pad{padding:18px}
 .form-vertical{display:flex;flex-direction:column;row-gap:18px}
 label{display:block;margin:0 0 6px;font-weight:800}
 input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:6px;background:#fff;font-size:1rem}
 input:focus,select:focus,.btn:focus-visible,.chip:focus-visible{outline:none;border-color:#a8d6c6;box-shadow:0 0 0 3px #d8efe8}
-input:disabled{background:#fafafa;color:#555}
 .small{font-size:.9rem;color:var(--muted)}
 .note{background:var(--info-bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.92rem;color:#2f5149}
+.warn{color:var(--warn)}
+.err{color:#7f1d1d;background:#fdecec;border-color:#f3c8c8}
 
 /* Chips rettangolari */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -53,13 +55,13 @@ input:disabled{background:#fafafa;color:#555}
 .btn.secondary{background:#fff;color:var(--enpap);border-color:var(--enpap)}
 .btn.secondary:hover{background:#f2faf7}
 
-/* Tab */
+/* Tabs */
 .tabbar{display:flex;gap:0;border-bottom:2px solid var(--line);background:#fff;border-radius:8px 8px 0 0;overflow:auto}
 .tabbar button{appearance:none;background:#fff;border:0;border-right:1px solid var(--line);padding:12px 14px;font-weight:800;color:#355e55;cursor:pointer}
 .tabbar button.active{background:var(--enpap-soft);color:#0d3e32}
 .tab{display:none}.tab.active{display:block}
 
-/* KPI & tabelle */
+/* KPI & table */
 .kpis{display:grid;gap:12px;margin-top:12px}
 @media(min-width:720px){.kpis{grid-template-columns:repeat(3,1fr)}}
 .kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
@@ -68,13 +70,15 @@ input:disabled{background:#fafafa;color:#555}
 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border)}
 th,td{border:1px solid var(--border);padding:10px 8px}
 th{background:#f3f7f5;color:#33584f;text-transform:uppercase;font-weight:800}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;background:#edf7f2;border:1px solid #cfe7df;font-weight:800;color:#1f4b3f;font-size:.85rem}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="wrap">
     <h1>Simulatore ENPAP</h1>
-    <div class="sub">2025 • coeff. 78% • la rivalsa 2% viene sempre tolta dall’incassato per calcolare il reddito</div>
+    <div class="sub">2025 • coeff. 78% • dal totale incassato viene sempre tolto il 2% ENPAP per calcolare il reddito</div>
   </div>
 </div>
 
@@ -97,46 +101,37 @@ th{background:#f3f7f5;color:#33584f;text-transform:uppercase;font-weight:800}
             <button class="chip" data-val="85000">85.000</button>
           </div>
           <p class="small" style="margin-top:6px">
-            Il calcolo usa <b>compensi = incassato ÷ 1,02</b> (rivalsa ENPAP 2% sempre esclusa) e poi <b>imponibile = compensi × 78%</b>.
+            Nei calcoli usiamo <b>compensi = incassato ÷ 1,02</b> (rivalsa 2% esclusa) e poi <b>imponibile = compensi × 78%</b>.
           </p>
         </div>
 
-        <!-- Imposta -->
+        <!-- Aliquota soggettivo -->
         <div>
-          <label for="imp">Imposta sostitutiva</label>
-          <select id="imp">
-            <option value="0.05">5% (primi 5 anni)</option>
-            <option value="0.15">15% (ordinaria)</option>
-          </select>
+          <label>Contributo soggettivo (10% → 30%)</label>
+          <div class="chips" id="aliqChips"></div>
+          <div class="small" style="margin-top:6px">Puoi elevarla in step di 2 punti.</div>
         </div>
 
-        <!-- Contributo soggettivo -->
+        <!-- Riduzioni (scelte subito, con auto-disattivazione) -->
         <div class="block">
-          <div class="bar">Contributo soggettivo</div>
+          <div class="bar">Riduzioni e minimi (automatici in base al reddito)</div>
           <div class="content">
             <div class="subgrid">
               <div>
-                <label>Aliquota (10% → 30%)</label>
-                <div class="chips" id="aliqChips"></div>
-                <div class="small" style="margin-top:6px">Puoi elevarla in step di 2 punti.</div>
+                <label class="small" style="display:flex;gap:10px;align-items:flex-start">
+                  <input type="checkbox" id="rid50">
+                  <span><b>Ho diritto alla riduzione al 50%</b><br><span class="small">lavoro dipendente nell’anno, pensione, pensionato altro ente, inattività per malattia ≥ 6 mesi, ecc.</span></span>
+                </label>
               </div>
               <div>
-                <label>Profilo / minimo (attivato automaticamente in base al reddito)</label>
-                <select id="profilo">
-                  <option value="std">Senza riduzioni — min € 856 (fino a € 8.560)</option>
-                  <option value="rid50" disabled>Riduzione 50% — min € 428 (fino a € 4.280)</option>
-                  <option value="neo3" disabled>Iscritto da ≤ 3 anni — min € 286 (fino a € 2.860)</option>
-                  <option value="1712" disabled>Reddito netto ≤ € 1.712 — € 172</option>
-                </select>
-                <div class="note" style="margin-top:8px">
-                  <label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="eligRid50"> Ho diritto alla <b>riduzione al 50%</b> 
-                    <span class="small"> (lavoro dipendente nell’anno, pensione, pensionato altro ente, inattività per malattia ≥ 6 mesi, ecc.).</span>
-                  </label>
-                  <label style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" id="eligNeo3"> Sono <b>iscritto da non oltre 3 anni</b></label>
-                  <div id="eligMsg" class="small" style="margin-top:8px"></div>
-                </div>
+                <label class="small" style="display:flex;gap:10px;align-items:center">
+                  <input type="checkbox" id="neo3">
+                  <span><b>Sono iscritto da non oltre 3 anni</b></span>
+                </label>
               </div>
             </div>
+            <div id="eligMsg" class="small" style="margin-top:8px">Inserisci l’incassato: abiliteremo le riduzioni utili e mostreremo il minimo applicato.</div>
+            <div id="badgeMin" style="margin-top:8px;display:none"><span class="badge" id="badgeText"></span></div>
           </div>
         </div>
 
@@ -147,8 +142,8 @@ th{background:#f3f7f5;color:#33584f;text-transform:uppercase;font-weight:800}
             <div class="subgrid">
               <div>
                 <label>Integrativo (fisso)</label>
-                <input type="text" value="2%" disabled>
-                <div class="small">Minimo € 66 • è rivalsa in fattura</div>
+                <input type="text" value="2% (min € 66)" disabled>
+                <div class="small">È rivalsa in fattura, non riduce il netto ma è dovuta.</div>
               </div>
               <div>
                 <label>Maternità (€)</label>
@@ -164,7 +159,7 @@ th{background:#f3f7f5;color:#33584f;text-transform:uppercase;font-weight:800}
           <button class="btn secondary" id="btnPrint">Stampa</button>
         </div>
 
-        <div id="err" class="note" style="display:none;margin-top:10px;color:#7f1d1d;background:#fdecec;border-color:#f3c8c8">Inserisci un incassato annuo valido (> 0).</div>
+        <div id="err" class="note err" style="display:none;margin-top:10px">Inserisci un incassato annuo valido (> 0).</div>
 
       </div>
     </div>
@@ -190,25 +185,21 @@ th{background:#f3f7f5;color:#33584f;text-transform:uppercase;font-weight:800}
       </div>
     </div>
     <div class="pad tab" id="t2">
-      <table>
-        <tbody id="tblDet"></tbody>
-      </table>
+      <table><tbody id="tblDet"></tbody></table>
     </div>
     <div class="pad tab" id="t3">
-      <table>
-        <tbody id="tblScad"></tbody>
-      </table>
+      <table><tbody id="tblScad"></tbody></table>
     </div>
   </section>
 </div>
 
 <script>
-/* ===== Utils ===== */
+/* ========= Utils ========= */
 function euro(n){const r=Math.round(n||0);try{return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);}catch(e){return '€ '+(r||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');}}
 function parseNum(s){if(s==null)return 0;let t=String(s).trim().replace(/\s+/g,'');t=t.replace(/\./g,'').replace(',', '.');const n=parseFloat(t);return isNaN(n)?0:n}
 function tr(a,b){return '<tr><td>'+a+'</td><td>'+b+'</td></tr>'}
 
-/* ===== UI helpers ===== */
+/* ========= Incassato chips ========= */
 document.querySelectorAll('#incChips .chip').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('#incChips .chip').forEach(x=>x.classList.remove('active'));
@@ -216,98 +207,106 @@ document.querySelectorAll('#incChips .chip').forEach(b=>{
     refreshEligibility();
   });
 });
+document.getElementById('incassato').addEventListener('input',refreshEligibility);
 
-/* Aliquote soggettivo 10→30 step 2 */
+/* ========= Aliquote 10→30 step 2 ========= */
 const aliqHost=document.getElementById('aliqChips');
 const aliqVals=Array.from({length:11},(_,i)=>10+i*2);
-aliqVals.forEach((p,i)=>{const btn=document.createElement('button');btn.className='chip'+(i===0?' active':'');btn.textContent=p+'%';btn.dataset.val=p;aliqHost.appendChild(btn);});
 let soggAliqSel=10;
+aliqVals.forEach((p,i)=>{const btn=document.createElement('button');btn.className='chip'+(i===0?' active':'');btn.textContent=p+'%';btn.dataset.val=p;aliqHost.appendChild(btn);});
 aliqHost.addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
   aliqHost.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); soggAliqSel=parseInt(b.dataset.val,10)||10;
 });
 
-/* Eligibility toggles */
-document.getElementById('eligRid50').addEventListener('change',refreshEligibility);
-document.getElementById('eligNeo3').addEventListener('change',refreshEligibility);
-document.getElementById('incassato').addEventListener('input',refreshEligibility);
+/* ========= Riduzioni: check + gating ========= */
+const elRid50=document.getElementById('rid50');
+const elNeo3=document.getElementById('neo3');
+elRid50.addEventListener('change',refreshEligibility);
+elNeo3.addEventListener('change',refreshEligibility);
 
-/* ===== Gating automatico in base al reddito (imponibile) ===== */
 function imponibileFromIncassato(){
   const inc=parseNum(document.getElementById('incassato').value);
   if(inc<=0) return 0;
-  const compensi=inc/1.02;          // rivalsa sempre esclusa
-  return compensi*0.78;              // coeff 78%
+  const compensi=inc/1.02;   // rivalsa 2% sempre esclusa
+  return compensi*0.78;       // coeff 78%
 }
+
+/* Calcola quale minimo si applica e aggiorna UI dei check */
 function refreshEligibility(){
   const imp=imponibileFromIncassato();
-  const sel=document.getElementById('profilo');
-  const rid50=document.getElementById('eligRid50').checked;
-  const neo3=document.getElementById('eligNeo3').checked;
+  const msg=document.getElementById('eligMsg');
+  const badge=document.getElementById('badgeMin');
+  const badgeText=document.getElementById('badgeText');
 
-  // Regole soglie (basate sul REDDITO NETTO PROFESSIONALE = imponibile forfettario)
-  const can1712 = imp>0 && imp<=1712;
-  const canNeo3  = neo3 && imp>0 && imp<=2860;
-  const canRid50 = rid50 && imp>0 && imp<=4280;
-  const canStd   = imp>0 && imp<=8560; // oltre 8.560 non si applicano minimi, resta la % scelta
+  // Soglie “utilità” dei check
+  const canUseNeo3 = imp>0 && imp<=2860;
+  const canUseRid50 = imp>0 && imp<=4280;
 
-  // Abilita/disabilita opzioni
-  sel.querySelector('option[value="1712"]').disabled = !can1712;
-  sel.querySelector('option[value="neo3"]').disabled = !canNeo3;
-  sel.querySelector('option[value="rid50"]').disabled = !canRid50;
-  sel.querySelector('option[value="std"]').disabled   = false; // selezionabile sempre
+  // Se non danno vantaggio, disattiva e deseleziona
+  elNeo3.disabled = !canUseNeo3;
+  if(!canUseNeo3) elNeo3.checked = false;
 
-  // Se l'opzione attuale non è più valida, sposta alla migliore disponibile
-  if(sel.selectedOptions[0].disabled){
-    if(can1712) sel.value='1712';
-    else if(canNeo3) sel.value='neo3';
-    else if(canRid50) sel.value='rid50';
-    else sel.value='std';
+  elRid50.disabled = !canUseRid50;
+  if(!canUseRid50) elRid50.checked = false;
+
+  if(imp<=0){
+    msg.textContent = 'Inserisci l’incassato: abiliteremo le riduzioni utili e mostreremo il minimo applicato.';
+    badge.style.display='none';
+    return;
   }
 
-  // Messaggio guida
-  const m=document.getElementById('eligMsg');
-  if(imp<=0){m.textContent='Inserisci l’incassato: attiveremo le opzioni consentite dalle soglie di reddito.'; return;}
-  const parts=[];
-  parts.push(`Reddito netto stimato (imponibile): ${euro(imp)}.`);
-  if(can1712) parts.push('Puoi usare la quota fissa €172.');
-  if(canNeo3) parts.push('Se sei iscritto da ≤3 anni, puoi usare il minimo €286.');
-  if(canRid50) parts.push('Se hai diritto alla riduzione 50%, puoi usare il minimo €428.');
-  if(imp<=8560) parts.push('Senza riduzioni puoi usare il minimo €856.');
-  if(imp>8560) parts.push('Sopra € 8.560 non si applicano i minimi: vale la percentuale scelta.');
-  m.textContent=parts.join(' ');
-}
-refreshEligibility();
+  // Determina minimo applicabile
+  const res = getMinimoApplicato(imp, {neo3: elNeo3.checked, rid50: elRid50.checked});
+  badgeText.textContent = 'Minimo applicato: ' + (res.min>0 ? euro(res.min)+' — '+res.reason : 'nessuno (vale la % scelta)');
+  badge.style.display='inline-block';
 
-/* ===== Calcolo ===== */
+  // Messaggio guida
+  const hints=[];
+  hints.push(`Reddito netto stimato (imponibile): ${euro(imp)}.`);
+  if(imp<=1712) hints.push('Quota fissa €172 automatica.');
+  else{
+    if(canUseNeo3) hints.push('Opzione “≤3 anni” disponibile (min €286).');
+    if(canUseRid50) hints.push('Opzione “riduzione 50%” disponibile (min €428).');
+    if(imp<=8560) hints.push('Senza riduzioni: minimo €856.');
+    if(imp>8560) hints.push('Sopra € 8.560 nessun minimo: vale la percentuale.');
+  }
+  msg.textContent=hints.join(' ');
+}
+
+/* Logica dei minimi: ritorna {min, reason} */
+function getMinimoApplicato(imponibile, flags){
+  // 172 automatico
+  if(imponibile<=1712) return {min:172, reason:'reddito ≤ 1.712 €'};
+  let candidates=[];
+  if(flags.neo3 && imponibile<=2860) candidates.push({v:286, why:'neo‑iscritto (≤ 3 anni) – soglia 2.860 €'});
+  if(flags.rid50 && imponibile<=4280) candidates.push({v:428, why:'riduzione 50% – soglia 4.280 €'});
+  if(imponibile<=8560) candidates.push({v:856, why:'senza riduzioni – soglia 8.560 €'});
+
+  if(candidates.length===0) return {min:0, reason:'sopra le soglie: nessun minimo'};
+  // scegli il minore
+  candidates.sort((a,b)=>a.v-b.v);
+  return {min:candidates[0].v, reason:candidates[0].why};
+}
+
+/* ========= Calcolo ========= */
 function compute(){
   const inc=parseNum(document.getElementById('incassato').value);
   const err=document.getElementById('err');
   if(inc<=0){err.style.display='block';return;} else err.style.display='none';
 
-  const compensi = inc/1.02;            // rivalsa 2% sempre esclusa
-  const impon = compensi*0.78;          // coeff 78%
+  const compensi = inc/1.02;
+  const impon = compensi*0.78;
 
-  // Soggettivo
-  const prof=document.getElementById('profilo').value;
   const perc=(soggAliqSel||10)/100;
-  let min=856, soglia=8560;
-  if(prof==='rid50'){min=428; soglia=4280;}
-  else if(prof==='neo3'){min=286; soglia=2860;}
-  else if(prof==='1712'){min=172; soglia=1712;}
+  const {min,reason} = getMinimoApplicato(impon, {neo3: elNeo3.checked, rid50: elRid50.checked});
+  const soggPerc = impon*perc;
+  const soggettivo = Math.max(min, soggPerc); // il getMinimoApplicato già evita min dove non valido
 
-  let soggPerc = impon*perc;
-  let soggettivo = (impon<=soglia) ? Math.max(min, soggPerc) : soggPerc;
-  // caso 1712: selezionabile solo se abilitat* da refreshEligibility
-
-  // Integrativo (rivalsa)
   const integr = Math.max(66, compensi*0.02);
-
-  // Maternità
   const mat = parseNum(document.getElementById('maternita').value)||110;
 
-  // Imposta sostitutiva
   const impRate=parseFloat(document.getElementById('imp').value)||0.05;
   const imposta = impon*impRate;
 
@@ -326,9 +325,8 @@ function compute(){
   det+=tr('Incassato',euro(inc));
   det+=tr('Compensi (incassato ÷ 1,02)',euro(compensi));
   det+=tr('Imponibile (78%)',euro(impon));
-  det+=tr('Profilo soggettivo',document.getElementById('profilo').selectedOptions[0].textContent);
   det+=tr('Aliquota soggettivo',Math.round(perc*100)+'%');
-  det+=tr('Soglia minimo (reddito ≤)',euro(soglia));
+  det+=tr('Minimo applicato', (min>0? euro(min)+' — '+reason : 'nessuno'));
   det+=tr('Soggettivo dovuto',euro(soggettivo));
   det+=tr('Integrativo (2%, min €66)',euro(integr));
   det+=tr('Maternità',euro(mat));
@@ -337,7 +335,7 @@ function compute(){
 
   // Scadenze
   const accontoMarzo = soggettivo*0.70 + integr*0.70 + mat;
-  const saldoOttobre = soggettivo*0.30 + integr*0.30 + 0 + imposta;
+  const saldoOttobre = soggettivo*0.30 + integr*0.30 + imposta;
   let sc='';
   sc+=tr('3 marzo — Acconto (70% sogg. + 70% integr.) + maternità',euro(accontoMarzo));
   sc+=tr('1 ottobre — Saldo ENPAP + imposta',euro(saldoOttobre));
@@ -357,6 +355,12 @@ document.querySelectorAll('.tabbar button').forEach(btn=>{
 
 /* Stampa */
 document.getElementById('btnPrint').addEventListener('click',()=>window.print());
+
+/* Init */
+(function init(){
+  // build aliquote chips
+  refreshEligibility();
+})();
 </script>
 </body>
 </html>
