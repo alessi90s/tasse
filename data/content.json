@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Post 1",
+    "body": "Questo testo non appare nel sorgente HTML, ma solo dopo il fetch.",
+    "link": "https://example.com"
+  },
+  {
+    "title": "Post 2",
+    "body": "Anche questo è inserito dinamicamente via JavaScript."
+  }
+]
