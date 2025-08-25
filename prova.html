@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contenuto caricato via JS</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    .card { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <noscript>Questo sito richiede JavaScript per caricare i contenuti.</noscript>
+
+  <h1>Articoli</h1>
+  <div id="list"></div>
+
+  <script>
+    (async () => {
+      try {
+        // Carica un JSON locale dal repo (stessa origine => ok su GitHub Pages)
+        const res = await fetch("./data/content.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("Impossibile caricare content.json");
+        const items = await res.json();
+
+        const list = document.getElementById("list");
+        list.innerHTML = ""; // pulisci
+
+        items.forEach(item => {
+          const el = document.createElement("article");
+          el.className = "card";
+          el.innerHTML = `
+            <h2>${item.title}</h2>
+            <p>${item.body}</p>
+            ${item.link ? `<p><a href="${item.link}" target="_blank" rel="noopener">Approfondisci</a></p>` : ""}
+          `;
+          list.appendChild(el);
+        });
+      } catch (err) {
+        console.error(err);
+        document.getElementById("list").innerHTML = "<p>Errore nel caricamento dei contenuti.</p>";
+      }
+    })();
+  </script>
+</body>
+</html>
