@@ -41,6 +41,7 @@ h1{margin:0;font-size:2rem;font-weight:900;letter-spacing:-.01em;line-height:1.2
 .field{width:100%}
 label{display:block;margin:0 0 6px;font-weight:800}
 input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
+input[type="date"]{padding:10px 12px}
 input:disabled{background:#f8fafc;color:#334155}
 input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visible{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
 
@@ -111,7 +112,7 @@ th,td{border:1px solid var(--border);padding:12px 8px}
 th{background:#f7f7fb;color:#475569;font-weight:800}
 tr:hover{background:#f8faff}
 tfoot tr th{background:#f1f5f9;font-weight:800}
-#tblScadenze td:nth-child(2),#rateBody td:nth-child(3),#rateBody td:nth-child(5),#rateBody td:nth-child(6),#scadTot{text-align:right;font-variant-numeric:tabular-nums}
+#tblScadenze td:nth-child(2),#tblFissi td:nth-child(2),#rateBody td:nth-child(3),#rateBody td:nth-child(5),#rateBody td:nth-child(6),#scadTot{text-align:right;font-variant-numeric:tabular-nums}
 .badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#eef2ff;border:1px solid #c7d2fe;font-weight:800;font-size:.85em}
 
 /* Spiegazione + Copy */
@@ -150,22 +151,6 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   @page{size:A4;margin:12mm}
 }
 .print-head,.print-title{display:none}
-
-.menu-toggle{
-  position:absolute;top:14px;right:18px;cursor:pointer;
-  width:30px;height:24px;display:flex;flex-direction:column;justify-content:space-between;
-}
-.menu-toggle span{display:block;height:3px;width:100%;background:black;border-radius:2px;transition:.3s}
-.menu{position:absolute;top:60px;right:18px;background:#fff;border:1px solid #e6e6e6;
-  border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.15);display:none;flex-direction:column;min-width:220px;z-index:100}
-.menu a{padding:12px 16px;color:#0f172a;text-decoration:none;font-weight:600;border-bottom:1px solid #f0f0f0}
-.menu a:hover{background:#f5f9f7;color:#00795c}
-.menu a:last-child{border-bottom:none}
-.menu.show{display:flex}
-.menu-toggle.active span:nth-child(1){transform:rotate(45deg) translateY(10px)}
-.menu-toggle.active span:nth-child(2){opacity:0}
-.menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translateY(-10px)}
-
 </style>
 </head>
 <body>
@@ -174,29 +159,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   <header>
     <h1>Simulatore Forfettario per<br><u><span class="hl">INPS Commercianti / Artigiani 2025</span></u></h1>
   </header>
-<div class="menu-toggle" id="menuToggle">
-  <span></span><span></span><span></span>
-</div>
-<div class="menu" id="menuBox">
-  <a href="index.html">Gestione Separata INPS</a>
-  <a href="inps.html">INPS Commercianti / Artigiani</a>
-  <a href="enpap.html">ENPAP – Tasse e contributi</a>
-</div>
 
-<script>
-const menuT=document.getElementById('menuToggle');
-const menuB=document.getElementById('menuBox');
-menuT.addEventListener('click',()=>{
-  menuT.classList.toggle('active');
-  menuB.classList.toggle('show');
-});
-// Chiudi se clicchi fuori
-document.addEventListener('click',e=>{
-  if(!menuB.contains(e.target)&&!menuT.contains(e.target)){
-    menuB.classList.remove('show');menuT.classList.remove('active');
-  }
-});
-</script>
   <!-- FORM -->
   <section class="card" id="inputCard" style="margin-top:14px">
     <div class="pad">
@@ -257,8 +220,24 @@ document.addEventListener('click',e=>{
             <button class="chip" data-reduct="35">Riduzione 35%</button>
             <button class="chip" data-reduct="50">Riduzione 50%</button>
           </div>
-          <div id="boxInfo" class="desc" style="margin-top:6px"></div>
         </div>
+
+        <div class="field">
+          <label>Apertura Partita IVA</label>
+          <div class="chips" id="openChips">
+            <button class="chip active" data-open="pre2025">Apertura prima del 2025</button>
+            <button class="chip" data-open="in2025">Apertura nel 2025</button>
+          </div>
+          <div class="subgrid">
+            <div>
+              <label for="dataApertura">Data apertura (se nel 2025)</label>
+              <input id="dataApertura" type="date" min="2025-01-01" max="2025-12-31" disabled>
+              <div class="desc" id="openHint">Se hai aperto prima del 2025 i fissi sono dovuti per 12 mesi.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="boxInfo" class="desc" style="margin-top:-10px"></div>
 
         <!-- Opzioni avanzate -->
         <details class="adv" style="margin-top:4px" id="advBox">
@@ -278,9 +257,7 @@ document.addEventListener('click',e=>{
                     <input id="accInpsPerc" type="text" inputmode="decimal" value="100">
                   </div>
                 </div>
-                <div class="desc">
-                  Per IVS Artigiani/Commercianti in genere si considerano acconti al <b>100%</b>. Modifica qui se vuoi simulare altro.
-                </div>
+                <div class="desc">Per IVS Artigiani/Commercianti consideriamo acconti al <b>100%</b>.</div>
               </div>
 
               <div class="ibox">
@@ -303,7 +280,7 @@ document.addEventListener('click',e=>{
                     </div>
                     <div><label>Coeff. 2024 (%)</label><input id="coeff2024" type="text" class="coeff-input" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="78"></div>
                   </div>
-                  <div class="desc">Stima veloce: usa la <b>stessa gestione e la stessa agevolazione</b> selezionata sopra; calcola i fissi + variabile.</div>
+                  <div class="desc">Stima: stessa gestione/agevolazione di quest’anno; calcolo completo IVS (fissi pro‑rata + variabile).</div>
                 </div>
               </div>
 
@@ -380,7 +357,7 @@ document.addEventListener('click',e=>{
       <div class="pad">
         <div class="kpis">
           <div class="kpi"><h3>Reddito imponibile</h3><div class="big" id="outImponibile">€ 0</div><div class="muted" style="font-size:.85rem">Incassato × coefficiente</div></div>
-          <div class="kpi"><h3>Contributi INPS (fissi + variabile)</h3><div class="big" id="outInps">€ 0</div><div class="muted" style="font-size:.85rem">Calcolati su scaglioni IVS</div></div>
+          <div class="kpi"><h3>INPS (fissi + variabile)</h3><div class="big" id="outInps">€ 0</div><div class="muted" style="font-size:.85rem">Fissi pro‑rata + scaglioni IVS</div></div>
           <div class="kpi"><h3>Imposta sostitutiva</h3><div class="big" id="outImposta">€ 0</div><div class="muted" style="font-size:.85rem">Su (imponibile − deducibili)</div></div>
         </div>
         <div class="kpis" style="margin-top:6px">
@@ -398,11 +375,19 @@ document.addEventListener('click',e=>{
     <div id="tab3" class="tab">
       <h2 class="print-title">Scadenze da pagare</h2>
       <div class="pad">
-        <h3 style="margin:0 0 6px">Scadenze sintetiche</h3>
-        <table><tbody id="tblScadenze"></tbody><tfoot><tr><th style="text-align:right" colspan="1">Totale anno</th><th id="scadTot" style="text-align:right"></th></tr></tfoot></table>
+        <h3 style="margin:0 0 6px">Fissi IVS 2025 (pro‑rata)</h3>
+        <table>
+          <tbody id="tblFissi"></tbody>
+          <tfoot><tr><th style="text-align:right">Totale fissi</th><th id="totFissi" style="text-align:right"></th></tr></tfoot>
+        </table>
+
+        <div class="hr" style="height:1px;background:var(--border);margin:14px 0"></div>
+
+        <h3 style="margin:0 0 6px">Saldi & Acconti</h3>
+        <table><tbody id="tblScadenze"></tbody><tfoot><tr><th style="text-align:right">Totale (fissi + saldi/acconti)</th><th id="scadTot" style="text-align:right"></th></tr></tfoot></table>
 
         <details class="rates" id="ratesAcc" style="margin-top:12px" open>
-          <summary>Mostra dettaglio rate di giugno (5 rate con interessi) + riga di novembre</summary>
+          <summary>Dettaglio rate di giugno (5 rate con interessi) + riga di novembre</summary>
           <div id="rateBlock" style="margin-top:8px">
             <table>
               <thead><tr><th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata</th></tr></thead>
@@ -422,17 +407,19 @@ document.addEventListener('click',e=>{
 <script>
 (function(){
   /* === Costanti INPS 2025 === */
-  const MINIMALE = 18555;             // reddito minimale
-  const SOGLIA_SUP = 55448;           // soglia per +1%
+  const MINIMALE = 18555;
+  const SOGLIA_SUP = 55448;
   const FISSI = { artigiani: 4460.64, commercianti: 4549.70 };
-  const VAR_RATE = {                   // aliquote variabili “base”
-    artigiani: 0.24,
-    commercianti: 0.2448
-  };
-  const VAR_RATE_HIGH = {              // +1% sulla parte > 55.448
-    artigiani: 0.25,
-    commercianti: 0.2548
-  };
+  const VAR_RATE = { artigiani: 0.24, commercianti: 0.2448 };
+  const VAR_RATE_HIGH = { artigiani: 0.25, commercianti: 0.2548 };
+
+  /* Scadenze fissi */
+  const FISSI_DATES = [
+    {label:"16 maggio 2025", quarter:1},
+    {label:"20 agosto 2025", quarter:2},
+    {label:"17 novembre 2025", quarter:3},
+    {label:"16 febbraio 2026", quarter:4}
+  ];
 
   /* --- Utils --- */
   function euro(n){
@@ -459,21 +446,33 @@ document.addEventListener('click',e=>{
   function wrapSection(title,inner,cls){return `<div class="section ${cls||''}"><button type="button" class="copy-btn" title="Copia" aria-label="Copia">Copia</button><div class="copy-content">${title?`<h3>${title}</h3>`:''}${inner}</div></div>`}
 
   /* --- Stato --- */
-  let coeffFromChips=78,lastState=null,cacheGiugno=0,cacheNov=0;
+  let coeffFromChips=78,lastState=null,cacheGiugno=0,cacheNov=0, cacheFissiTot=0;
 
-  /* --- UI dinamica box info --- */
+  /* --- UI dinamica gestione/agevolazione/apertura --- */
   const gestioneSel = document.getElementById('gestione');
   const ridChips = document.getElementById('riduzioneChips');
+  const openChips = document.getElementById('openChips');
+  const openDate = document.getElementById('dataApertura');
+
   function refreshInfo(){
     const g = gestioneSel.value;
     const txt = `
-      <b>Fissi 2025</b>: ${euro(FISSI[g])}. 
-      <b>Variabile</b>: ${Math.round(VAR_RATE[g]*100)}% sulla parte di imponibile oltre ${euro(MINIMALE)} fino a ${euro(SOGLIA_SUP)}, poi ${Math.round(VAR_RATE_HIGH[g]*100)}% sulla quota eccedente ${euro(SOGLIA_SUP)}.
+      <b>Fissi 2025</b>: ${euro(FISSI[g])} (annuo, da ripartire su <b>4 scadenze</b>).
+      <br><b>Variabile</b>: ${Math.round(VAR_RATE[g]*100)}% sulla parte di imponibile oltre ${euro(MINIMALE)} fino a ${euro(SOGLIA_SUP)}, poi ${Math.round(VAR_RATE_HIGH[g]*100)}% sull’eccedenza.
     `;
     setHTML('boxInfo', txt);
   }
   gestioneSel.addEventListener('change', refreshInfo);
   refreshInfo();
+
+  openChips.addEventListener('click', e=>{
+    const c=e.target.closest('.chip'); if(!c) return;
+    openChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    const mode=c.dataset.open;
+    if(mode==='pre2025'){ openDate.value=''; openDate.disabled=true; setHTML('openHint','Apertura <b>prima del 2025</b>: fissi dovuti per 12 mesi (3‑3‑3‑3).'); }
+    else{ openDate.disabled=false; setHTML('openHint','Seleziona la data: i fissi saranno calcolati <b>per i mesi restanti del 2025</b> e ripartiti per trimestre.'); }
+  });
 
   /* --- Tab underline --- */
   const inkbar=document.getElementById('inkbar');
@@ -536,10 +535,28 @@ document.addEventListener('click',e=>{
     try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
   });
 
-  /* === Calcolo INPS Art/Comm === */
-  function aliquoteGestione(g){
-    return {fisso:FISSI[g], rateLow:VAR_RATE[g], rateHigh:VAR_RATE_HIGH[g]};
+  /* === Apertura → mesi attivi per trimestre (Q1,Q2,Q3,Q4) === */
+  function monthsByQuarter(){
+    const openedPre = openChips.querySelector('.chip.active')?.dataset.open !== 'in2025';
+    if(openedPre) return [3,3,3,3];
+
+    const v = openDate.value;
+    if(!v) return [0,0,0,0];
+    const d = new Date(v+"T12:00:00");
+    const m = d.getMonth()+1; // 1..12
+    // Mesi dovuti = da mese di apertura incluso fino a dicembre
+    const monthsActive = 13 - m; // feb=11, dec=1
+    const counts=[0,0,0,0];
+    for(let month=m; month<=12; month++){
+      if(month<=3) counts[0]++;
+      else if(month<=6) counts[1]++;
+      else if(month<=9) counts[2]++;
+      else counts[3]++;
+    }
+    return counts;
   }
+
+  /* === Riduzioni === */
   function reductFactor(code){
     if(code==='dip') return 0; // esenzione totale
     if(code==='35') return 0.65;
@@ -550,26 +567,42 @@ document.addEventListener('click',e=>{
     const active = ridChips.querySelector('.chip.active');
     return active ? active.dataset.reduct : 'none';
   }
-  function calcINPS_IVS(imponibile,g,redCode){
-    const {fisso, rateLow, rateHigh} = aliquoteGestione(g);
+
+  /* === INPS: fissi (pro‑rata) + variabile === */
+  function aliquoteGestione(g){
+    return {fissoAnn:FISSI[g], rateLow:VAR_RATE[g], rateHigh:VAR_RATE_HIGH[g]};
+  }
+
+  function calcFissiProRata(g, redCode){
+    const {fissoAnn} = aliquoteGestione(g);
     const mult = reductFactor(redCode);
-    if(mult===0) return {fissi:0, varBase1:0, varBase2:0, varQuota1:0, varQuota2:0, totale:0};
+    if(mult===0) return {q:[0,0,0,0], tot:0};
 
-    const base1 = Math.max(0, Math.min(imponibile, SOGLIA_SUP) - MINIMALE); // parte tra 18.555 e 55.448
-    const base2 = Math.max(0, imponibile - SOGLIA_SUP);                      // oltre 55.448
+    const qMonths = monthsByQuarter(); // [Q1,Q2,Q3,Q4]
+    const monthly = fissoAnn/12;
+    const q = qMonths.map(n => n*monthly*mult);
+    const tot = q.reduce((a,b)=>a+b,0);
+    return {q, tot, qMonths, monthly:monthly*mult};
+  }
 
-    const q1 = base1 * rateLow;
-    const q2 = base2 * rateHigh;
+  function calcINPS_Variabile(imponibile,g,redCode){
+    const { rateLow, rateHigh } = aliquoteGestione(g);
+    const mult = reductFactor(redCode);
+    if(mult===0) return {base1:0, base2:0, quota1:0, quota2:0, tot:0, rateLow, rateHigh};
+    const base1 = Math.max(0, Math.min(imponibile, SOGLIA_SUP) - MINIMALE);
+    const base2 = Math.max(0, imponibile - SOGLIA_SUP);
+    const q1 = base1*rateLow*mult;
+    const q2 = base2*rateHigh*mult;
+    return {base1, base2, quota1:q1, quota2:q2, tot:q1+q2, rateLow, rateHigh};
+  }
 
-    const fissi = fisso * mult;
-    const variabile = (q1 + q2) * mult;
-    const tot = fissi + variabile;
-
-    return {fissi, varBase1:base1, varBase2:base2, varQuota1:q1*mult, varQuota2:q2*mult, totale:tot, rateLow, rateHigh};
+  function calcINPS_IVS(imponibile,g,redCode){
+    const fissi = calcFissiProRata(g, redCode);
+    const variab = calcINPS_Variabile(imponibile,g,redCode);
+    return { fissi, variab, totale: fissi.tot + variab.tot };
   }
 
   /* --- Calcolo principale --- */
-  let lastStateLocal=null;
   function compute(){
     const incassato=val('incassato');
     let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
@@ -592,18 +625,24 @@ document.addEventListener('click',e=>{
       const coeff24=(parseNum(document.getElementById('coeff2024').value)||78)/100;
       const imp24rate=parseFloat(document.getElementById('imp2024').value)||0.05;
       const impon24=inc24*coeff24;
-      const inps24 = calcINPS_IVS(impon24, gestione, reduct).totale; // stima completa (fissi + variabile)
+      const inps24 = calcINPS_IVS(impon24, gestione, reduct).totale;
       const imp24=Math.max(0,impon24)*imp24rate;
       accImpPrev=imp24*1.00; accInpsPrev=inps24*1.00;
     }
 
     const err=document.getElementById('err');
+    // Se apertura nel 2025 ma senza data, blocco il calcolo
+    const isIn2025 = openChips.querySelector('.chip.active')?.dataset.open==='in2025';
+    if(isIn2025 && !openDate.value){
+      err.style.display='block'; err.textContent='Seleziona la data di apertura nel 2025 per calcolare i fissi pro‑rata.';
+      document.getElementById('resultsBox').style.display='none'; return;
+    }
     if(incassato<=0){err.style.display='block';err.textContent='Inserisci un incassato annuo valido (> 0) o usa il calcolo inverso nelle Opzioni avanzate.';document.getElementById('resultsBox').style.display='none';return}
     err.style.display='none';
 
     const imponibileForf=incassato*coeff;
 
-    // INPS IVS (fissi + variabile per scaglioni)
+    // INPS IVS (fissi pro‑rata + variabile)
     const inpsObj = calcINPS_IVS(imponibileForf, gestione, reduct);
     const inps = inpsObj.totale;
 
@@ -611,16 +650,15 @@ document.addEventListener('click',e=>{
     const imponibileFisc=Math.max(0,imponibileForf-Math.max(0,deducibili));
     const imposta=imponibileFisc*impRate;
 
-    // Saldi (netti degli acconti anno precedente)
+    // Saldi
     let saldoImposta=Math.max(0,imposta-Math.max(0,accImpPrev));
     let saldoInps=Math.max(0,inps-Math.max(0,accInpsPrev));
     const saldoTotale=saldoImposta+saldoInps;
 
-    // Crediti
+    // Crediti e nuovi acconti
     const creditoImp=Math.max(0,accImpPrev-imposta);
     const creditoInps=Math.max(0,accInpsPrev-inps);
 
-    // Nuovi acconti
     const accImpBase=imposta*accImpPerc;
     const accInpsBase=inps*accInpsPerc;
 
@@ -655,16 +693,19 @@ document.addEventListener('click',e=>{
     /* Dettaglio (tab 2) */
     let det='';
     det+=tr('<b>Gestione</b>',gestione==='artigiani'?'Artigiani':'Commercianti');
+    const openedPre = openChips.querySelector('.chip.active')?.dataset.open!=='in2025';
+    det+=tr('Apertura', openedPre ? 'Prima del 2025' : ('Nel 2025 — dal ' + new Date(openDate.value+"T12:00:00").toLocaleDateString('it-IT')));
     det+=tr('<b>Incassato</b>',euro(incassato));
     det+=tr('Coefficiente',coeffPerc+'%');
     det+=tr('<b>Imponibile</b>',euro(imponibileForf));
     // INPS breakdown
-    if(reduct==='dip') det+=tr('INPS (esenzione lavoro dip.)','<b>€ 0</b>');
-    else{
-      det+=tr('INPS fissi annui',euro(inpsObj.fissi));
-      det+=tr(`INPS variabile (${(inpsObj.rateLow*100).toFixed(2)}% su quota ${euro(inpsObj.varBase1)})`,euro(inpsObj.varQuota1));
-      if(inpsObj.varBase2>0) det+=tr(`INPS variabile (${(inpsObj.rateHigh*100).toFixed(2)}% su quota ${euro(inpsObj.varBase2)})`,euro(inpsObj.varQuota2));
-      if(reduct==='35'||reduct==='50') det+=tr('Agevolazione applicata',reduct==='35'?'Riduzione 35%':'Riduzione 50%');
+    if(currentReductionCode()==='dip'){
+      det+=tr('INPS (esenzione lavoro dip.)','<b>€ 0</b>');
+    }else{
+      const rLow=(inpsObj.variab.rateLow*100).toFixed(2), rHigh=(inpsObj.variab.rateHigh*100).toFixed(2);
+      det+=tr('INPS fissi (pro‑rata)',euro(inpsObj.fissi.tot));
+      det+=tr(`INPS variabile ${rLow}% su quota ${euro(inpsObj.variab.base1)}`,euro(inpsObj.variab.quota1));
+      if(inpsObj.variab.base2>0) det+=tr(`INPS variabile ${rHigh}% su quota ${euro(inpsObj.variab.base2)}`,euro(inpsObj.variab.quota2));
       det+=tr('<b>INPS totale</b>','<b>'+euro(inps)+'</b>');
     }
     det+=tr('Deducibili per imposta','− '+euro(deducibili));
@@ -689,11 +730,23 @@ document.addEventListener('click',e=>{
     det+=tr('INPS – 2° acconto (50%)',euro(accInps2));
     setHTML('tblDettaglio',det); setHTML('detTot','');
 
-    /* Scadenze (tab 3) */
+    /* Scadenze FISSI (tab 3) */
+    let totFissi=0, tf='';
+    cacheFissiTot=0;
+    FISSI_DATES.forEach((d,idx)=>{
+      const importo = inpsObj.fissi.q[idx]||0;
+      tf+=tr(d.label, euro(importo), true);
+      totFissi += importo;
+    });
+    cacheFissiTot=totFissi;
+    setHTML('tblFissi', tf); setHTML('totFissi', euro(totFissi));
+
+    /* Scadenze Saldi/Acconti (tab 3) */
     cacheGiugno=giugnoTot; cacheNov=novTot;
-    let sc=''; sc+=tr('<span class="badge-month">Giugno</span> — Saldo (imp.+INPS) + 1° acconti',euro(giugnoTot),true);
+    let sc=''; sc+=tr('<span class="badge-month">Giugno</span> — Saldo (imposta + INPS) + 1° acconti',euro(giugnoTot),true);
     sc+=tr('<span class="badge-month">Novembre</span> — 2° acconti',euro(novTot),true);
-    setHTML('tblScadenze',sc); setHTML('scadTot',euro(giugnoTot+novTot));
+    setHTML('tblScadenze',sc);
+    setHTML('scadTot',euro(giugnoTot+novTot+totFissi));
 
     document.getElementById('ratesAcc').open=true;
     buildRate();
@@ -704,7 +757,7 @@ document.addEventListener('click',e=>{
       accImpPrev,accInpsPrev,saldoImposta,saldoInps,saldoTotale,
       accImpTot,accInpsTot,accImp1,accImp2,accInps1,accInps2,
       giugnoTot,novTot,totale,creditoImp,creditoInps,creditoImpResid,creditoInpsResid,
-      inpsObj
+      inpsObj, totFissi
     };
     buildExplanation();
 
@@ -731,56 +784,57 @@ document.addEventListener('click',e=>{
                    s.reduct==='35'?' (riduzione 35%)':
                    s.reduct==='50'?' (riduzione 50%)':'';
 
+    const openedPre = openChips.querySelector('.chip.active')?.dataset.open!=='in2025';
+    const openTxt = openedPre ? 'prima del 2025' :
+      ('nel 2025 (dal '+ new Date(document.getElementById('dataApertura').value+"T12:00:00").toLocaleDateString('it-IT') +')');
+
     let html='';
     if(!simple){
       html+=wrapSection('Imponibile',
-        P(`Hai incassato <span class="hl"><b>${inc}</b></span>. Con coefficiente <span class="hl"><b>${s.coeffPerc}%</b></span> il reddito imponibile diventa:`) +
-        P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>`),'');
-
+        P(`Incassato <span class="hl"><b>${inc}</b></span> × coefficiente <span class="hl"><b>${s.coeffPerc}%</b></span> = reddito imponibile <b>${impForf}</b>.`),'');
       let inpsTxt='';
       if(s.reduct==='dip'){
-        inpsTxt += P(`Hai selezionato <b>Esenzione</b> (lavoro dipendente): i contributi IVS <b>non sono dovuti</b>.`);
+        inpsTxt += P(`Gestione <b>${gName}</b>${redTxt}. Nessun contributo IVS dovuto (fissi e variabile = 0 €).`);
       }else{
-        inpsTxt += P(`<b>${gName}</b>${redTxt}. I contributi sono la somma di <b>fissi</b> + <b>variabile a scaglioni</b>.`);
-        inpsTxt += P(`Fissi annui: <b>${euro(s.inpsObj.fissi)}</b>.`);
-        const rLow = (s.inpsObj.rateLow*100).toFixed(2), rHigh=(s.inpsObj.rateHigh*100).toFixed(2);
-        inpsTxt += P(`Variabile: ${rLow}% sulla quota di imponibile da ${euro(MINIMALE)} a ${euro(SOGLIA_SUP)} (eccedenza: ${euro(s.inpsObj.varBase1)} → ${euro(s.inpsObj.varQuota1)}).`);
-        if(s.inpsObj.varBase2>0) inpsTxt += P(`${rHigh}% sulla parte oltre ${euro(SOGLIA_SUP)} (${euro(s.inpsObj.varBase2)} → ${euro(s.inpsObj.varQuota2)}).`);
+        inpsTxt += P(`Gestione <b>${gName}</b>${redTxt}. I contributi sono <b>fissi pro‑rata per apertura ${openTxt}</b> + <b>variabile a scaglioni</b> sull’imponibile.`);
+        inpsTxt += P(`Fissi complessivi 2025: <b>${euro(s.inpsObj.fissi.tot)}</b> (ripartiti su 16/05, 20/08, 17/11, 16/02/2026).`);
+        const rLow=(s.inpsObj.variab.rateLow*100).toFixed(2), rHigh=(s.inpsObj.variab.rateHigh*100).toFixed(2);
+        inpsTxt += P(`Variabile: ${rLow}% tra ${euro(MINIMALE)} e ${euro(SOGLIA_SUP)} (${euro(s.inpsObj.variab.base1)} → ${euro(s.inpsObj.variab.quota1)})` + (s.inpsObj.variab.base2>0? `; ${rHigh}% oltre ${euro(SOGLIA_SUP)} (${euro(s.inpsObj.variab.base2)} → ${euro(s.inpsObj.variab.quota2)})` : '') + '.');
       }
       inpsTxt+=P(`👉 <b>INPS totale</b>: <b>${inps}</b>.`);
       html+=wrapSection('Contributi INPS', inpsTxt,'inps');
 
       let impTxt=(s.deducibili>0)
-        ? P(`Prima togliamo i <b>contributi deducibili</b> (${euro(s.deducibili)}): <span class="mono">${impForf} − ${euro(s.deducibili)} = ${baseImp}</span>.`)
-        : P(`Base imposta: <b>${baseImp}</b> (nessuna deduzione).`);
-      impTxt+=P(`Aliquota <b>${Math.round(s.impRate*100)}%</b>: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
-      impTxt+=P(`👉 Saldo imposta ora: <b>${saldoIMP}</b>.`);
+        ? P(`Base per imposta: ${impForf} − contributi deducibili ${euro(s.deducibili)} = <b>${baseImp}</b>.`)
+        : P(`Base per imposta: <b>${baseImp}</b> (nessuna deduzione).`);
+      impTxt+=P(`Aliquota <b>${Math.round(s.impRate*100)}%</b> ⇒ imposta <b>${imposta}</b>. Saldo imposta ora: <b>${saldoIMP}</b>.`);
       html+=wrapSection('Imposta sostitutiva', impTxt,'imp');
 
       html+=wrapSection('Totale saldi ora',
         P(`<span class="mono"><b>${saldoINPS}</b> (INPS) + <b>${saldoIMP}</b> (imposta) = <b>${saldoTot}</b></span>.`),'');
 
-      let accTxt=P(`Calcolati sul dovuto di quest’anno e <b>già ridotti dei crediti</b> (se presenti).`) +
+      let accTxt=P(`Calcolati sul dovuto di quest’anno e <b>ridotti dei crediti</b> (se presenti).`) +
                   P(`<b>Imposta</b>: ${accIMPtot} (50% giugno, 50% novembre).`) +
-                  P(`<b>INPS</b>: ${accINPStot} (50% giugno, 50% novembre — configurabile).`);
+                  P(`<b>INPS</b>: ${accINPStot} (50% giugno, 50% novembre).`);
       html+=wrapSection('Acconti per l’anno successivo', accTxt,'');
 
       html+=wrapSection('Scadenze',
+        P(`<b>Fissi IVS</b> su 4 date: importi mostrati nella tab <b>Scadenze</b>.`) +
         P(`<b>Giugno</b> = saldi (<b>${saldoINPS}</b> + <b>${saldoIMP}</b>) + primi acconti (<b>${accIMP1}</b> imposta + <b>${accINPS1}</b> INPS) = <b>${giu}</b>.`) +
         P(`<b>Novembre</b> = secondi acconti = <b>${nov}</b>.`),'');
 
       html+=wrapSection('Totale anno e incidenza',
-        P(`<span class="mono">${giu} + ${nov} = ${tot}</span>. Incidenza: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; totale <b>${perc(s.totale,s.incassato)}</b>.`),'');
+        P(`<span class="mono">${giu} + ${nov} + ${euro(s.totFissi)} = ${euro(s.junePlusNovPlusFissi || (s.giugnoTot + s.novTot + s.totFissi))}</span>. Incidenza su incassato: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; fissi <b>${perc(s.totFissi,s.incassato)}</b>.`),'');
     }else{
       html+=wrapSection('Imponibile', P(`Incassato <b>${inc}</b> → imponibile <b>${impForf}</b> (coeff. <b>${s.coeffPerc}%</b>).`),'');
-      html+=wrapSection('INPS', P(`${gName}${redTxt}. Fissi + variabile a scaglioni → <b>${inps}</b>. Saldo INPS ora: <b>${saldoINPS}</b>.`),'inps');
-      html+=wrapSection('Imposta sostitutiva', P(`Base <b>${baseImp}</b> × ${Math.round(s.impRate*100)}% = <b>${imposta}</b>. Saldo: <b>${saldoIMP}</b>.`),'imp');
-      html+=wrapSection('Scadenze', P(`<b>Giugno</b>: saldi + 1° acconti = <b>${giu}</b>. • <b>Novembre</b>: 2° acconti = <b>${nov}</b>. Totale: <b>${tot}</b>.`),'');
+      html+=wrapSection('INPS', P(`${gName}${redTxt}. Fissi pro‑rata + variabile → <b>${inps}</b>. Saldo INPS: <b>${saldoINPS}</b>.`),'inps');
+      html+=wrapSection('Imposta', P(`Base <b>${baseImp}</b> × ${Math.round(s.impRate*100)}% = <b>${imposta}</b>. Saldo: <b>${saldoIMP}</b>.`),'imp');
+      html+=wrapSection('Scadenze', P(`<b>Fissi</b>: 16/05, 20/08, 17/11, 16/02/2026. • <b>Giugno</b>: saldi + 1° acconti = <b>${giu}</b>. • <b>Novembre</b>: 2° acconti = <b>${nov}</b>.`),'');
     }
     setHTML('explanation',html);
   }
 
-  /* Rate (come tuo template) */
+  /* Rate (come template) */
   function buildRate(){
     const totGiu=cacheGiugno, quota=totGiu/5;
     let tbody='',sumInt=0,sumTotGiu=0;
@@ -862,9 +916,8 @@ document.addEventListener('click',e=>{
   document.addEventListener('DOMContentLoaded',()=>{
     incInput.value='';
     document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
-    const t=document.querySelector('.tab-btn.active'); if(t) setTimeout(()=>{document.getElementById('inkbar').style.width=t.offsetWidth+'px';document.getElementById('inkbar').style.left=t.offsetLeft+'px';},0);
+    const tb=document.querySelector('.tab-btn.active'); if(tb) setTimeout(()=>{document.getElementById('inkbar').style.width=tb.offsetWidth+'px';document.getElementById('inkbar').style.left=tb.offsetLeft+'px';},0);
 
-    // riduzione chips toggle
     ridChips.addEventListener('click', e=>{
       const c=e.target.closest('.chip'); if(!c) return;
       ridChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
@@ -884,6 +937,9 @@ document.addEventListener('click',e=>{
       document.getElementById('accImpPerc').value='100'; document.getElementById('accInpsPerc').value='100';
       ridChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
       ridChips.querySelector('.chip[data-reduct="none"]').classList.add('active');
+      openChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      openChips.querySelector('.chip[data-open="pre2025"]').classList.add('active');
+      openDate.value=''; openDate.disabled=true; setHTML('openHint','Se hai aperto prima del 2025 i fissi sono dovuti per 12 mesi.');
       document.getElementById('ratesAcc').open=true;
       document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').textContent='Vista Dettagliata';
       document.getElementById('resultsBox').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});
