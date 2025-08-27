@@ -22,17 +22,17 @@ body{
   margin:0;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
   background:
-    radial-gradient(rgba(2,6,23,.08) 1px, transparent 1px) 0 0/ var(--dots) var(--dots),
+    radial-gradient(rgba(2,6,23,.06) 1px, transparent 1px) 0 0/ var(--dots) var(--dots),
     #f7f9fc;
 }
-.wrap{max-width:860px;margin:32px auto;padding:0 14px}
+.wrap{max-width:900px;margin:32px auto;padding:0 14px}
 
 /* Header */
 header{text-align:center;margin-bottom:16px}
 h1{margin:0;font-size:2rem;font-weight:900;letter-spacing:-.01em;line-height:1.2}
 .hl{padding:.05em .35em;border-radius:.45em;background:var(--hl-y);border:1px solid #f3e89a}
 
-/* Cards */
+/* Card */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .pad{padding:20px}
 
@@ -47,13 +47,18 @@ input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visi
 
 /* Chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:9999px;background:#fff;cursor:pointer;font-weight:900;user-select:none}
+.chip{height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:9999px;background:#fff;cursor:pointer;font-weight:900;user-select:none;transition:background .15s,border-color .15s,transform .05s}
 .chip:hover{border-color:#bcd0ff}
+.chip:active{transform:translateY(1px)}
 .chip.active{background:#111827;color:#fff;border-color:#111827}
 .coeff-wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .coeff-input{width:86px}
 
-/* Pulsanti */
+/* Pills & buttons */
+.pill-toggle{display:flex;gap:8px;margin:8px 0 6px}
+.pill{height:34px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
+.pill.active{background:#111827;color:#fff;border-color:#111827}
+
 .actions{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:8px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;font-weight:900;cursor:pointer;transition:transform .05s}
 .btn:active{transform:translateY(1px)}
@@ -86,10 +91,12 @@ input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visi
 .kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:0 6px 16px rgba(2,6,23,.04);display:flex;flex-direction:column;justify-content:center;min-height:120px}
 .kpi h3{margin:0 0 6px;font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:800}
 .kpi .big{font-size:1.35rem;font-weight:900;font-variant-numeric:tabular-nums}
-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04);page-break-inside:avoid}
-th,td{border:1px solid var(--border);padding:12px 8px}
+
+table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
+th,td{border:1px solid var(--border);padding:12px 10px}
 th{background:#f7f7fb;color:#475569;font-weight:800}
-tr:hover{background:#f8faff}
+tbody tr:nth-child(odd){background:#fcfcff}
+tbody tr:hover{background:#f5f8ff}
 tfoot tr th{background:#f1f5f9;font-weight:800}
 #tblScadenze td:nth-child(2),#tblFissi td:nth-child(2),#rateBody td:nth-child(3),#rateBody td:nth-child(5),#rateBody td:nth-child(6),#scadTot{text-align:right;font-variant-numeric:tabular-nums}
 .badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#eef2ff;border:1px solid #c7d2fe;font-weight:800;font-size:.85em}
@@ -104,7 +111,7 @@ tfoot tr th{background:#f1f5f9;font-weight:800}
 @media (max-width:900px){.copy-btn{display:none}}
 .explanation{max-width:820px;margin:0 auto;text-align:left}
 .explanation .line{line-height:30px;margin:0;font-weight:500}
-.muted{color:var(--muted)}
+.muted{color:#64748b}
 .mono{font-variant-numeric:tabular-nums}
 .error{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
 
@@ -131,15 +138,14 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 </head>
 <body>
 <div class="wrap">
-  <!-- TITOLO -->
   <header>
     <h1>Simulatore Forfettario per<br><u><span class="hl">INPS Commercianti / Artigiani 2025</span></u></h1>
   </header>
 
-  <!-- FORM -->
   <section class="card" id="inputCard" style="margin-top:14px">
     <div class="pad">
-      <div class="form-vertical" style="max-width:720px;margin:0 auto">
+      <div class="form-vertical" style="max-width:760px;margin:0 auto">
+
         <div class="field">
           <label>Anno <span class="hl">2025</span></label>
           <input type="text" value="2025" disabled aria-disabled="true"/>
@@ -205,7 +211,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
             <div>
               <label for="dataApertura">Data apertura (se nel 2025)</label>
               <input id="dataApertura" type="date" min="2025-01-01" max="2025-12-31" disabled>
-              <div class="desc" id="openHint">Se hai aperto prima del 2025 i fissi sono dovuti per 12 mesi.</div>
+              <div class="desc" id="openHint">Se hai aperto prima del 2025 i minimi si pagano per 12 mesi.</div>
             </div>
           </div>
         </div>
@@ -217,6 +223,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
           <summary>Opzioni avanzate</summary>
           <div class="adv-panel">
             <div class="adv-grid">
+
               <div class="ibox">
                 <div class="bar">Acconti</div>
                 <div class="subgrid">
@@ -266,6 +273,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                 <div id="invOut" class="desc" style="margin-top:8px"></div>
                 <div class="desc">Nota: copre i <b>saldi</b> (imposta + INPS) ma non i nuovi acconti.</div>
               </div>
+
             </div>
           </div>
         </details>
@@ -285,7 +293,6 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     </div>
   </section>
 
-  <!-- RISULTATI -->
   <section id="resultsBox" class="card" style="margin-top:14px;display:none" aria-live="polite">
     <div class="print-head" id="printHead"></div>
 
@@ -332,7 +339,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     <div id="tab3" class="tab">
       <h2 class="print-title">Scadenze da pagare</h2>
       <div class="pad">
-        <h3 style="margin:0 0 6px">Fissi IVS 2025 (pro-rata a giorni)</h3>
+        <h3 style="margin:0 0 6px">Fissi IVS 2025 (ripartizione corretta)</h3>
         <table>
           <tbody id="tblFissi"></tbody>
           <tfoot><tr><th style="text-align:right">Totale fissi</th><th id="totFissi" style="text-align:right"></th></tr></tfoot>
@@ -371,10 +378,10 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   const VAR_RATE = { artigiani: 0.24, commercianti: 0.2448 };
   const VAR_RATE_HIGH = { artigiani: 0.25, commercianti: 0.2548 };
   const FIX_DATES = [
-    {label:"16 maggio 2025", q:1},
-    {label:"20 agosto 2025", q:2},
-    {label:"17 novembre 2025", q:3},
-    {label:"16 febbraio 2026", q:4}
+    {label:"16/05/2025 — Q1", date:new Date('2025-05-16')},
+    {label:"20/08/2025 — Q2", date:new Date('2025-08-20')},
+    {label:"17/11/2025 — Q3", date:new Date('2025-11-17')},
+    {label:"16/02/2026 — Q4", date:new Date('2026-02-16')}
   ];
 
   /* === Utils === */
@@ -388,47 +395,57 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   function P(t){return `<p class="line">${t}</p>`}
   function wrapSection(title,inner,cls){return `<div class="section ${cls||''}"><button type="button" class="copy-btn">Copia</button><div class="copy-content">${title?`<h3>${title}</h3>`:''}${inner}</div></div>`}
 
-  /* === Giorni/Trimestri === */
-  function quarterBounds(year,q){ // q=1..4
-    const starts=[new Date(year,0,1),new Date(year,3,1),new Date(year,6,1),new Date(year,9,1)];
-    const ends=[new Date(year,2,31),new Date(year,5,30),new Date(year,8,30),new Date(year,11,31)];
-    return {start:starts[q-1], end:ends[q-1]};
-  }
-  function daysDiffInclusive(d1,d2){
-    return Math.floor((Date.UTC(d2.getFullYear(),d2.getMonth(),d2.getDate())-Date.UTC(d1.getFullYear(),d1.getMonth(),d1.getDate()))/86400000)+1;
-  }
-
   /* === Riduzioni === */
   function reductFactor(code){ if(code==='dip')return 0; if(code==='35')return .65; if(code==='50')return .50; return 1 }
   function currentReductionCode(){const a=document.querySelector('#riduzioneChips .chip.active');return a?a.dataset.reduct:'none'}
 
-  /* === FISSI a giorni per trimestre === */
-  function calcFissiByDays(gestione, reductCode, openMode, openDateStr){
+  /* === FISSI (nuova logica richiesta) ===
+     - Se "pre2025" => 4 quote piene (dopo eventuale riduzione)
+     - Se "in2025":
+         1) individua la prima scadenza successiva alla data di apertura -> €0
+         2) calcola l'importo annuo pro-rata giorni da data apertura a 31/12
+            proRata = annuo * giorni_rimanenti / giorni_anno
+         3) ripartisci il proRata sulle scadenze rimanenti *partendo dalla fine*,
+            con tetto = quota base (annuo/4). Così febbraio tende ad essere piena.
+  */
+  function calcFissiByDates(gestione, reductCode, openMode, openDateStr){
     const mult = reductFactor(reductCode);
     const annuo = FISSI[gestione]*mult;
-    const baseQuarter = annuo/4;
+    const baseQ = annuo/4;
     const qVals=[0,0,0,0];
     if(mult===0) return {q:qVals, tot:0};
 
-    // Apertura prima del 2025: 4 quote piene
-    if(openMode!=='in2025') return {q:[baseQuarter,baseQuarter,baseQuarter,baseQuarter], tot:annuo};
+    // 4 rate piene se non è apertura nel 2025
+    if(openMode!=='in2025') return {q:[baseQ,baseQ,baseQ,baseQ], tot:annuo};
 
     if(!openDateStr) return {q:[0,0,0,0], tot:0};
-    const dOpen = new Date(openDateStr+"T12:00:00");
+    const open = new Date(openDateStr+'T12:00:00');
 
-    // Per ogni trimestre: 0 prima dell'apertura, proporzionato nel trimestre di apertura, pieno dopo
-    for(let q=1;q<=4;q++){
-      const {start,end}=quarterBounds(YEAR,q);
-      const dTot = daysDiffInclusive(start,end);
-      if(dOpen < start){ // apertura dopo questo trimestre
-        qVals[q-1]=0;
-      }else if(dOpen > end){ // apertura prima di questo trimestre
-        qVals[q-1]=baseQuarter;
-      }else{ // apertura dentro questo trimestre
-        const dAct = daysDiffInclusive(dOpen,end);
-        qVals[q-1]= baseQuarter * (dAct/dTot);
-      }
+    // Caso 1 gennaio 2025: tutte piene (tua richiesta)
+    if(open <= new Date('2025-01-01T12:00:00')) return {q:[baseQ,baseQ,baseQ,baseQ], tot:annuo};
+
+    // trova prima scadenza successiva all'apertura
+    let firstIdx = 0;
+    while(firstIdx<FIX_DATES.length && !(FIX_DATES[firstIdx].date>open)) firstIdx++;
+    if(firstIdx>=FIX_DATES.length) firstIdx=FIX_DATES.length-1; // fallback
+
+    qVals[firstIdx]=0; // prima utile = €0
+
+    // giorni rimanenti nell'anno
+    const endYear = new Date('2025-12-31T12:00:00');
+    const daysYear = 365; // 2025 non è bisestile
+    const daysRemain = Math.max(0, Math.floor((endYear-open)/(1000*60*60*24))+1);
+    let proRata = annuo * (daysRemain/daysYear);
+
+    // ripartizione dalla fine (così febbraio tende ad essere piena)
+    for(let i=3;i>firstIdx;i--){
+      const take = Math.min(baseQ, proRata);
+      qVals[i]=take;
+      proRata -= take;
     }
+    // quel che resta (se c'è) va alla scadenza subito dopo quella a 0
+    if(firstIdx+1<=3 && proRata>0) qVals[firstIdx+1]=Math.min(baseQ, proRata);
+
     const tot=qVals.reduce((a,b)=>a+b,0);
     return {q:qVals, tot};
   }
@@ -459,46 +476,32 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   refreshInfo();
   gestioneSel.addEventListener('change',refreshInfo);
 
-  // CHIP HANDLERS (ripristinati)
+  // Chips
   incChips.addEventListener('click',e=>{
     const chip=e.target.closest('.chip'); if(!chip) return;
     incChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
     chip.classList.add('active');
     incInput.value = chip.dataset.valNum;
-    incInput.focus();
-    try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
+    incInput.focus(); try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
   });
   incInput.addEventListener('input',()=>{incChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));});
-
   document.getElementById('coeffChips').addEventListener('click',e=>{
     const c=e.target.closest('.chip'); if(!c) return;
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    document.getElementById('coeffCustom').value='';
+    c.classList.add('active'); document.getElementById('coeffCustom').value='';
   });
-
   ridChips.addEventListener('click',e=>{
     const c=e.target.closest('.chip'); if(!c) return;
     ridChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
     c.classList.add('active');
   });
-
   openChips.addEventListener('click',e=>{
     const c=e.target.closest('.chip'); if(!c) return;
     openChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
     c.classList.add('active');
     const mode=c.dataset.open;
-    if(mode==='in2025'){openDate.disabled=false; setHTML('openHint','Se apri nel 2025: la prima rata utile si riduce in base al mese di apertura.');}
+    if(mode==='in2025'){openDate.disabled=false; setHTML('openHint','Se apri nel 2025: la prima rata utile è <b>€0</b>, la successiva è <b>proporzionata</b>, le ultime rimanenti sono <b>piene</b>.');}
     else{openDate.disabled=true; openDate.value=''; setHTML('openHint','Apertura prima del 2025: 4 rate minime intere.');}
-  });
-
-  document.getElementById('pillManuale').addEventListener('click',function(){
-    this.classList.add('active');document.getElementById('pillStima').classList.remove('active');
-    document.getElementById('accManual').style.display='grid';document.getElementById('accStima').style.display='none';
-  });
-  document.getElementById('pillStima').addEventListener('click',function(){
-    this.classList.add('active');document.getElementById('pillManuale').classList.remove('active');
-    document.getElementById('accManual').style.display='none';document.getElementById('accStima').style.display='block';
   });
 
   // Tabs underline
@@ -519,6 +522,9 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
   });
 
+  document.getElementById('pillManuale').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillStima').classList.remove('active');document.getElementById('accManual').style.display='grid';document.getElementById('accStima').style.display='none';});
+  document.getElementById('pillStima').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillManuale').classList.remove('active');document.getElementById('accManual').style.display='none';document.getElementById('accStima').style.display='block';});
+
   /* === Calcolo principale === */
   let lastState=null, cacheGiugno=0, cacheNov=0;
 
@@ -537,14 +543,14 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const openDateStr=document.getElementById('dataApertura').value;
 
     const err=document.getElementById('err');
-    if(openMode==='in2025' && !openDateStr){err.style.display='block';err.textContent='Seleziona la data di apertura nel 2025 per ripartire i fissi a giorni.';document.getElementById('resultsBox').style.display='none';return}
+    if(openMode==='in2025' && !openDateStr){err.style.display='block';err.textContent='Seleziona la data di apertura nel 2025 per ripartire i minimi correttamente.';document.getElementById('resultsBox').style.display='none';return}
     if(incassato<=0){err.style.display='block';err.textContent='Inserisci un incassato annuo valido (> 0).';document.getElementById('resultsBox').style.display='none';return}
     err.style.display='none';
 
     const imponibileForf=incassato*coeff;
 
     // INPS fissi + variabile
-    const fissi=calcFissiByDays(gestione, reduct, openMode, openDateStr);
+    const fissi=calcFissiByDates(gestione, reduct, openMode, openDateStr);
     const variab=calcINPS_Variabile(imponibileForf, gestione, reduct);
     const inpsTot=fissi.tot + variab.tot;
 
@@ -559,7 +565,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     }else{
       const inc24=val('incasso2024'), c24=(parseNum(document.getElementById('coeff2024').value)||78)/100, imp24=parseFloat(document.getElementById('imp2024').value)||0.05;
       const impon24=inc24*c24;
-      const inps24 = calcINPS_Variabile(impon24, gestione, reduct).tot; // stima veloce
+      const inps24 = calcINPS_Variabile(impon24, gestione, reduct).tot; // stima
       const imp24Val=Math.max(0,impon24)*imp24;
       accImpPrev=imp24Val; accInpsPrev=inps24;
     }
@@ -608,10 +614,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     }else{
       det+='<tr><th colspan="2">Contributi fissi (minimi)</th></tr>';
       det+=tr('Totale fissi (anno)',euro(fissi.tot));
-      det+=tr('16/05/2025 — Q1',euro(fissi.q[0]));
-      det+=tr('20/08/2025 — Q2',euro(fissi.q[1]));
-      det+=tr('17/11/2025 — Q3',euro(fissi.q[2]));
-      det+=tr('16/02/2026 — Q4',euro(fissi.q[3]));
+      for(let i=0;i<4;i++) det+=tr(FIX_DATES[i].label,euro(fissi.q[i]));
       det+='<tr><th colspan="2">Contributi variabili (sul reddito)</th></tr>';
       const rL=(variab.rateLow*100).toFixed(2), rH=(variab.rateHigh*100).toFixed(2);
       det+=tr('Variabile totale',euro(variab.tot));
@@ -635,7 +638,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
     /* Scadenze */
     let tf=''; let totFissi=0;
-    FIX_DATES.forEach((d,idx)=>{ tf+=tr(d.label, euro(fissi.q[idx]||0), true); totFissi+=(fissi.q[idx]||0); });
+    for(let i=0;i<4;i++){ tf+=tr(FIX_DATES[i].label, euro(fissi.q[i]||0), true); totFissi+=(fissi.q[i]||0); }
     setHTML('tblFissi',tf); setHTML('totFissi',euro(totFissi));
 
     cacheGiugno=giugnoTot; cacheNov=novTot;
@@ -655,35 +658,47 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       <div style="font-size:12px;color:#6b7280;margin-top:2px">Stampa generata il ${nowIt()}</div>`);
   }
 
+  /* === Spiegazione estesa (più lunga) === */
   function buildExplanation(){
-    if(!lastState) return;
-    const s=lastState, simple=document.getElementById('simpToggle').checked;
-    const impForf=euro(s.imponibileForf), inpsVar=euro(s.variab.tot), inpsFissi=euro(s.fissi.tot),
+    const s=lastState; if(!s) return;
+    const simple=document.getElementById('simpToggle').checked;
+    const inc=euro(s.incassato), impForf=euro(s.imponibileForf), baseImp=euro(s.imponibileFisc),
+          inpsFissi=euro(s.fissi.tot), inpsVar=euro(s.variab.tot),
           q1=euro(s.fissi.q[0]||0), q2=euro(s.fissi.q[1]||0), q3=euro(s.fissi.q[2]||0), q4=euro(s.fissi.q[3]||0),
-          imposta=euro(s.imposta), baseImp=euro(s.imponibileFisc),
-          saldoINPS=euro(s.saldoInps), saldoIMP=euro(s.saldoImp),
+          imposta=euro(s.imposta), saldoINPS=euro(s.saldoInps), saldoIMP=euro(s.saldoImp),
           giu=euro(s.giugnoTot), nov=euro(s.novTot), tot=euro(s.giugnoTot+s.novTot+s.totFissi);
+
+    const rL=(s.variab.rateLow*100).toFixed(2), rH=(s.variab.rateHigh*100).toFixed(2);
 
     let html='';
     if(!simple){
-      html+=wrapSection('Contributi fissi (minimi) – come si pagano',
-        P(`I minimi si dividono in <b>4 rate</b>: 16/05, 20/08, 17/11 e 16/02/2026.`) +
-        P(`Se apri a <b>gennaio</b> paghi tutte e quattro le rate intere.`) +
-        P(`Se apri <b>durante l’anno</b>: le rate <b>prima</b> dell’apertura sono <b>€ 0</b>, la <b>prima utile</b> si riduce in base al periodo effettivo lavorato, le <b>altre due</b> sono <b>intere</b>.`) +
-        P(`Per il tuo caso: Q1 <b>${q1}</b>, Q2 <b>${q2}</b>, Q3 <b>${q3}</b>, Q4 <b>${q4}</b> — Totale minimi <b>${inpsFissi}</b>.`),'inps');
-
-      const rL=(s.variab.rateLow*100).toFixed(2), rH=(s.variab.rateHigh*100).toFixed(2);
-      html+=wrapSection('Contributi variabili (sul reddito)',
-        P(`Imponibile forfettario <b>${impForf}</b>. Sulla parte oltre ${euro(MINIMALE)} si applica <b>${rL}%</b> fino a ${euro(SOGLIA_SUP)}, poi <b>${rH}%</b> sull’eccedenza. Totale variabile: <b>${inpsVar}</b>.`),'inps');
-
-      html+=wrapSection('Imposta sostitutiva, saldi e acconti',
-        P(`Base per imposta: <b>${baseImp}</b> → imposta <b>${imposta}</b>.`) +
-        P(`<b>Giugno</b>: saldi (imposta + variabile) + 1° acconti = <b>${giu}</b>. <b>Novembre</b>: 2° acconti = <b>${nov}</b>.`) +
-        P(`Totale anno (minimi + giugno + novembre): <b>${tot}</b>.`), 'imp');
+      html+=wrapSection('1) Imponibile forfettario',
+        P(`Hai incassato <span class="hl"><b>${inc}</b></span>. Con coefficiente di redditività <b>${s.coeffPerc}%</b>, l’imponibile forfettario diventa:`) +
+        P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>.`),'');
+      html+=wrapSection('2) Contributi fissi (minimi) – come si pagano',
+        P(`I minimi si dividono in <b>4 rate</b> con scadenze fisse: <b>16/05</b>, <b>20/08</b>, <b>17/11</b> e <b>16/02</b> (anno successivo).`) +
+        P(`Se <b>apri a gennaio</b> paghi tutte le rate <b>intere</b>. Se <b>apri durante l’anno</b>:`) +
+        P(`• La <b>prima scadenza utile</b> dopo l’apertura è <b>€ 0</b> (non ti si addebita il periodo precedente).`) +
+        P(`• La <b>scadenza successiva</b> è <b>ridotta</b> in base ai <b>giorni rimanenti dell’anno</b>.`) +
+        P(`• Le <b>ultime scadenze</b> rimaste sono <b>piene</b> se c’è capienza.`) +
+        P(`Per il tuo caso: Q1 <b>${q1}</b>, Q2 <b>${q2}</b>, Q3 <b>${q3}</b>, Q4 <b>${q4}</b> → totale minimi <b>${inpsFissi}</b>.`),'inps');
+      html+=wrapSection('3) Contributi variabili (sul reddito)',
+        P(`Sull’imponibile ${impForf}: la parte <b>oltre ${euro(MINIMALE)}</b> paga il <b>${rL}%</b> fino a ${euro(SOGLIA_SUP)}, e l’eccedenza successiva il <b>${rH}%</b>.`) +
+        P(`Totale variabile: <b>${inpsVar}</b>.`),'inps');
+      html+=wrapSection('4) Imposta sostitutiva',
+        P(`Base: <span class="mono">${impForf} − contributi deducibili = ${baseImp}</span>.`) +
+        P(`Aliquota <b>${Math.round(s.impRate*100)}%</b> → imposta calcolata <b>${imposta}</b>.`),'imp');
+      html+=wrapSection('5) Saldi e acconti',
+        P(`<b>Giugno</b> = saldi (<b>${saldoINPS}</b> INPS variabile + <b>${saldoIMP}</b> imposta) + primi acconti (<b>${euro(s.accInps1)}</b> INPS + <b>${euro(s.accImp1)}</b> imposta) = <b>${giu}</b>.`) +
+        P(`<b>Novembre</b> = secondi acconti (<b>${euro(s.accInps2)}</b> INPS + <b>${euro(s.accImp2)}</b> imposta) = <b>${nov}</b>.`) +
+        P(`I minimi seguono le loro scadenze dedicate e non rientrano in giugno/novembre.`),'');
+      html+=wrapSection('Totale anno & incidenza',
+        P(`<span class="mono">Minimi (${inpsFissi}) + Giugno (${giu}) + Novembre (${nov}) = <b>${tot}</b></span>.`) +
+        P(`Incidenza sul fatturato: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accInpsTot+s.accImpTot,s.incassato)}</b>; totale <b>${perc(s.giugnoTot+s.novTot+s.totFissi,s.incassato)}</b>.`),'');
     }else{
       html+=wrapSection('Sintesi',
-        P(`Minimi: <b>${inpsFissi}</b> — Q1 ${q1}, Q2 ${q2}, Q3 ${q3}, Q4 ${q4}.`) +
-        P(`Variabile su imponibile ${impForf}: <b>${inpsVar}</b>. Imposta su base ${baseImp}: <b>${imposta}</b>.`) +
+        P(`Imponibile: <b>${impForf}</b>. Minimi: <b>${inpsFissi}</b> (Q1 ${q1}, Q2 ${q2}, Q3 ${q3}, Q4 ${q4}).`) +
+        P(`Variabile: <b>${inpsVar}</b>. Imposta: <b>${imposta}</b>.`) +
         P(`Giugno <b>${giu}</b> • Novembre <b>${nov}</b> • Totale con minimi <b>${tot}</b>.`),'');
     }
     setHTML('explanation',html);
@@ -711,11 +726,11 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active');
     document.getElementById('imposta').value='0.05';
     document.getElementById('accImpPerc').value='100'; document.getElementById('accInpsPerc').value='100';
-    ridChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-    ridChips.querySelector('.chip[data-reduct="none"]').classList.add('active');
-    openChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-    openChips.querySelector('.chip[data-open="pre2025"]').classList.add('active');
-    openDate.disabled=true; openDate.value='';
+    document.querySelectorAll('#riduzioneChips .chip').forEach(x=>x.classList.remove('active'));
+    document.querySelector('#riduzioneChips .chip[data-reduct="none"]').classList.add('active');
+    document.querySelectorAll('#openChips .chip').forEach(x=>x.classList.remove('active'));
+    document.querySelector('#openChips .chip[data-open="pre2025"]').classList.add('active');
+    document.getElementById('dataApertura').disabled=true; document.getElementById('dataApertura').value='';
     document.getElementById('resultsBox').style.display='none';
   });
 
