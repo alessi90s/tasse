@@ -1,514 +1,783 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Simulatore Forfettario • Gestione Separata 2025</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
 :root{
-  --bg:#f7f9fc;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#e6e6eb;
-  --accent:#2563eb;--accent-2:#0ea5e9;--ok:#16a34a;--warn:#f59e0b;--bad:#ef4444;
-  --hl:#fff8c8;--shadow:0 14px 28px rgba(2,6,23,.08);--r:14px;--dots:26px;
+  --bg:#ecf2fc; --card:#fff; --text:#0f172a; --muted:#64748b; --border:#e6e6eb;
+  --accent:#7586fe; --accent-dark:#5e6ff4; --ink:#7586fe;
+  --radius:14px; --shadow:0 14px 28px rgba(2,6,23,.08);
 }
 *{box-sizing:border-box}
 html{font-size:17px}
 body{
   margin:0;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:radial-gradient(rgba(2,6,23,.08) 1px, transparent 1px) 0 0/ var(--dots) var(--dots),#f7f9fc;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:antialiased;background:var(--bg);
 }
-.wrap{max-width:940px;margin:26px auto;padding:0 14px}
-header{text-align:center;margin-bottom:10px}
-h1{margin:0;font-size:2rem;line-height:1.2;font-weight:900}
-.hl{background:var(--hl);padding:.05em .35em;border-radius:.45em;border:1px solid #f3e89a}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.wrap{max-width:860px;margin:32px auto;padding:0 14px}
+
+/* Header */
+header{text-align:center;margin-bottom:16px}
+h1{margin:0;font-size:2rem;font-weight:900;letter-spacing:-.01em;line-height:1.2}
+.hl{background:transparent;border:none;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 .pad{padding:20px}
-label{font-weight:900;display:block;margin:0 0 6px}
+
+/* Form */
+.form-vertical{display:flex;flex-direction:column;row-gap:22px}
+.field{width:100%}
+label{display:block;margin:0 0 6px;font-weight:800}
 input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
-input:disabled{background:#f3f4f6;color:#334155}
-input:focus,select:focus,.chip:focus-visible,.btn:focus-visible{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
-.form{display:flex;flex-direction:column;gap:18px}
+input:disabled{background:#f8fafc;color:#334155}
+input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visible{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
+
+/* Chips uniformi */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.chip{height:40px;padding:0 14px;border:1px solid var(--border);border-radius:999px;background:#fff;font-weight:900;cursor:pointer}
-.chip:hover{border-color:#bfd3ff}
-.chip.active{background:#111827;color:#fff;border-color:#111827}
-.inline-flag{display:flex;gap:10px;align-items:center;margin-top:8px;font-weight:800}
-#exBox{display:none;margin-top:8px}
-details.adv>summary{
-  list-style:none;cursor:pointer;font-weight:900;display:flex;align-items:center;gap:10px;
-  padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:#fff
-}
+.chip{height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:9999px;background:#fff;cursor:pointer;font-weight:900}
+.chip:hover{border-color:#bcd0ff}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.coeff-wrap{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.coeff-input{width:86px}
+
+/* Pulsanti */
+.actions{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;font-weight:900;cursor:pointer;transition:transform .05s}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);color:#fff;height:46px;padding:0 18px;max-width:380px;width:100%}
+.btn.primary:hover{background:var(--accent-dark)}
+.sub-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn.dark{background:#fe795b;color:#fff;height:38px;padding:0 12px}
+.btn.secondary{background:#fff;border:1px solid var(--border);height:38px;padding:0 12px}
+
+/* Opzioni avanzate */
+details.adv{display:block;width:100%}
+details.adv>summary{cursor:pointer;list-style:none;padding:10px 14px;border:1px solid var(--border);border-radius:12px;font-weight:900;background:#fff;display:flex;align-items:center;gap:10px}
 details.adv>summary::before{content:"";width:10px;height:10px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s}
 details.adv[open]>summary::before{transform:rotate(-135deg)}
-.adv-panel{display:none;margin-top:12px;border:1px solid var(--border);border-radius:16px;background:#fff;box-shadow:0 12px 24px rgba(2,6,23,.06)}
+details.adv[open]>summary{background:#111827;color:#fff;border-color:#111827}
+.adv-panel{display:none;margin-top:12px;width:100%;background:#fff;border:1px solid #E6E6E6;border-radius:16px;box-shadow:0 12px 24px rgba(2,6,23,.06);padding:16px}
 details.adv[open] .adv-panel{display:block}
-.adv-grid{display:grid;gap:16px;padding:16px}
-.ibox{border:1px solid var(--border);border-radius:12px;padding:14px}
-.ibox .bar{margin:-6px -6px 10px;padding:8px 10px;border-radius:8px;background:#111827;color:#fff;font-weight:900}
+.adv-grid{display:grid;row-gap:20px}
 .subgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-.desc{font-size:12px;color:var(--muted)}
-.actions{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:6px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;font-weight:900;cursor:pointer;transition:.05s}
-.btn.primary{background:var(--accent);color:#fff;height:46px;max-width:420px;width:100%}
-.btn.dark{background:#111827;color:#fff;height:38px;padding:0 12px}
-.btn.secondary{background:#fff;border:1px solid var(--border);height:38px;padding:0 12px}
-.sub-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.error{margin-top:8px;padding:10px;border-left:4px solid var(--bad);background:#fdecec;border-radius:10px;color:#7f1d1d}
-.tabbar{display:flex;gap:8px;overflow:auto hidden;padding:10px 12px}
-.tabbtn{border:1px solid var(--border);background:#fff;border-radius:999px;padding:6px 12px;height:34px;cursor:pointer;font-weight:900;white-space:nowrap}
-.tabbtn.active{background:#e8f0ff;border-color:#c7d2fe}
-.tab{display:none;padding:0 12px 16px}
-.tab.active{display:block}
-.viewctrl{display:flex;justify-content:flex-end;padding:0 12px 8px;gap:10px;align-items:center}
-.viewctrl small{font-weight:900;color:#334155}
+.ibox{background:#fff;border:1px solid #E6E6E6;border-radius:12px;padding:16px;box-shadow:0 6px 16px rgba(2,6,23,.04)}
+.ibox .bar{display:flex;align-items:center;gap:8px;margin:-4px -4px 12px;padding:8px 10px;border-radius:8px;background:#0F1D40;color:#fff;font-weight:900}
+.desc{font-size:12px;color:#6b7280;margin-top:6px}
+
+/* Toggle pill Manuale/Stima */
+.pill-toggle{display:flex;justify-content:center;gap:8px;margin:8px 0 14px}
+.pill{height:34px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
+.pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Tabs */
+.tabbar-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px}
+.tab-bar{position:relative;display:flex;gap:8px;overflow:auto hidden}
+.tab-btn{position:relative;border:1px solid var(--border);background:#fff;border-radius:9999px;padding:6px 12px;height:34px;cursor:pointer;font-weight:900;white-space:nowrap}
+.tab-btn.active{background:#e8f0ff;border-color:#c7d2fe}
+.inkbar{position:absolute;height:2px;background:var(--ink);border-radius:2px;bottom:-6px;left:0;width:0;transition:all .25s}
+.tab{display:none}.tab.active{display:block}
+
+/* Vista */
+.viewctrl{display:flex;align-items:center;gap:8px}
+#viewLabel{font-weight:800;color:#475569}
 .switch{position:relative;display:inline-block;width:44px;height:24px}
 .switch input{opacity:0;width:0;height:0}
 .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#e5e7eb;border-radius:999px;transition:.2s}
 .slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
-.switch input:checked + .slider{background:#60a5fa}
+.switch input:checked + .slider{background:#b491ff}
 .switch input:checked + .slider:before{transform:translateX(20px)}
+
+/* KPI & tabelle */
+.kpis{display:grid;gap:12px;margin-top:8px}
+@media(min-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:860px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;box-shadow:0 6px 16px rgba(2,6,23,.04);display:flex;flex-direction:column;justify-content:center;min-height:120px}
+.kpi h3{margin:0 0 6px;font-size:.78rem;color:#64748b;text-transform:uppercase;font-weight:800}
+.kpi .big{font-size:1.35rem;font-weight:900;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;margin-top:6px;font-size:.98rem;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04);page-break-inside:avoid}
+th,td{border:1px solid var(--border);padding:12px 8px}
+th{background:#f7f7fb;color:#475569;font-weight:800}
+tr:hover{background:#f8faff}
+tfoot tr th{background:#f1f5f9;font-weight:800}
+#tblScadenze td:nth-child(2),#rateBody td:nth-child(3),#rateBody td:nth-child(5),#rateBody td:nth-child(6),#scadTot{text-align:right;font-variant-numeric:tabular-nums}
+.badge-month{display:inline-block;padding:2px 8px;border-radius:9999px;background:#ffd791;border:1px solid #f1c364;font-weight:800;font-size:.85em}
+
+/* Sezioni spiegazione + Copy */
 .section{position:relative;border-left:4px solid #e5e7eb;padding:14px;margin:12px 0 8px;border-radius:10px;background:#fff;border:1px solid var(--border);box-shadow:0 6px 16px rgba(2,6,23,.04)}
-.section.inps{border-left-color:#2563eb}
+.section.inps{border-left-color:#7586fe}
 .section.imp{border-left-color:#16a34a}
-.section.ex{border-left-color:#f59e0b}
-.section h3{margin:0 0 6px;font-size:1.05rem;font-weight:900}
-.kv{margin:4px 0}
-.kv b{background:var(--hl);padding:.05em .25em;border-radius:.35em;border:1px solid #f3e89a}
-.mono{font-variant-numeric:tabular-nums}
-.copy-btn{position:absolute;right:-10px;top:-10px;padding:6px 10px;font-size:.75rem;font-weight:900;border:0;border-radius:999px;background:#111827;color:#fff;box-shadow:0 6px 14px rgba(2,6,23,.18);cursor:pointer;opacity:0;transition:opacity .15s,transform .15s;transform:translateY(2px)}
+.section h3{margin:0 0 6px;font-size:1.05rem;font-weight:800}
+.copy-btn{position:absolute;right:-10px;top:-10px;padding:6px 10px;font-size:.75rem;font-weight:900;border:0;border-radius:999px;background:#ff9696;color:#fff;box-shadow:0 6px 14px rgba(2,6,23,.18);cursor:pointer;opacity:0;transition:opacity .15s,transform .15s;transform:translateY(2px)}
 .section:hover .copy-btn{opacity:1;transform:none}
 @media (max-width:900px){.copy-btn{display:none}}
-table{width:100%;border-collapse:collapse;margin-top:10px;background:#fff;border:1px solid var(--border)}
-th,td{border:1px solid var(--border);padding:10px}
-th{background:#f7f7fb;color:#475569;font-weight:900}
-td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums}
-tfoot th{background:#f1f5f9}
-.badge{display:inline-block;padding:2px 8px;border:1px solid #c7d2fe;border-radius:9999px;background:#eef2ff;font-weight:800;font-size:.85em}
-details.rates>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:900;color:#111827;padding:10px 0}
-details.rates[open]>summary{border-bottom:1px dashed #e5e7eb}
+.explanation{max-width:820px;margin:0 auto;text-align:left}
+.explanation .line{line-height:30px;margin:0;font-weight:500}
+.muted{color:var(--muted)}
+.mono{font-variant-numeric:tabular-nums}
+.error{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
+
+/* Accordion rate */
+details.rates>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:900;color:#111827;padding:8px 0}
 details.rates>summary::before{content:"";width:8px;height:8px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s}
 details.rates[open]>summary::before{transform:rotate(-135deg)}
-/* PRINT: solo risultati */
+
+/* ARIA only */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap;border:0!important}
+
+/* Print */
 @media print{
-  header,#formCard,.tabbar .tabbtn:not(.active),.viewctrl,.copy-btn{display:none!important}
-  .wrap{max-width:1000px;padding:0;margin:0}
-  .tab{display:block!important;padding:0}
-  .card{border:none;box-shadow:none}
+  body{background:#fff}
+  header,#inputCard,.tabbar-wrap .viewctrl,.copy-btn{display:none!important}
+  .wrap{max-width:1000px;margin:0;padding:0}
+  #resultsBox{margin-top:0!important;border:none;box-shadow:none}
+  .tabbar-wrap{display:none!important}
+  .print-head{display:block !important; border-bottom:1px solid #ddd; padding:6px 0; margin-bottom:8px}
+  .print-title{display:block !important; font-size:1.15rem; font-weight:800; margin:6px 0}
+  .tab{display:block !important; page-break-inside:avoid}
+  table,tr,td,th{page-break-inside:avoid}
   @page{size:A4;margin:12mm}
 }
+.print-head,.print-title{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header><h1>Simulatore Forfettario per <u><span class="hl">Gestione Separata 2025</span></u></h1></header>
+  <!-- TITOLO -->
+  <header>
+    <h1>Simulatore Forfettario per<br><u><span class="hl">Gestione Separata 2025</span></u></h1>
+  </header>
 
   <!-- FORM -->
-  <section id="formCard" class="card pad" style="margin-bottom:16px">
-    <div class="form" style="max-width:780px;margin:0 auto">
-      <div>
-        <label>Anno di riferimento <span class="hl">2025</span></label>
-        <input value="2025" disabled/>
-      </div>
+  <section class="card" id="inputCard" style="margin-top:14px">
+    <div class="pad">
+      <div class="form-vertical" style="max-width:720px;margin:0 auto">
 
-      <div>
-        <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno (GS + Ex-Enpals)</span></label>
-        <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50.000"/>
-        <div id="chipsInc" class="chips">
-          <button class="chip" data-val="10000">10.000</button>
-          <button class="chip" data-val="20000">20.000</button>
-          <button class="chip" data-val="30000">30.000</button>
-          <button class="chip" data-val="50000">50.000</button>
-          <button class="chip" data-val="65000">65.000</button>
-          <button class="chip" data-val="85000">85.000</button>
+        <div class="field">
+          <label for="anno">Anno di riferimento <span class="hl">2025</span></label>
+          <input id="anno" type="text" value="2025" disabled aria-disabled="true"/>
         </div>
 
-        <div class="inline-flag">
-          <input type="checkbox" id="exFlag">
-          <label for="exFlag" style="margin:0">Hai fatto prestazione con <span class="hl">Ex-Enpals</span>?</label>
-        </div>
-        <div id="exBox">
-          <label for="incEx">Incassato Ex-Enpals (€) <span class="muted">(non può superare l’incassato annuo)</span></label>
-          <input id="incEx" type="text" inputmode="numeric" placeholder="es. 12.000"/>
-        </div>
-      </div>
-
-      <div>
-        <label>Coefficiente di <span class="hl">redditività</span></label>
-        <div id="chipsCoeff" class="chips">
-          <button class="chip active" data-coeff="78">78%</button>
-          <button class="chip" data-coeff="86">86%</button>
-          <button class="chip" data-coeff="67">67%</button>
-        </div>
-      </div>
-
-      <div>
-        <label for="impSel">Percentuale <span class="hl">Imposta sostitutiva</span></label>
-        <select id="impSel">
-          <option value="0.05" selected>5% (primi 5 anni)</option>
-          <option value="0.15">15% (ordinaria)</option>
-        </select>
-      </div>
-
-      <details class="adv">
-        <summary>Opzioni avanzate</summary>
-        <div class="adv-panel">
-          <div class="adv-grid">
-
-            <div class="ibox">
-              <div class="bar">Parametri INPS & acconti</div>
-              <div class="subgrid">
-                <div><label>Aliquota INPS GS (%)</label><input id="aliqInps" type="text" inputmode="decimal" value="26,07"></div>
-                <div><label>Acconti imposta (%)</label><input id="accImpPerc" type="text" inputmode="numeric" value="100"></div>
-                <div><label>Acconti INPS (%)</label><input id="accInpsPerc" type="text" inputmode="numeric" value="80"></div>
-              </div>
-              <div class="desc">Metodo storico: imposta 100% (50%+50%), INPS 80% (40%+40%).</div>
-            </div>
-
-            <div class="ibox">
-              <div class="bar">Prestazioni Ex-Enpals</div>
-              <div class="subgrid">
-                <div>
-                  <label>Aliquota Ex-Enpals</label>
-                  <select id="aliqEx">
-                    <option value="0.0919" selected>9,19%</option>
-                    <option value="0.0989">9,89%</option>
-                  </select>
-                </div>
-              </div>
-              <div class="desc">Il contributo Ex-Enpals è trattenuto alla fonte e non rientra nelle scadenze.</div>
-            </div>
-
-            <div class="ibox">
-              <div class="bar">Come impostare gli acconti dell’anno precedente</div>
-              <div class="subgrid">
-                <div><label>Acconti IMPOSTA versati (€)</label><input id="accImpPrev" type="text" inputmode="numeric" value="0"></div>
-                <div><label>Acconti INPS versati (€)</label><input id="accInpsPrev" type="text" inputmode="numeric" value="0"></div>
-              </div>
-              <div class="desc">Se i tuoi acconti superano i saldi, l’eccedenza riduce i nuovi acconti da versare.</div>
-            </div>
-
-            <div class="ibox">
-              <div class="bar">Contributi deducibili (per l’imposta)</div>
-              <div class="subgrid">
-                <div style="grid-column:1/-1">
-                  <label>Contributi previdenziali già versati nell’anno (€) — deducibili solo per l’imposta</label>
-                  <input id="deducibili" type="text" inputmode="numeric" value="0">
-                </div>
-              </div>
-            </div>
-
+        <div class="field">
+          <label for="incassato">Incassato annuo (€) <span class="hl">importo incassato dell’anno</span></label>
+          <input id="incassato" type="text" inputmode="numeric" placeholder="es. 50000" value="">
+          <div class="chips" id="incChips" aria-label="Importi rapidi">
+            <button class="chip" data-val="10.000" data-val-num="10000">10.000</button>
+            <button class="chip" data-val="20.000" data-val-num="20000">20.000</button>
+            <button class="chip" data-val="30.000" data-val-num="30000">30.000</button>
+            <button class="chip" data-val="50.000" data-val-num="50000">50.000</button>
+            <button class="chip" data-val="65.000" data-val-num="65000">65.000</button>
+            <button class="chip" data-val="85.000" data-val-num="85000">85.000</button>
           </div>
         </div>
-      </details>
 
-      <div class="actions">
-        <button id="btnCalcola" class="btn primary">Calcola</button>
-        <div class="sub-actions">
-          <button id="btnStampa" class="btn dark">Stampa PDF</button>
-          <button id="btnReset" class="btn secondary">Reset</button>
+        <div class="field">
+          <label>Coefficiente di <span class="hl">redditività</span></label>
+          <div class="coeff-wrap">
+            <div class="chips" id="coeffChips">
+              <button class="chip active" data-coeff="78">78%</button>
+              <button class="chip" data-coeff="86">86%</button>
+              <button class="chip" data-coeff="67">67%</button>
+            </div>
+            <input id="coeffCustom" class="coeff-input" maxlength="2" inputmode="numeric" pattern="[0-9]*" placeholder="%" title="2 cifre"/>
+            <span class="muted" style="font-size:.9rem">personalizzato</span>
+          </div>
         </div>
+
+        <div class="field">
+          <label for="imposta">Percentuale <span class="hl">Imposta sostitutiva</span></label>
+          <select id="imposta">
+            <option value="0.05" selected>5% (primi 5 anni)</option>
+            <option value="0.15">15% (ordinaria)</option>
+          </select>
+        </div>
+
+        <!-- Opzioni avanzate -->
+        <details class="adv" style="margin-top:4px" id="advBox">
+          <summary>⚙️ Opzioni avanzate</summary>
+          <div class="adv-panel">
+            <div class="adv-grid">
+
+              <div class="ibox">
+                <div class="bar">Parametri INPS & acconti</div>
+                <div class="subgrid">
+                  <div><label>Aliquota INPS (%)</label><input id="aliqInps" type="text" inputmode="decimal" value="26,07"></div>
+                </div>
+                <div class="desc">Acconti fissi (metodo storico): <b>Imposta 100%</b> (50%+50%), <b>INPS 80%</b> (40%+40%).</div>
+              </div>
+
+              <div class="ibox">
+                <div class="bar">Acconti versati l’anno precedente</div>
+                <div class="pill-toggle" role="tablist" aria-label="Modalità inserimento acconti">
+                  <button type="button" class="pill active" id="pillManuale" aria-pressed="true">Manuale</button>
+                  <button type="button" class="pill" id="pillStima" aria-pressed="false">Stima automatica da incasso 2024</button>
+                </div>
+
+                <div class="subgrid" id="accManual">
+                  <div><label>Acconti IMPOSTA versati (€)</label><input id="accImpPrev" type="text" inputmode="decimal" value="0"></div>
+                  <div><label>Acconti INPS versati (€)</label><input id="accInpsPrev" type="text" inputmode="decimal" value="0"></div>
+                </div>
+
+                <div id="accStima" style="display:none">
+                  <div class="subgrid">
+                    <div><label>Incassato 2024 (€)</label><input id="incasso2024" type="text" inputmode="decimal" value="0"></div>
+                    <div><label>Imposta 2024</label>
+                      <select id="imp2024"><option value="0.05" selected>5%</option><option value="0.15">15%</option></select>
+                    </div>
+                    <div><label>Coeff. 2024 (%)</label><input id="coeff2024" type="text" class="coeff-input" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="78"></div>
+                    <div><label>Aliquota INPS 2024 (%)</label><input id="inps2024" type="text" inputmode="decimal" value="26,07"></div>
+                  </div>
+                  <div class="desc">Stima veloce: nessuna deduzione; acconti ≈ imposta×100% e INPS×80%.</div>
+                </div>
+              </div>
+
+              <div class="ibox">
+                <div class="bar">Contributi deducibili (per l’imposta)</div>
+                <div class="subgrid">
+                  <div style="grid-column:1/-1">
+                    <label for="deducibili">Contributi previdenziali già versati nell’anno (€) — deducibili solo per l’imposta</label>
+                    <input id="deducibili" type="text" inputmode="decimal" value="0"/>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Calcolo inverso -->
+              <div class="ibox">
+                <div class="bar">Calcolo inverso (netto desiderato → incassato)</div>
+                <div class="subgrid" style="align-items:end">
+                  <div>
+                    <label for="nettoTarget">Netto annuo desiderato (€)</label>
+                    <input id="nettoTarget" type="text" inputmode="decimal" placeholder="es. 20000" value="">
+                  </div>
+                  <div>
+                    <button type="button" id="btnInverti" class="btn dark" style="width:100%">Calcola incassato necessario</button>
+                  </div>
+                </div>
+                <div id="invOut" class="desc" style="margin-top:8px"></div>
+                <div class="desc">Ora il lordo calcolato copre <b>saldi + acconti</b> (non solo i saldi).</div>
+              </div>
+
+            </div>
+          </div>
+        </details>
+
+        <div class="actions">
+          <button class="btn primary" id="btnCalc">Calcola</button>
+          <div class="sub-actions">
+            <button class="btn dark" id="btnPrint">Stampa PDF</button>
+            <button class="btn secondary" id="btnReset">Reset</button>
+          </div>
+        </div>
+
       </div>
 
       <div id="err" class="error" style="display:none"></div>
+      <div id="liveResult" class="sr-only" aria-live="polite"></div>
     </div>
   </section>
 
   <!-- RISULTATI -->
-  <section id="results" class="card" style="display:none">
-    <div class="tabbar">
-      <button class="tabbtn active" data-tab="t1">Come si calcolano</button>
-      <button class="tabbtn" data-tab="t2">Risultati Tasse da pagare</button>
-      <button class="tabbtn" data-tab="t3">Scadenze da pagare</button>
-    </div>
-    <div class="viewctrl">
-      <small>Vista:</small>
-      <label class="switch"><input id="vDett" type="checkbox" checked><span class="slider"></span></label>
-      <small id="viewTxt">Dettagliata</small>
-    </div>
+  <section id="resultsBox" class="card" style="margin-top:14px;display:none" aria-live="polite">
+    <div class="print-head" id="printHead"></div>
 
-    <!-- Come si calcolano -->
-    <div id="t1" class="tab active">
-      <div class="section" id="sec-intro">
-        <button class="copy-btn" data-copy="#sec-intro">Copia</button>
-        <h3>Quanto pago di tasse?</h3>
-        <p class="kv" id="p1"></p>
-        <p class="kv" id="p2"></p>
+    <div class="tabbar-wrap">
+      <div class="tab-bar" id="tabBar">
+        <button class="tab-btn active" data-tab="tab1">Come si calcolano</button>
+        <button class="tab-btn" data-tab="tab2">Risultati Tasse da pagare</button>
+        <button class="tab-btn" data-tab="tab3">Scadenze da pagare</button>
+        <span class="inkbar" id="inkbar"></span>
       </div>
-
-      <div id="exBlock" class="section ex" style="display:none">
-        <button class="copy-btn" data-copy="#exBlock">Copia</button>
-        <h3>Prestazioni Ex-Enpals</h3>
-        <p class="kv" id="ex-raw"></p>
-        <p class="kv" id="ex-contrib"></p>
-        <p class="kv" id="ex-netto"></p>
-      </div>
-
-      <div class="section inps" id="sec-inps">
-        <button class="copy-btn" data-copy="#sec-inps">Copia</button>
-        <h3>Contributi INPS – Gestione Separata</h3>
-        <p class="kv" id="inps-base"></p>
-        <p class="kv" id="inps-saldi"></p>
-      </div>
-
-      <div class="section imp" id="sec-imp">
-        <button class="copy-btn" data-copy="#sec-imp">Copia</button>
-        <h3>Imposta sostitutiva</h3>
-        <p class="kv" id="imp-base"></p>
-        <p class="kv" id="imp-saldi"></p>
-      </div>
-
-      <div class="section" id="sec-tot">
-        <button class="copy-btn" data-copy="#sec-tot">Copia</button>
-        <h3>Totale saldi da versare adesso</h3>
-        <p class="kv" id="tot-saldi"></p>
+      <div class="viewctrl">
+        <span id="viewLabel">Vista Dettagliata</span>
+        <label class="switch" title="Cambia vista">
+          <input type="checkbox" id="simpToggle"><span class="slider"></span>
+        </label>
       </div>
     </div>
 
-    <!-- Risultati -->
-    <div id="t2" class="tab">
-      <table>
-        <thead><tr><th>Voce</th><th>Importo</th></tr></thead>
-        <tbody id="tbl-righe"></tbody>
-        <tfoot>
-          <tr><th>Totale saldi (imposta + INPS)</th><th id="tbl-tot"></th></tr>
-          <tr><th>Primi acconti di giugno (50% imposta, 40% INPS)</th><th id="tbl-accGiu"></th></tr>
-          <tr><th>Secondi acconti di novembre (50% imposta, 40% INPS)</th><th id="tbl-accNov"></th></tr>
-          <tr><th>Totale anno (saldi + acconti)</th><th id="tbl-anno"></th></tr>
-        </tfoot>
-      </table>
+    <div id="tab1" class="tab active">
+      <h2 class="print-title">Come si calcolano</h2>
+      <div class="pad"><div id="explanation" class="explanation"></div></div>
     </div>
 
-    <!-- Scadenze -->
-    <div id="t3" class="tab">
-      <table id="tblScadenze">
-        <thead><tr><th>Scadenza</th><th>Importo</th></tr></thead>
-        <tbody id="scadBody"></tbody>
-        <tfoot><tr><th>Totale anno</th><th id="scadTot"></th></tr></tfoot>
-      </table>
+    <div id="tab2" class="tab">
+      <h2 class="print-title">Risultati Tasse da pagare</h2>
+      <div class="pad">
+        <div class="kpis">
+          <div class="kpi"><h3>Reddito imponibile</h3><div class="big" id="outImponibile">€ 0</div><div class="muted" style="font-size:.85rem">Incassato × coefficiente</div></div>
+          <div class="kpi"><h3>Contributi INPS</h3><div class="big" id="outInps">€ 0</div><div class="muted" style="font-size:.85rem">Aliquota su imponibile</div></div>
+          <div class="kpi"><h3>Imposta sostitutiva</h3><div class="big" id="outImposta">€ 0</div><div class="muted" style="font-size:.85rem">Su (imponibile − deducibili)</div></div>
+        </div>
+        <div class="kpis" style="margin-top:6px">
+          <div class="kpi"><h3>Saldo da versare ora</h3><div class="big" id="outSaldo">€ 0</div></div>
+          <div class="kpi"><h3>Acconti netti</h3><div class="big" id="outAcconti">€ 0</div></div>
+          <div class="kpi"><h3>Totale anno</h3><div class="big" id="outTotale">€ 0</div></div>
+        </div>
+        <div class="hr" style="height:1px;background:var(--border);margin:14px 0"></div>
+        <div id="warnings" style="text-align:center"></div>
+        <h3 style="margin:6px 0">Dettaglio</h3>
+        <table><tbody id="tblDettaglio"></tbody><tfoot><tr><th style="text-align:right" colspan="1">Totale</th><th id="detTot" style="text-align:center"></th></tr></tfoot></table>
+      </div>
+    </div>
 
-      <details class="rates" open>
-        <summary>Mostra dettaglio rate di giugno in 5 rate (con interessi) + riga di novembre</summary>
-        <table>
-          <thead>
-            <tr><th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata da pagare</th></tr>
-          </thead>
-          <tbody id="rateBody"></tbody>
-          <tfoot>
-            <tr><th colspan="4">Totale interessi giugno</th><th id="rateInt"></th><th id="rateTot"></th></tr>
-          </tfoot>
-        </table>
-      </details>
-      <div class="desc" style="margin-top:8px">Il contributo <b>Ex-Enpals</b> non appare qui perché già trattenuto alla fonte.</div>
+    <div id="tab3" class="tab">
+      <h2 class="print-title">Scadenze da pagare</h2>
+      <div class="pad">
+        <h3 style="margin:0 0 6px">Scadenze sintetiche</h3>
+        <table><tbody id="tblScadenze"></tbody><tfoot><tr><th style="text-align:right" colspan="1">Totale anno</th><th id="scadTot" style="text-align:right"></th></tr></tfoot></table>
+
+        <details class="rates" id="ratesAcc" style="margin-top:12px" open>
+          <summary>Mostra dettaglio rate di giugno (5 rate con interessi) + riga di novembre</summary>
+          <div id="rateBlock" style="margin-top:8px">
+            <table>
+              <thead><tr><th>#</th><th>Scadenza</th><th>Quota capitale</th><th>Interessi %</th><th>Interessi €</th><th>Rata</th></tr></thead>
+              <tbody id="rateBody"></tbody>
+              <tfoot>
+                <tr><th colspan="4" style="text-align:right">Totale interessi giugno</th><th id="rateIntTot">€ 0</th><th id="rateTot">€ 0</th></tr>
+                <tr><th colspan="5" style="text-align:right">Totale complessivo (giugno + novembre)</th><th id="rateTotAll">€ 0</th></tr>
+              </tfoot>
+            </table>
+          </div>
+        </details>
+      </div>
     </div>
   </section>
 </div>
 
 <script>
-/* ==== util ==== */
-const $ = s => document.querySelector(s);
-const el = id => document.getElementById(id);
-const fmt = n => (isFinite(n)? n.toLocaleString('it-IT') : '0');
-const euro = n => fmt(Math.round(n));
-const parseEuro = s => {
-  if (typeof s!=='string') s = String(s??'');
-  s = s.replace(/\./g,'').replace(',', '.').trim();
-  const v = parseFloat(s);
-  return isNaN(v)?0:v;
-};
-const parsePercTxt = s => parseEuro(s)/100;
+(function(){
+  /* --- Utils --- */
+  function euro(n){
+    const r = Math.round(n || 0);
+    try{
+      return new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:0,maximumFractionDigits:0}).format(r);
+    }catch(e){
+      return '€ ' + r.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    }
+  }
+  function parseNum(s){
+    if(s==null) return 0;
+    let t = String(s).trim().replace(/\s+/g,'');
+    t = t.replace(/\./g,'').replace(',', '.');
+    const n = parseFloat(t);
+    return isNaN(n) ? 0 : n;
+  }
+  function val(id){return parseNum(document.getElementById(id).value)}
+  function setHTML(id,html){const el=document.getElementById(id);if(el)el.innerHTML=html}
+  function tr(a,b,right=false){return '<tr><td>'+a+'</td><td style="text-align:'+(right?'right':'center')+';font-variant-numeric:tabular-nums">'+b+'</td></tr>'}
+  function perc(n,b){return b>0?(Math.round((n/b*100))+'%'):'0%'}
+  function nowIt(){return new Intl.DateTimeFormat('it-IT',{dateStyle:'medium',timeStyle:'short'}).format(new Date())}
 
-/* Base INPS corretta: prima tolgo l'Ex-Enpals dal totale, poi applico il coefficiente */
-function baseInpsCorretta(incTot, incEx, coeff){
-  const baseLordo = Math.max(0, incTot - incEx);
-  return baseLordo * (coeff/100);
-}
+  /* --- Stato --- */
+  let coeffFromChips=78,lastState=null,cacheGiugno=0,cacheNov=0;
 
-/* ==== elementi ==== */
-const incI=el('incassato'), chipsInc=el('chipsInc');
-const exFlag=el('exFlag'), exBox=el('exBox'), incExI=el('incEx');
-const chipsCoeff=el('chipsCoeff'); let coeff=78;
-const impSel=el('impSel'), aliqInpsI=el('aliqInps'), aliqExSel=el('aliqEx');
-const accImpPrevI=el('accImpPrev'), accInpsPrevI=el('accInpsPrev');
-const accImpPercI=el('accImpPerc'), accInpsPercI=el('accInpsPerc');
-const dedI=el('deducibili');
-const err=el('err');
-const res=el('results');
-
-/* ==== ui events ==== */
-chipsInc.addEventListener('click',e=>{
-  const b=e.target.closest('.chip'); if(!b) return;
-  incI.value=fmt(Number(b.dataset.val||0));
-});
-exFlag.addEventListener('change',()=>{exBox.style.display=exFlag.checked?'block':'none';});
-chipsCoeff.addEventListener('click',e=>{
-  const b=e.target.closest('.chip'); if(!b) return;
-  chipsCoeff.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active'); coeff=Number(b.dataset.coeff||78);
-});
-document.querySelectorAll('.tabbtn').forEach(b=>{
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('.tabbtn').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
+  /* --- Tab underline --- */
+  const inkbar=document.getElementById('inkbar');
+  function moveInkbar(btn){if(!btn)return;inkbar.style.width=btn.offsetWidth+'px';inkbar.style.left=btn.offsetLeft+'px';}
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('.tab-btn'); if(!b) return;
+    document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.getElementById(b.dataset.tab).classList.add('active');
+    b.classList.add('active'); document.getElementById(b.dataset.tab).classList.add('active'); moveInkbar(b);
   });
-});
-el('vDett').addEventListener('change',()=>{el('viewTxt').textContent=el('vDett').checked?'Dettagliata':'Semplificata';renderTexts();});
-document.addEventListener('click',e=>{
-  const btn=e.target.closest('.copy-btn'); if(!btn) return;
-  const sel=btn.getAttribute('data-copy'); const n=document.querySelector(sel);
-  if(!n) return;
-  const txt=n.innerText.replace(/\n{2,}/g,'\n');
-  navigator.clipboard.writeText(txt);
-  btn.textContent='Copiato!'; setTimeout(()=>btn.textContent='Copia',900);
-});
-el('btnReset').addEventListener('click',()=>{
-  incI.value=''; incExI.value=''; exFlag.checked=false; exBox.style.display='none';
-  coeff=78; chipsCoeff.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-  chipsCoeff.querySelector('[data-coeff="78"]').classList.add('active');
-  impSel.value='0.05'; aliqInpsI.value='26,07'; aliqExSel.value='0.0919';
-  accImpPrevI.value='0'; accInpsPrevI.value='0'; accImpPercI.value='100'; accInpsPercI.value='80';
-  dedI.value='0'; err.style.display='none'; res.style.display='none';
-});
-el('btnStampa').addEventListener('click',()=>window.print());
+  window.addEventListener('resize',()=>moveInkbar(document.querySelector('.tab-btn.active')));
 
-/* format on blur */
-[incI,incExI,accImpPrevI,accInpsPrevI,dedI,aliqInpsI].forEach(inp=>{
-  inp.addEventListener('blur',()=>{
-    if(inp===aliqInpsI){ let v=inp.value.trim().replace('.',','); if(!v)v='26,07'; inp.value=v; return; }
-    const v=parseEuro(inp.value); inp.value=v?fmt(v):'';
+  /* --- Input Incassato --- */
+  const incInput=document.getElementById('incassato');
+  const incChips=document.getElementById('incChips');
+
+  incInput.addEventListener('input', () => {
+    incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   });
-});
 
-/* ==== core calc ==== */
-let state=null;
-el('btnCalcola').addEventListener('click',()=>{
-  err.style.display='none'; err.textContent='';
-  const incTot = parseEuro(incI.value);
-  const incEx  = exFlag.checked ? parseEuro(incExI.value) : 0;
-  if(exFlag.checked && incEx>incTot){ err.style.display='block'; err.textContent='Errore: l’incassato Ex-Enpals non può superare l’incassato annuo.'; return; }
+  // Chip: scrivono il numero puro
+  incChips.addEventListener('click', (e) => {
+    const chip=e.target.closest('.chip'); if(!chip) return;
+    incChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    const raw = chip.dataset.valNum || chip.dataset.val || chip.textContent;
+    const clean = String(raw).replace(/\./g,'').replace(/\s/g,'');
+    incInput.value = clean;
+    incInput.focus();
+    try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
+  });
 
-  const aliqInps = parsePercTxt(aliqInpsI.value||'26,07');
-  const aliqImp  = parseFloat(impSel.value||'0.05');
-  const aliqEx   = parseFloat(aliqExSel.value||'0.0919');
-  const accImpPrev = parseEuro(accImpPrevI.value||'0');
-  const accInpsPrev= parseEuro(accInpsPrevI.value||'0');
-  const accImpPerc = Math.max(0,Math.min(100,parseEuro(accImpPercI.value||'100')))/100;
-  const accInpsPerc= Math.max(0,Math.min(100,parseEuro(accInpsPercI.value||'80')))/100;
-  const ded = parseEuro(dedI.value||'0');
+  /* --- Coefficiente --- */
+  document.getElementById('coeffChips').addEventListener('click',e=>{
+    const c=e.target.closest('.chip'); if(!c) return;
+    document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active'); coeffFromChips=parseInt(c.dataset.coeff,10)||78;
+    document.getElementById('coeffCustom').value='';
+  });
+  document.getElementById('coeffCustom').addEventListener('input',function(){
+    this.value=this.value.replace(/\D/g,'').slice(0,2);
+    document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
+  });
 
-  const imponibile = incTot*(coeff/100);               // imponibile per IMPOSTA
-  const exContrib = incEx*aliqEx;                      // informativo
-  const baseInps  = baseInpsCorretta(incTot,incEx,coeff);   // <<< LOGICA CORRETTA
-  const inpsDov   = baseInps*aliqInps;
-  const impBase   = Math.max(0,imponibile-ded);
-  const impDov    = impBase*aliqImp;
+  /* --- Opzioni avanzate: pill toggle --- */
+  function refreshAccMode(){
+    const man=document.getElementById('pillManuale'), sti=document.getElementById('pillStima');
+    const manual=man.classList.contains('active');
+    document.getElementById('accManual').style.display=manual?'grid':'none';
+    document.getElementById('accStima').style.display=manual?'none':'block';
+    man.setAttribute('aria-pressed',manual?'true':'false');
+    sti.setAttribute('aria-pressed',manual?'false':'true');
+  }
+  document.getElementById('pillManuale').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillStima').classList.remove('active');refreshAccMode();});
+  document.getElementById('pillStima').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillManuale').classList.remove('active');refreshAccMode();});
 
-  // saldi netti
-  let saldoImp = Math.max(0, impDov - accImpPrev);
-  let saldoInps= Math.max(0, inpsDov - accInpsPrev);
-  const credImp = Math.max(0, accImpPrev - impDov);
-  const credInps= Math.max(0, accInpsPrev - inpsDov);
+  /* --- Vista dettagliata/semplificata --- */
+  const simp=document.getElementById('simpToggle'), viewLabel=document.getElementById('viewLabel');
+  simp.addEventListener('change',()=>{viewLabel.textContent = simp.checked ? 'Vista Semplificata' : 'Vista Dettagliata'; if(document.getElementById('resultsBox').style.display!=='none') buildExplanation();});
 
-  // nuovi acconti (storico) + riduzione per crediti
-  let accImpTot = impDov*accImpPerc;
-  let accInpsTot= inpsDov*accInpsPerc;
-  accImpTot = Math.max(0, accImpTot - credImp);
-  accInpsTot= Math.max(0, accInpsTot - credInps);
+  /* --- Copy singolo blocco --- */
+  document.addEventListener('click',async e=>{
+    const btn=e.target.closest('.copy-btn'); if(!btn) return;
+    const box=btn.closest('.section'); const payload=(box.querySelector('.copy-content')||box).innerText.trim();
+    try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
+  });
 
-  // split
-  const accImpG = accImpTot/2,  accImpN = accImpTot/2;
-  const accInpsG= accInpsTot*0.40, accInpsN= accInpsTot*0.40;
+  /* --- Calcolo --- */
+  function compute(){
+    const incassato=val('incassato');
+    let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
+    if(!coeffPerc||coeffPerc<=0) coeffPerc=78;
+    const coeff=coeffPerc/100;
 
-  const giugno = saldoImp+saldoInps+accImpG+accInpsG;
-  const novembre = accImpN+accInpsN;
-  const totAnno = giugno+novembre;
+    const impRate=parseFloat(document.getElementById('imposta').value)||0.05;
+    const aliqInps=parseNum(document.getElementById('aliqInps').value)/100||0.2607;
+    const deducibili=val('deducibili');
 
-  state = {incTot,incEx,coeff,aliqImp,aliqInps,aliqEx,imponibile,exContrib,baseInps,inpsDov,impBase,impDov,
-           saldoImp,saldoInps,accImpTot,accInpsTot,accImpG,accImpN,accInpsG,accInpsN,giugno,novembre,totAnno, ded,
-           accImpPrev,accInpsPrev,credImp,credInps};
+    // Acconti fissi: 100% imposta, 80% INPS
+    const ACC_IMP_PERC = 1.00;
+    const ACC_INPS_PERC = 0.80;
 
-  renderTexts();
-  renderTables();
-  renderScadenze();
-  res.style.display='block';
-});
+    let accImpPrev=0, accInpsPrev=0;
+    const manual=document.getElementById('pillManuale').classList.contains('active');
+    if(manual){
+      accImpPrev=val('accImpPrev'); accInpsPrev=val('accInpsPrev');
+    }else{
+      const inc24=val('incasso2024');
+      const coeff24=(parseNum(document.getElementById('coeff2024').value)||78)/100;
+      const imp24rate=parseFloat(document.getElementById('imp2024').value)||0.05;
+      const inps24rate=parseNum(document.getElementById('inps2024').value)/100||0.2607;
+      const impon24=inc24*coeff24;
+      const inps24=impon24*inps24rate;
+      const imp24=impon24*imp24rate;
+      accImpPrev=imp24*ACC_IMP_PERC; accInpsPrev=inps24*ACC_INPS_PERC;
+    }
 
-/* ==== render ==== */
-function renderTexts(){
-  if(!state) return;
-  const s=state, det=el('vDett').checked;
+    const err=document.getElementById('err');
+    if(incassato<=0){err.style.display='block';err.textContent='Inserisci un incassato annuo valido (> 0) o usa il calcolo inverso nelle Opzioni avanzate.';document.getElementById('resultsBox').style.display='none';return}
+    err.style.display='none';
 
-  const r1 = `Nel forfettario non tassi tutto l’incassato ma l’<b>imponibile</b> (= Incassato × Coefficiente).`;
-  const r2 = `Con i tuoi dati: <b>${fmt(s.incTot)} € × ${s.coeff}% = ${fmt(s.imponibile)} €</b>.`;
-  el('p1').innerHTML = det ? r1+' '+r2 : `Imponibile stimato: <b>${fmt(s.imponibile)} €</b> (da ${fmt(s.incTot)} € × ${s.coeff}%).`;
-  el('p2').innerHTML = det
-    ? `Paghi <b>INPS GS</b> al ${(s.aliqInps*100).toFixed(2)}% e <b>Imposta sostitutiva</b> al ${(s.aliqImp*100).toFixed(0)}%.`
-    : `Aliquote: INPS ${(s.aliqInps*100).toFixed(2)}% • Imposta ${(s.aliqImp*100).toFixed(0)}%.`;
+    const imponibileForf=incassato*coeff;
+    const inps=imponibileForf*aliqInps;
 
-  if(s.incEx>0){
-    el('exBlock').style.display='block';
-    el('ex-raw').innerHTML = `Incasso Ex-Enpals: <b>${fmt(s.incEx)} €</b> (aliquota ${(s.aliqEx*100).toFixed(2)}%).`;
-    el('ex-contrib').innerHTML = `Contributo trattenuto alla fonte: <b>${fmt(s.exContrib)} €</b>.`;
-    el('ex-netto').innerHTML = `Netto effettivamente incassato su queste prestazioni: <b>${fmt(s.incEx - s.exContrib)} €</b>.`;
-  }else{
-    el('exBlock').style.display='none';
+    const imponibileFisc=Math.max(0,imponibileForf-Math.max(0,deducibili));
+    const imposta=imponibileFisc*impRate;
+
+    let saldoImposta=Math.max(0,imposta-Math.max(0,accImpPrev));
+    let saldoInps=Math.max(0,inps-Math.max(0,accInpsPrev));
+    const saldoTotale=saldoImposta+saldoInps;
+
+    const creditoImp=Math.max(0,accImpPrev-imposta);
+    const creditoInps=Math.max(0,accInpsPrev-inps);
+
+    const accImpBase=imposta*ACC_IMP_PERC;
+    const accInpsBase=inps*ACC_INPS_PERC;
+
+    const accImpTot=Math.max(0,accImpBase-creditoImp);
+    const accInpsTot=Math.max(0,accInpsBase-creditoInps);
+
+    const creditoImpResid=Math.max(0,creditoImp-accImpBase);
+    const creditoInpsResid=Math.max(0,creditoInps-accInpsBase);
+
+    const accImp1=accImpTot*0.50, accImp2=accImpTot*0.50;
+    const accInps1=accInpsTot*0.50, accInps2=accInpsTot*0.50;
+
+    const accontiTot=accImpTot+accInpsTot;
+    const giugnoTot=saldoTotale+accImp1+accInps1;
+    const novTot=accImp2+accInps2;
+    const totale=saldoTotale+accontiTot;
+
+    /* KPI */
+    setHTML('outImponibile',euro(imponibileForf));
+    setHTML('outInps',euro(inps));
+    setHTML('outImposta',euro(imposta));
+    setHTML('outSaldo',euro(saldoTotale));
+    setHTML('outAcconti',euro(accontiTot));
+    setHTML('outTotale',euro(totale));
+    setHTML('liveResult',`Aggiornato. Saldo ${euro(saldoTotale)}, acconti ${euro(accontiTot)}, totale ${euro(totale)}.`);
+
+    /* Note */
+    let w=''; if(incassato>100000) w='<div class="muted"><b>Attenzione:</b> oltre 100.000€ → uscita <b>immediata</b> dal forfettario.</div>';
+    else if(incassato>85000) w='<div class="muted"><b>Nota:</b> oltre 85.000€ → uscita dal forfettario <b>dall’anno successivo</b>.</div>';
+    setHTML('warnings',w);
+
+    /* Dettaglio (tab 2) */
+    let det='';
+    det+=tr('<b>Incassato</b>',euro(incassato));
+    det+=tr('Coefficiente',Math.round(coeff*100)+'%');
+    det+=tr('<b>Imponibile</b>',euro(imponibileForf));
+    det+=tr('Deducibili per imposta','− '+euro(deducibili));
+    det+=tr('Base per imposta',euro(imponibileFisc));
+    det+=tr('Aliquota imposta',Math.round(impRate*100)+'%');
+    det+=tr('<b>Imposta calcolata</b>',euro(imposta));
+    det+=tr('Acconti imposta anno precedente','− '+euro(accImpPrev));
+    det+=tr('<b>Saldo imposta</b>','<b>'+euro(saldoImposta)+'</b>');
+    if(creditoImp>0) det+=tr('Credito imposta utilizzato','− '+euro(Math.min(creditoImp, accImpBase)));
+    if(creditoImpResid>0) det+=tr('Credito imposta residuo',euro(creditoImpResid));
+    det+=tr('Contributi INPS ('+(aliqInps*100).toFixed(2)+'%)',euro(inps));
+    det+=tr('Acconti INPS anno precedente','− '+euro(accInpsPrev));
+    det+=tr('<b>Saldo INPS</b>','<b>'+euro(saldoInps)+'</b>');
+    if(creditoInps>0) det+=tr('Credito INPS utilizzato','− '+euro(Math.min(creditoInps, accInpsBase)));
+    if(creditoInpsResid>0) det+=tr('Credito INPS residuo',euro(creditoInpsResid));
+    det+=tr('<b>Saldo totale</b>','<b>'+euro(saldoTotale)+'</b>');
+    det+='<tr><th colspan="2">Acconti per l’anno prossimo (netti dei crediti)</th></tr>';
+    det+=tr('Imposta – totale acconti',euro(accImpTot));
+    det+=tr('INPS – totale acconti',euro(accInpsTot));
+    det+=tr('Imposta – 1° acconto (50%)',euro(accImp1));
+    det+=tr('Imposta – 2° acconto (50%)',euro(accImp2));
+    det+=tr('INPS – 1° acconto (40%)',euro(accInps1));
+    det+=tr('INPS – 2° acconto (40%)',euro(accInps2));
+    setHTML('tblDettaglio',det); setHTML('detTot','');
+
+    /* Scadenze (tab 3) */
+    cacheGiugno=giugnoTot; cacheNov=novTot;
+    let sc=''; sc+=tr('<span class="badge-month">Giugno</span> — Saldo (imp.+INPS) + 1° acconti',euro(giugnoTot),true);
+    sc+=tr('<span class="badge-month">Novembre</span> — 2° acconti',euro(novTot),true);
+    setHTML('tblScadenze',sc); setHTML('scadTot',euro(giugnoTot+novTot));
+
+    document.getElementById('ratesAcc').open=true; // mostra subito il dettaglio rate
+    buildRate();
+
+    lastState={
+      incassato,coeffPerc,coeff,impRate,aliqInps,imponibileForf,inps,deducibili,imponibileFisc,imposta,
+      accImpPrev,accInpsPrev,saldoImposta,saldoInps,saldoTotale,accImpTot,accInpsTot,accImp1,accImp2,accInps1,accInps2,
+      giugnoTot,novTot,totale,creditoImp,creditoInps,creditoImpResid,creditoInpsResid
+    };
+    buildExplanation();
+
+    document.getElementById('resultsBox').style.display='';
+    moveInkbar(document.querySelector('.tab-btn.active'));
+
+    setHTML('printHead', `<div><strong>Simulatore Forfettario – Gestione Separata 2025</strong></div>
+      <div style="font-size:12px;color:#6b7280;margin-top:2px">Stampa generata il ${nowIt()}</div>`);
   }
 
-  el('inps-base').innerHTML =
-    `Base INPS = max(0, (${fmt(s.incTot)} € − ${fmt(s.incEx)} €) × ${s.coeff}%) → <b>${fmt(s.baseInps)} €</b>.`;
-  el('inps-saldi').innerHTML = `Contributi dovuti: <b>${fmt(s.inpsDov)} €</b> − acconti versati <b>${fmt(s.accInpsPrev)} €</b> → <b>saldo INPS ${fmt(s.saldoInps)} €</b>.`;
+  function P(t){return `<p class="line">${t}</p>`}
+  function wrapSection(title,inner,cls){return `<div class="section ${cls||''}">
+    <button type="button" class="copy-btn" title="Copia" aria-label="Copia">Copia</button>
+    <div class="copy-content">${title?`<h3>${title}</h3>`:''}${inner}</div></div>`}
 
-  el('imp-base').innerHTML = `Base imposta = max(0, ${fmt(s.imponibile)} € − deducibili <b>${fmt(s.ded)} €</b>) → <b>${fmt(s.impBase)} €</b>.`;
-  el('imp-saldi').innerHTML = `Imposta dovuta: <b>${fmt(s.impDov)} €</b> − acconti versati <b>${fmt(s.accImpPrev)} €</b> → <b>saldo imposta ${fmt(s.saldoImp)} €</b>.`;
-  el('tot-saldi').innerHTML = `Totale saldi ora: <b>${fmt(s.saldoInps)} €</b> (INPS) + <b>${fmt(s.saldoImp)} €</b> (imposta) = <b>${fmt(s.saldoInps+s.saldoImp)} €</b>.`;
-}
+  function buildExplanation(){
+    if(!lastState) return;
+    const s=lastState, simple=document.getElementById('simpToggle').checked;
+    document.getElementById('viewLabel').textContent = simple ? 'Vista Semplificata' : 'Vista Dettagliata';
 
-function renderTables(){
-  const s=state, tb=el('tbl-righe'); tb.innerHTML='';
-  const add=(k,v)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${k}</td><td class="mono">${euro(v)} €</td>`;tb.appendChild(tr);};
-  add('Saldo INPS (dopo acconti versati)', s.saldoInps);
-  add('Saldo imposta (dopo acconti versati)', s.saldoImp);
-  el('tbl-tot').textContent = euro(s.saldoInps+s.saldoImp)+' €';
-  el('tbl-accGiu').textContent = euro(s.accInpsG + s.accImpG)+' €';
-  el('tbl-accNov').textContent = euro(s.accInpsN + s.accImpN)+' €';
-  el('tbl-anno').textContent = euro(s.totAnno)+' €';
-}
+    const inc=euro(s.incassato), impForf=euro(s.imponibileForf), inps=euro(s.inps), imposta=euro(s.imposta),
+          baseImp=euro(s.imponibileFisc), saldoINPS=euro(s.saldoInps), saldoIMP=euro(s.saldoImposta),
+          saldoTot=euro(s.saldoTotale), giu=euro(s.giugnoTot), nov=euro(s.novTot), tot=euro(s.totale),
+          accINPStot=euro(s.accInpsTot), accIMPtot=euro(s.accImpTot),
+          accINPS1=euro(s.accInps1), accIMP1=euro(s.accImp1);
 
-function renderScadenze(){
-  const s=state, tbody=el('scadBody'); tbody.innerHTML='';
-  const r1=document.createElement('tr'); r1.innerHTML=`<td><span class="badge">Giugno</span> — Saldi (imp.+INPS) + 1° acconti</td><td class="mono">${euro(s.giugno)} €</td>`;
-  const r2=document.createElement('tr'); r2.innerHTML=`<td><span class="badge">Novembre</span> — 2° acconti</td><td class="mono">${euro(s.novembre)} €</td>`;
-  const r3=document.createElement('tr'); r3.innerHTML=`<td style="font-weight:900">Totale anno</td><td class="mono" style="font-weight:900">${euro(s.totAnno)} €</td>`;
-  tbody.appendChild(r1);tbody.appendChild(r2);
-  el('scadTot').textContent=euro(s.totAnno)+' €';
+    const credImp=s.creditoImp, credInps=s.creditoInps, credImpRes=s.creditoImpResid, credInpsRes=s.creditoInpsResid;
 
-  // rate giugno in 5
-  const base = s.giugno;
-  const quota = base/5;
-  const perc = [0,0.18,0.51,0.84,1.17];
-  const date = ['30 giugno','16 luglio','20 agosto','16 settembre','16 ottobre'];
-  const rb = el('rateBody'); rb.innerHTML='';
-  let totInt=0, totR=0;
-  for(let i=0;i<5;i++){
-    const int = quota*perc[i]/100;
-    totInt+=int; const rata=quota+int; totR+=rata;
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${i+1}</td><td>${date[i]}</td><td class="mono">${euro(quota)} €</td><td>${perc[i].toFixed(2)}%</td><td class="mono">${euro(int)} €</td><td class="mono"><b>${euro(rata)} €</b></td>`;
-    rb.appendChild(tr);
+    let html='';
+    if(!simple){
+      html+=wrapSection('Imponibile',
+        P(`Hai incassato <u><b>${inc}</b></u>. Con coefficiente <u><b>${s.coeffPerc}%</b></u> il reddito imponibile diventa:`) +
+        P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>`),'');
+
+      let inpsTxt=P(`INPS al <b>${(s.aliqInps*100).toFixed(2)}%</b> sull’imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
+      if(s.accInpsPrev>0){
+        if(credInps>0){
+          inpsTxt+=P(`Acconti INPS già versati: <b>${euro(s.accInpsPrev)}</b> > dovuto → <b>saldo 0 €</b> e <b>credito ${euro(credInps)}</b> che riduce i nuovi acconti (eventuale residuo: ${euro(credInpsRes)}).`);
+        }else{
+          inpsTxt+=P(`Acconti INPS versati: <b>${euro(s.accInpsPrev)}</b>. Saldo ora: <span class="mono">${inps} − ${euro(s.accInpsPrev)} = ${saldoINPS}</span>.`);
+        }
+      }
+      inpsTxt+=P(`👉 <b>Saldo INPS</b> da versare ora: <b>${saldoINPS}</b>.`);
+      html+=wrapSection('Contributi INPS', inpsTxt,'inps');
+
+      let impTxt=(s.deducibili>0)
+        ? P(`Prima togliamo i <b>contributi deducibili</b> (${euro(s.deducibili)}): <span class="mono">${impForf} − ${euro(s.deducibili)} = ${baseImp}</span>.`)
+        : P(`Base imposta: <b>${baseImp}</b> (nessuna deduzione).`);
+      impTxt+=P(`Aliquota <b>${Math.round(s.impRate*100)}%</b>: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
+      if(s.accImpPrev>0){
+        if(credImp>0){
+          impTxt+=P(`Acconti imposta già versati: <b>${euro(s.accImpPrev)}</b> > dovuto → <b>saldo 0 €</b> e <b>credito ${euro(credImp)}</b> (riduce i nuovi acconti, residuo: ${euro(credImpRes)}).`);
+        }else{
+          impTxt+=P(`Acconti imposta versati: <b>${euro(s.accImpPrev)}</b>. Saldo ora: <span class="mono">${imposta} − ${euro(s.accImpPrev)} = ${saldoIMP}</span>.`);
+        }
+      }
+      impTxt+=P(`👉 <b>Saldo imposta</b> da versare ora: <b>${saldoIMP}</b>.`);
+      html+=wrapSection('Imposta sostitutiva', impTxt,'imp');
+
+      html+=wrapSection('Totale saldi ora',
+        P(`<span class="mono"><b>${saldoINPS}</b> (INPS) + <b>${saldoIMP}</b> (imposta) = <b>${saldoTot}</b></span>.`),'');
+
+      let accTxt=P(`Calcolati sul dovuto di quest’anno e <b>già ridotti dei crediti</b> (se presenti).`) +
+                  P(`<b>Imposta</b>: ${accIMPtot} (50% giugno, 50% novembre).`) +
+                  P(`<b>INPS</b>: ${accINPStot} (40% giugno, 40% novembre).`);
+      if(credImp>0||credInps>0){
+        accTxt+=P(`I crediti hanno ridotto gli acconti. ${credImp>0?`Imposta −${euro(Math.min(credImp, s.imposta))}. `:''}${credInps>0?`INPS −${euro(Math.min(credInps, s.inps))}.`:''}`);
+        if(credImpRes>0||credInpsRes>0) accTxt+=P(`Residui da riportare: imposta ${euro(credImpRes)}, INPS ${euro(credInpsRes)}.`);
+      }
+      html+=wrapSection('Acconti per l’anno successivo', accTxt,'');
+
+      html+=wrapSection('Scadenze',
+        P(`<b>Giugno</b> = saldi (<b>${saldoINPS}</b> + <b>${saldoIMP}</b>) + primi acconti (<b>${accIMP1}</b> imposta + <b>${euro(s.accInps1)}</b> INPS) = <b>${giu}</b>.`) +
+        P(`<b>Novembre</b> = secondi acconti = <b>${nov}</b>.`),'');
+
+      html+=wrapSection('Totale anno e incidenza',
+        P(`<span class="mono">${giu} + ${nov} = ${tot}</span>. Incidenza: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; totale <b>${perc(s.totale,s.incassato)}</b>.`),'');
+
+    }else{
+      html+=wrapSection('Imponibile',
+        P(`Incassato <b>${inc}</b> → con coefficiente <b>${s.coeffPerc}%</b> l’imponibile è <b>${impForf}</b>.`),'');
+
+      let inpsS=P(`INPS su imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
+      if(s.creditoInps>0) inpsS+=P(`Acconti superiori al dovuto: <b>saldo 0 €</b>, credito <b>${euro(s.creditoInps)}</b> che riduce i nuovi acconti${s.creditoInpsResid>0?`, residuo ${euro(s.creditoInpsResid)}`:''}.`);
+      else if(s.accInpsPrev>0) inpsS+=P(`Acconti scalati ⇒ saldo INPS: <b>${saldoINPS}</b>.`);
+      else inpsS+=P(`Saldo INPS: <b>${saldoINPS}</b>.`);
+      html+=wrapSection('Contributi INPS', inpsS,'inps');
+
+      let impS=P(`Base per imposta: <b>${baseImp}</b>. Calcolo: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
+      if(s.creditoImp>0) impS+=P(`Acconti superiori al dovuto: <b>saldo 0 €</b>, credito <b>${euro(s.creditoImp)}</b> che riduce i nuovi acconti${s.creditoImpResid>0?`, residuo ${euro(s.creditoImpResid)}`:''}.`);
+      else if(s.accImpPrev>0) impS+=P(`Acconti scalati ⇒ saldo imposta: <b>${saldoIMP}</b>.`);
+      else impS+=P(`Saldo imposta: <b>${saldoIMP}</b>.`);
+      html+=wrapSection('Imposta sostitutiva', impS,'imp');
+
+      html+=wrapSection('Scadenze',
+        P(`<b>Giugno</b>: saldi + primi acconti = <b>${giu}</b>. • <b>Novembre</b>: secondi acconti = <b>${nov}</b>. Totale anno: <b>${tot}</b>.`),'');
+
+    }
+    setHTML('explanation',html);
   }
-  const trN=document.createElement('tr');
-  trN.innerHTML=`<td colspan="5" style="text-align:left"><span class="badge">Novembre</span> — secondi acconti</td><td class="mono"><b>${euro(s.novembre)} €</b></td>`;
-  rb.appendChild(trN);
-  el('rateInt').textContent=euro(totInt)+' €';
-  el('rateTot').textContent=euro(totR)+' €';
-}
 
-/* stampa */
-el('btnStampa').addEventListener('click',()=>window.print());
+  function buildRate(){
+    const totGiu=cacheGiugno, quota=totGiu/5;
+    let tbody='',sumInt=0,sumTotGiu=0;
+    const RATE_PERC=[0.00,0.18,0.51,0.84,1.17];
+    const RATE_DATE=["30 giugno","16 luglio","20 agosto","16 settembre","16 ottobre"];
+    for(let i=0;i<5;i++){
+      const p=RATE_PERC[i]/100, interesse=totGiu*p, rata=quota+interesse;
+      sumInt+=interesse; sumTotGiu+=rata;
+      tbody+=`<tr><td>${i+1}</td><td>${RATE_DATE[i]}</td><td>${euro(quota)}</td><td>${RATE_PERC[i].toFixed(2)}%</td><td>${euro(interesse)}</td><td><b>${euro(rata)}</b></td></tr>`;
+    }
+    tbody+=`<tr><td>6</td><td><b>Novembre — 2° acconti</b></td><td>${euro(cacheNov)}</td><td>—</td><td>—</td><td><b>${euro(cacheNov)}</b></td></tr>`;
+    setHTML('rateBody',tbody); setHTML('rateIntTot',euro(sumInt)); setHTML('rateTot',euro(sumTotGiu)); setHTML('rateTotAll',euro(sumTotGiu+cacheNov));
+  }
+
+  /* Netto dopo saldi + acconti — per calcolo inverso */
+  function netAfterTotale(inc){
+    const coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
+    const coeff=(coeffPerc>0?coeffPerc:78)/100;
+    const impRate=parseFloat(document.getElementById('imposta').value)||0.05;
+    const aliqInps=parseNum(document.getElementById('aliqInps').value)/100||0.2607;
+    const deducibili=val('deducibili');
+
+    // Acconti fissi
+    const ACC_IMP_PERC=1.00, ACC_INPS_PERC=0.80;
+
+    let accImpPrev=0, accInpsPrev=0;
+    if(document.getElementById('pillManuale').classList.contains('active')){
+      accImpPrev=val('accImpPrev'); accInpsPrev=val('accInpsPrev');
+    }else{
+      const inc24=val('incasso2024');
+      const coeff24=(parseNum(document.getElementById('coeff2024').value)||78)/100;
+      const imp24rate=parseFloat(document.getElementById('imp2024').value)||0.05;
+      const inps24rate=parseNum(document.getElementById('inps2024').value)/100||0.2607;
+      const impon24=inc24*coeff24;
+      const inps24=impon24*inps24rate;
+      const imp24=impon24*imp24rate;
+      accImpPrev=imp24*ACC_IMP_PERC; accInpsPrev=inps24*ACC_INPS_PERC;
+    }
+
+    const impon=inc*coeff;
+    const inps=impon*aliqInps;
+    const imposta=Math.max(0,impon-deducibili)*impRate;
+
+    const saldoINPS=Math.max(0,inps-accInpsPrev);
+    const saldoIMP=Math.max(0,imposta-accImpPrev);
+
+    const creditoImp=Math.max(0,accImpPrev-imposta);
+    const creditoInps=Math.max(0,accInpsPrev-inps);
+    const accImpBase=imposta*ACC_IMP_PERC;
+    const accInpsBase=inps*ACC_INPS_PERC;
+    const accImpTot=Math.max(0,accImpBase-creditoImp);
+    const accInpsTot=Math.max(0,accInpsBase-creditoInps);
+
+    const costoTot = saldoINPS + saldoIMP + accImpTot + accInpsTot;
+    return inc - costoTot;
+  }
+
+  /* Ricerca binaria: netto target -> incassato (dopo saldi + acconti) */
+  function findIncassatoForNet(target){
+    target=Math.max(0,target||0);
+    let lo=0, hi=Math.max(20000, target*3+10000);
+    for(let i=0;i<40 && netAfterTotale(hi)<target;i++) hi*=1.6;
+    for(let k=0;k<64;k++){
+      const mid=(lo+hi)/2;
+      if(netAfterTotale(mid)>=target) hi=mid; else lo=mid;
+    }
+    return Math.round(hi);
+  }
+
+  /* Stampa */
+  document.getElementById('btnPrint').addEventListener('click',()=>{
+    const vis=document.getElementById('resultsBox').style.display!=='none';
+    if(!vis){alert('Prima clicca su CALCOLA per generare i risultati da stampare.');return;}
+    window.print();
+  });
+
+  /* Inverti */
+  document.getElementById('btnInverti').addEventListener('click',()=>{
+    const target=val('nettoTarget');
+    if(target<=0){setHTML('invOut','Inserisci un netto desiderato valido.');return;}
+    const inc=findIncassatoForNet(target);
+    const incInput=document.getElementById('incassato');
+    incInput.value=String(inc);
+    [...document.getElementById('incChips').querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
+    setHTML('invOut',`Per avere circa <b>${euro(target)}</b> netti <u>dopo saldi + acconti</u>, ti servono circa <b>${euro(inc)}</b> di incassato.`);
+    compute();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  /* Calcola / Reset / Init */
+  document.getElementById('btnCalc').addEventListener('click',compute);
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('coeffChips').querySelector('.chip[data-coeff="78"]').classList.add('active');
+    const t=document.querySelector('.tab-btn.active'); if(t) setTimeout(()=>{document.getElementById('inkbar').style.width=t.offsetWidth+'px';document.getElementById('inkbar').style.left=t.offsetLeft+'px';},0);
+
+    ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','nettoTarget']
+      .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();id==='nettoTarget'?document.getElementById('btnInverti').click():compute();}})});
+
+    document.getElementById('btnReset').addEventListener('click',()=>{
+      ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','nettoTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      document.getElementById('coeffCustom').value='';
+      document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
+      document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active'); coeffFromChips=78;
+      document.getElementById('imposta').value='0.05';
+      document.getElementById('aliqInps').value='26,07';
+      document.getElementById('ratesAcc').open=true;
+      document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').textContent='Vista Dettagliata';
+      document.getElementById('resultsBox').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});
+      setHTML('invOut',''); setHTML('warnings','');
+      const tb=document.querySelector('.tab-btn[data-tab="tab1"]'); if(tb) tb.click();
+    });
+  });
+})();
 </script>
 </body>
 </html>
