@@ -130,6 +130,11 @@ tfoot tr th{background:#f1f5f9;font-weight:800}
 .mono{font-variant-numeric:tabular-nums}
 .error{margin-top:10px;padding:10px;border-left:4px solid #ef4444;background:#fdecec;border-radius:10px;color:#7f1d1d}
 
+/* Avvisi/Note locali */
+.form-note{font-size:.9rem;margin-top:.25rem;opacity:.95}
+.form-note.warning{background:#fff3cd;border:1px solid #ffe69c;padding:.4rem .6rem;border-radius:.6rem}
+.hidden{display:none !important}
+
 /* Accordion rate */
 details.rates>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:900;color:#111827;padding:8px 0}
 details.rates>summary::before{content:"";width:8px;height:8px;border:2px solid #111827;border-left:0;border-top:0;transform:rotate(45deg);transition:.2s}
@@ -249,6 +254,10 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                   <div style="grid-column:1/-1">
                     <label for="deducibili">Contributi previdenziali già versati nell’anno (€) — deducibili solo per l’imposta</label>
                     <input id="deducibili" type="text" inputmode="decimal" value="0"/>
+                    <!-- AVVISO DINAMICO SOTTO IL CAMPO -->
+                    <small id="deducibiliNotice" class="form-note warning hidden" aria-live="polite">
+                      Attenzione: i contributi sono deducibili solo se realmente versati nell’anno
+                    </small>
                   </div>
                 </div>
               </div>
@@ -376,7 +385,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   function parseNum(s){
     if(s==null) return 0;
     let t = String(s).trim().replace(/\s+/g,'');
-    t = t.replace(/\./g,'').replace(',', '.');
+    t = t.replace(/\./g,'').replace(",", '.');
     const n = parseFloat(t);
     return isNaN(n) ? 0 : n;
   }
@@ -450,6 +459,22 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const box=btn.closest('.section'); const payload=(box.querySelector('.copy-content')||box).innerText.trim();
     try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
   });
+
+  /* AVVISO DEDUCIBILI (input) */
+  function _parseNumLocal(v){
+    if (typeof parseNum === 'function') return parseNum(v);
+    if(v==null) return 0;
+    const s = String(v).replace(/\./g,'').replace(',', '.');
+    const n = Number(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function updateDeducibiliNotice(){
+    const el = document.getElementById('deducibili');
+    const note = document.getElementById('deducibiliNotice');
+    if(!el || !note) return;
+    const val = _parseNumLocal(el.value);
+    note.classList.toggle('hidden', !(val > 0));
+  }
 
   /* Calcolo */
   function compute(){
@@ -631,6 +656,9 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         ? P(`Prima togliamo i <b>contributi deducibili</b> (${euro(s.deducibili)}): <span class="mono">${impForf} − ${euro(s.deducibili)} = ${baseImp}</span>.`)
         : P(`Base imposta: <b>${baseImp}</b> (nessuna deduzione).`);
       impTxt+=P(`Aliquota <b>${impPerc}%</b>: <span class="mono">${baseImp} × ${impPerc}% = ${imposta}</span>.`);
+      if(s.deducibili>0){
+        impTxt+=P(`<b>Attenzione:</b> i contributi sono deducibili <b>solo se realmente versati nell’anno</b>.`);
+      }
       if(s.accImpPrev>0){
         if(credImp>0){
           impTxt+=P(`Acconti imposta già versati: <b>${euro(s.accImpPrev)}</b> > dovuto → <b>saldo 0 €</b> e <b>credito ${euro(credImp)}</b> (riduce i nuovi acconti, residuo: ${euro(credImpRes)}).`);
@@ -655,7 +683,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       }
       html+=wrapSection('Acconti per l’anno successivo', accTxt,'');
 
-      /* Totale anno = Saldi + Acconti (nuovo) */
+      /* Totale anno = Saldi + Acconti */
       html+=wrapSection('Totale anno',
         P(`<b>Saldi</b> = <b>${saldoIMP}</b> (imposta) + <b>${saldoINPS}</b> (INPS) → <b>${saldoTot}</b>.`) +
         P(`<b>Acconti</b> = <b>${accIMPtot}</b> (imposta) + <b>${accINPStot}</b> (INPS) → <b>${euro(s.accImpTot+s.accInpsTot)}</b>.`) +
@@ -663,7 +691,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         P(`Incidenza sul tuo incassato <b>${inc}</b>: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; totale <b>${perc(s.totale,s.incassato)}</b>.`)
       ,'');
 
-      /* Scadenze rimangono */
+      /* Scadenze */
       html+=wrapSection('Scadenze',
         P(`<b>Giugno</b> = saldi (<b>${saldoINPS}</b> + <b>${saldoIMP}</b>) + primi acconti (<b>${accIMP1}</b> imposta + <b>${euro(s.accInps1)}</b> INPS) = <b>${giu}</b>.`) +
         P(`<b>Novembre</b> = secondi acconti = <b>${nov}</b>.`),'');
@@ -677,6 +705,9 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       html+=wrapSection('Contributi INPS', inpsS,'inps');
 
       let impS=P(`Imposta ${impPerc}% su base <b>${baseImp}</b> → <span class="mono">${imposta}</span>.`);
+      if(s.deducibili>0){
+        impS+=P(`<b>Attenzione:</b> i contributi sono deducibili <b>solo se realmente versati nell’anno</b>.`);
+      }
       html+=wrapSection('Imposta sostitutiva', impS,'imp');
 
       html+=wrapSection('Totale anno',
@@ -780,12 +811,14 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   });
 
   /* Calcola / Reset / Init */
-  document.getElementById('btnCalc').addEventListener('click',compute);
+  document.getElementById('btnCalc').addEventListener('click',()=>{ updateDeducibiliNotice(); compute(); });
 
   document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('coeffChips').querySelector('.chip[data-coeff="78"]').classList.add('active');
     ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','aliqInps','nettoTarget']
-      .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();id==='nettoTarget'?document.getElementById('btnInverti').click():compute();}})});
+      .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();id==='nettoTarget'?document.getElementById('btnInverti').click():document.getElementById('btnCalc').click();}})});
+    document.getElementById('deducibili')?.addEventListener('input', updateDeducibiliNotice);
+    updateDeducibiliNotice();
 
     document.getElementById('btnReset').addEventListener('click',()=>{
       ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','nettoTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -799,6 +832,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       document.getElementById('resultsBox').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});
       setHTML('invOut',''); setHTML('warnings','');
       const tb=document.querySelector('.tab-btn[data-tab="tab1"]'); if(tb) tb.click();
+      updateDeducibiliNotice();
     });
   });
 })();
