@@ -42,7 +42,7 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 input:disabled{background:#f8fafc;color:#334155}
 input:focus,select:focus,.chip:focus-visible,.pill:focus-visible,.btn:focus-visible{outline:none;border-color:#c7d2fe;box-shadow:0 0 0 3px #e0e7ff}
 
-/* Chips uniformi */
+/* Chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .chip{height:40px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:9999px;background:#fff;cursor:pointer;font-weight:900}
 .chip:hover{border-color:#bcd0ff}
@@ -83,7 +83,7 @@ details.adv[open] .adv-panel{display:block}
 .pill{height:34px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
 .pill.active{background:var(--c2);color:#fff;border-color:var(--c2)}
 
-/* Tabs – menu pieno */
+/* Tabs */
 .tabbar-wrap{padding:10px 12px}
 .tab-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .tab-btn{border:1px solid var(--pill-border);background:var(--pill);border-radius:10px;padding:10px 12px;height:40px;cursor:pointer;font-weight:900;white-space:nowrap;text-align:center;box-shadow:inset 0 -2px 0 rgba(0,0,0,0)}
@@ -91,7 +91,7 @@ details.adv[open] .adv-panel{display:block}
 .inkbar{display:none}
 .tab{display:none}.tab.active{display:block}
 
-/* Vista (spostata sotto a destra) */
+/* Vista (sotto a destra) */
 .viewctrl{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:0 12px 12px}
 #viewLabel{font-weight:800;color:#475569}
 .switch{position:relative;display:inline-block;width:44px;height:24px}
@@ -215,7 +215,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                 <div class="subgrid">
                   <div><label>Aliquota INPS (%)</label><input id="aliqInps" type="text" inputmode="decimal" value="26,07"></div>
                 </div>
-                <div class="desc">Acconti fissi (metodo storico): <b>Imposta 100%</b> (50%+50%), <b>INPS 80%</b> (40%+40%).</div>
+                <div class="desc">Acconti (metodo storico): <b>Imposta 100%</b> (50%+50%), <b>INPS 80%</b> (40%+40%).</div>
               </div>
 
               <div class="ibox">
@@ -262,12 +262,11 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                     <input id="nettoTarget" type="text" inputmode="decimal" placeholder="es. 20000" value="">
                   </div>
                   <div>
-                    <!-- stesso colore del bottone Calcola -->
                     <button type="button" id="btnInverti" class="btn primary" style="width:100%">Calcola incassato necessario</button>
                   </div>
                 </div>
                 <div id="invOut" class="desc" style="margin-top:8px"></div>
-                <div class="desc">Il lordo calcolato copre <b>saldi + acconti</b> (non solo i saldi).</div>
+                <div class="desc">Il lordo calcolato copre <b>saldi + acconti</b>.</div>
               </div>
 
             </div>
@@ -302,7 +301,6 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       </div>
     </div>
 
-    <!-- Vista spostata sotto, a destra -->
     <div class="viewctrl">
       <span id="viewLabel">Vista Dettagliata</span>
       <label class="switch" title="Cambia vista">
@@ -391,7 +389,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   /* --- Stato --- */
   let coeffFromChips=78,lastState=null,cacheGiugno=0,cacheNov=0;
 
-  /* --- Tab change --- */
+  /* Tabs */
   document.addEventListener('click',e=>{
     const b=e.target.closest('.tab-btn'); if(!b) return;
     document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
@@ -399,7 +397,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     b.classList.add('active'); document.getElementById(b.dataset.tab).classList.add('active');
   });
 
-  /* --- Input Incassato --- */
+  /* Incassato */
   const incInput=document.getElementById('incassato');
   const incChips=document.getElementById('incChips');
 
@@ -418,7 +416,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     try{incInput.setSelectionRange(incInput.value.length,incInput.value.length);}catch{}
   });
 
-  /* --- Coefficiente --- */
+  /* Coefficiente */
   document.getElementById('coeffChips').addEventListener('click',e=>{
     const c=e.target.closest('.chip'); if(!c) return;
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
@@ -430,7 +428,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
   });
 
-  /* --- Opzioni avanzate: pill toggle --- */
+  /* Pill Manuale/Stima */
   function refreshAccMode(){
     const man=document.getElementById('pillManuale'), sti=document.getElementById('pillStima');
     const manual=man.classList.contains('active');
@@ -442,18 +440,18 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   document.getElementById('pillManuale').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillStima').classList.remove('active');refreshAccMode();});
   document.getElementById('pillStima').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillManuale').classList.remove('active');refreshAccMode();});
 
-  /* --- Vista dettagliata/semplificata --- */
+  /* Vista */
   const simp=document.getElementById('simpToggle'), viewLabel=document.getElementById('viewLabel');
   simp.addEventListener('change',()=>{viewLabel.textContent = simp.checked ? 'Vista Semplificata' : 'Vista Dettagliata'; if(document.getElementById('resultsBox').style.display!=='none') buildExplanation();});
 
-  /* --- Copy singolo blocco --- */
+  /* Copy */
   document.addEventListener('click',async e=>{
     const btn=e.target.closest('.copy-btn'); if(!btn) return;
     const box=btn.closest('.section'); const payload=(box.querySelector('.copy-content')||box).innerText.trim();
     try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
   });
 
-  /* --- Calcolo --- */
+  /* Calcolo */
   function compute(){
     const incassato=val('incassato');
     let coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
@@ -526,7 +524,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     setHTML('outTotale',euro(totale));
     setHTML('liveResult',`Aggiornato. Saldo ${euro(saldoTotale)}, acconti ${euro(accontiTot)}, totale ${euro(totale)}.`);
 
-    /* Note */
+    /* Note soglie */
     let w=''; if(incassato>100000) w='<div class="muted"><b>Attenzione:</b> oltre 100.000€ → uscita <b>immediata</b> dal forfettario.</div>';
     else if(incassato>85000) w='<div class="muted"><b>Nota:</b> oltre 85.000€ → uscita dal forfettario <b>dall’anno successivo</b>.</div>';
     setHTML('warnings',w);
@@ -565,7 +563,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     sc+=tr('<span class="badge-month">Novembre</span> — 2° acconti',euro(novTot),true);
     setHTML('tblScadenze',sc); setHTML('scadTot',euro(giugnoTot+novTot));
 
-    document.getElementById('ratesAcc').open=true; // mostra subito il dettaglio rate
+    document.getElementById('ratesAcc').open=true;
     buildRate();
 
     lastState={
@@ -578,11 +576,13 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     document.getElementById('resultsBox').style.display='';
   }
 
+  /* Helpers per spiegazione */
   function P(t){return `<p class="line">${t}</p>`}
   function wrapSection(title,inner,cls){return `<div class="section ${cls||''}">
     <button type="button" class="copy-btn" title="Copia" aria-label="Copia">Copia</button>
     <div class="copy-content">${title?`<h3>${title}</h3>`:''}${inner}</div></div>`}
 
+  /* Spiegazione: testo richiesto + resto uguale, e Totale anno = Saldi + Acconti */
   function buildExplanation(){
     if(!lastState) return;
     const s=lastState, simple=document.getElementById('simpToggle').checked;
@@ -594,15 +594,28 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
           accINPStot=euro(s.accInpsTot), accIMPtot=euro(s.accImpTot),
           accINPS1=euro(s.accInps1), accIMP1=euro(s.accImp1);
 
+    const impPerc = Math.round(s.impRate*100);
+    const inpsPerc = (s.aliqInps*100).toFixed(2);
+
     const credImp=s.creditoImp, credInps=s.creditoInps, credImpRes=s.creditoImpResid, credInpsRes=s.creditoInpsResid;
 
     let html='';
+
+    /* PREMESSA – testo richiesto */
+    const premessa = wrapSection('Come funziona (in breve)',
+      P(`Nel regime forfettario paghi le tasse e i contributi <b>non</b> sul totale incassato ma sull’incassato dell’anno moltiplicato per il <b>coefficiente di redditività</b>, che nel tuo caso è del <b>${s.coeffPerc}%</b>.`) +
+      P(`Paghi il <b>${impPerc}%</b> di imposta sostitutiva e <b>circa ${inpsPerc}%</b> di contributi INPS sul <i>reddito imponibile</i> (incassato × coefficiente di redditività).`),
+    '');
+    html += premessa;
+
     if(!simple){
+      /* Imponibile */
       html+=wrapSection('Imponibile',
         P(`Hai incassato <u><b>${inc}</b></u>. Con coefficiente <u><b>${s.coeffPerc}%</b></u> il reddito imponibile diventa:`) +
         P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>`),'');
 
-      let inpsTxt=P(`INPS al <b>${(s.aliqInps*100).toFixed(2)}%</b> sull’imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
+      /* INPS */
+      let inpsTxt=P(`INPS al <b>${inpsPerc}%</b> sull’imponibile: <span class="mono">${impForf} × ${inpsPerc}% = ${inps}</span>.`);
       if(s.accInpsPrev>0){
         if(credInps>0){
           inpsTxt+=P(`Acconti INPS già versati: <b>${euro(s.accInpsPrev)}</b> > dovuto → <b>saldo 0 €</b> e <b>credito ${euro(credInps)}</b> che riduce i nuovi acconti (eventuale residuo: ${euro(credInpsRes)}).`);
@@ -613,10 +626,11 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       inpsTxt+=P(`👉 <b>Saldo INPS</b> da versare ora: <b>${saldoINPS}</b>.`);
       html+=wrapSection('Contributi INPS', inpsTxt,'inps');
 
+      /* Imposta */
       let impTxt=(s.deducibili>0)
         ? P(`Prima togliamo i <b>contributi deducibili</b> (${euro(s.deducibili)}): <span class="mono">${impForf} − ${euro(s.deducibili)} = ${baseImp}</span>.`)
         : P(`Base imposta: <b>${baseImp}</b> (nessuna deduzione).`);
-      impTxt+=P(`Aliquota <b>${Math.round(s.impRate*100)}%</b>: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
+      impTxt+=P(`Aliquota <b>${impPerc}%</b>: <span class="mono">${baseImp} × ${impPerc}% = ${imposta}</span>.`);
       if(s.accImpPrev>0){
         if(credImp>0){
           impTxt+=P(`Acconti imposta già versati: <b>${euro(s.accImpPrev)}</b> > dovuto → <b>saldo 0 €</b> e <b>credito ${euro(credImp)}</b> (riduce i nuovi acconti, residuo: ${euro(credImpRes)}).`);
@@ -627,48 +641,57 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       impTxt+=P(`👉 <b>Saldo imposta</b> da versare ora: <b>${saldoIMP}</b>.`);
       html+=wrapSection('Imposta sostitutiva', impTxt,'imp');
 
+      /* Totale saldi */
       html+=wrapSection('Totale saldi ora',
         P(`<span class="mono"><b>${saldoINPS}</b> (INPS) + <b>${saldoIMP}</b> (imposta) = <b>${saldoTot}</b></span>.`),'');
 
+      /* Acconti */
       let accTxt=P(`Calcolati sul dovuto di quest’anno e <b>già ridotti dei crediti</b> (se presenti).`) +
                   P(`<b>Imposta</b>: ${accIMPtot} (50% giugno, 50% novembre).`) +
                   P(`<b>INPS</b>: ${accINPStot} (40% giugno, 40% novembre).`);
       if(credImp>0||credInps>0){
         accTxt+=P(`I crediti hanno ridotto gli acconti. ${credImp>0?`Imposta −${euro(Math.min(credImp, s.imposta))}. `:''}${credInps>0?`INPS −${euro(Math.min(credInps, s.inps))}.`:''}`);
-        if(credImpRes>0||credInpsRes>0) accTxt+=P(`Residui da riportare: imposta ${euro(credImpRes)}, INPS ${euro(credInpsRes)}.`);
+        if(s.creditoImpResid>0||s.creditoInpsResid>0) accTxt+=P(`Residui da riportare: imposta ${euro(s.creditoImpResid)}, INPS ${euro(s.creditoInpsResid)}.`);
       }
       html+=wrapSection('Acconti per l’anno successivo', accTxt,'');
 
+      /* Totale anno = Saldi + Acconti (nuovo) */
+      html+=wrapSection('Totale anno',
+        P(`<b>Saldi</b> = <b>${saldoIMP}</b> (imposta) + <b>${saldoINPS}</b> (INPS) → <b>${saldoTot}</b>.`) +
+        P(`<b>Acconti</b> = <b>${accIMPtot}</b> (imposta) + <b>${accINPStot}</b> (INPS) → <b>${euro(s.accImpTot+s.accInpsTot)}</b>.`) +
+        P(`<span class="mono">Totale anno = Saldi + Acconti = ${saldoTot} + ${euro(s.accImpTot+s.accInpsTot)} = <b>${tot}</b></span>.`) +
+        P(`Incidenza sul tuo incassato <b>${inc}</b>: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; totale <b>${perc(s.totale,s.incassato)}</b>.`)
+      ,'');
+
+      /* Scadenze rimangono */
       html+=wrapSection('Scadenze',
         P(`<b>Giugno</b> = saldi (<b>${saldoINPS}</b> + <b>${saldoIMP}</b>) + primi acconti (<b>${accIMP1}</b> imposta + <b>${euro(s.accInps1)}</b> INPS) = <b>${giu}</b>.`) +
         P(`<b>Novembre</b> = secondi acconti = <b>${nov}</b>.`),'');
 
-      html+=wrapSection('Totale anno e incidenza',
-        P(`<span class="mono">${giu} + ${nov} = ${tot}</span>. Incidenza: saldi <b>${perc(s.saldoTotale,s.incassato)}</b>; acconti <b>${perc(s.accImpTot+s.accInpsTot,s.incassato)}</b>; totale <b>${perc(s.totale,s.incassato)}</b>.`),'');
-
     }else{
+      /* Versione semplificata */
       html+=wrapSection('Imponibile',
-        P(`Incassato <b>${inc}</b> → con coefficiente <b>${s.coeffPerc}%</b> l’imponibile è <b>${impForf}</b>.`),'');
+        P(`Incassato <b>${inc}</b> → coefficiente <b>${s.coeffPerc}%</b> → imponibile <b>${impForf}</b>.`),'');
 
-      let inpsS=P(`INPS su imponibile: <span class="mono">${impForf} × ${(s.aliqInps*100).toFixed(2)}% = ${inps}</span>.`);
-      if(s.creditoInps>0) inpsS+=P(`Acconti superiori al dovuto: <b>saldo 0 €</b>, credito <b>${euro(s.creditoInps)}</b> che riduce i nuovi acconti${s.creditoInpsResid>0?`, residuo ${euro(s.creditoInpsResid)}`:''}.`);
-      else if(s.accInpsPrev>0) inpsS+=P(`Acconti scalati ⇒ saldo INPS: <b>${saldoINPS}</b>.`);
-      else inpsS+=P(`Saldo INPS: <b>${saldoINPS}</b>.`);
+      let inpsS=P(`INPS ~${inpsPerc}%: <span class="mono">${impForf} × ${inpsPerc}% = ${inps}</span>.`);
       html+=wrapSection('Contributi INPS', inpsS,'inps');
 
-      let impS=P(`Base per imposta: <b>${baseImp}</b>. Calcolo: <span class="mono">${baseImp} × ${Math.round(s.impRate*100)}% = ${imposta}</span>.`);
-      if(s.creditoImp>0) impS+=P(`Acconti superiori al dovuto: <b>saldo 0 €</b>, credito <b>${euro(s.creditoImp)}</b> che riduce i nuovi acconti${s.creditoImpResid>0?`, residuo ${euro(s.creditoImpResid)}`:''}.`);
-      else if(s.accImpPrev>0) impS+=P(`Acconti scalati ⇒ saldo imposta: <b>${saldoIMP}</b>.`);
-      else impS+=P(`Saldo imposta: <b>${saldoIMP}</b>.`);
+      let impS=P(`Imposta ${impPerc}% su base <b>${baseImp}</b> → <span class="mono">${imposta}</span>.`);
       html+=wrapSection('Imposta sostitutiva', impS,'imp');
 
+      html+=wrapSection('Totale anno',
+        P(`<b>Saldi</b>: imposta <b>${saldoIMP}</b> + INPS <b>${saldoINPS}</b> = <b>${saldoTot}</b>.`) +
+        P(`<b>Acconti</b>: imposta <b>${accIMPtot}</b> + INPS <b>${accINPStot}</b> = <b>${euro(s.accImpTot+s.accInpsTot)}</b>.`) +
+        P(`<b>Totale</b>: <b>${tot}</b>.`),'');
+
       html+=wrapSection('Scadenze',
-        P(`<b>Giugno</b>: saldi + primi acconti = <b>${giu}</b>. • <b>Novembre</b>: secondi acconti = <b>${nov}</b>. Totale anno: <b>${tot}</b>.`),'');
+        P(`<b>Giugno</b>: saldi + primi acconti = <b>${giu}</b>. • <b>Novembre</b>: secondi acconti = <b>${nov}</b>.`),'');
 
     }
     setHTML('explanation',html);
   }
 
+  /* Rate */
   function buildRate(){
     const totGiu=cacheGiugno, quota=totGiu/5;
     let tbody='',sumInt=0,sumTotGiu=0;
@@ -683,7 +706,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     setHTML('rateBody',tbody); setHTML('rateIntTot',euro(sumInt)); setHTML('rateTot',euro(sumTotGiu)); setHTML('rateTotAll',euro(sumTotGiu+cacheNov));
   }
 
-  /* Netto dopo saldi + acconti — per calcolo inverso */
+  /* Netto desiderato → incassato, includendo saldi + acconti */
   function netAfterTotale(inc){
     const coeffPerc=document.getElementById('coeffCustom').value?parseInt(document.getElementById('coeffCustom').value,10):coeffFromChips;
     const coeff=(coeffPerc>0?coeffPerc:78)/100;
@@ -725,7 +748,6 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     return inc - costoTot;
   }
 
-  /* Ricerca binaria: netto target -> incassato (dopo saldi + acconti) */
   function findIncassatoForNet(target){
     target=Math.max(0,target||0);
     let lo=0, hi=Math.max(20000, target*3+10000);
