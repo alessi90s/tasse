@@ -2,85 +2,35 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <title>Simulatore Rate ENPAP – Interessi progressivi (k × 0,375%) + check 150 giorni</title>
+  <title>Simulatore Rate ENPAP – interessi per mesi trascorsi dalla scadenza</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     :root{
-      --bg:#0b0c10;
-      --card:#101218;
-      --muted:#9aa2b1;
-      --txt:#e9edf5;
-      --accent:#7dd3fc;
-      --border:#1e2230;
-      --ok:#86efac;
-      --warn:#fca5a5;
-      --warn-bg:#3b0d0d;
-      --ok-bg:#0f2a19;
+      --bg:#0b0c10; --card:#101218; --muted:#9aa2b1; --txt:#e9edf5;
+      --border:#1e2230; --ok:#86efac; --okbg:#0f2a19; --warn:#fca5a5; --warnbg:#3b0d0d;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; background:var(--bg); color:var(--txt);
-      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     .wrap{max-width:980px;margin:32px auto;padding:0 16px}
-    header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;gap:16px}
-    header h1{margin:0;font-size:20px;letter-spacing:.2px}
-    header .tag{font-size:12px;color:var(--muted)}
-    .card{
-      background:var(--card); border:1px solid var(--border);
-      border-radius:14px; padding:16px;
-      box-shadow:0 1px 0 rgba(255,255,255,.02), 0 8px 40px rgba(0,0,0,.35);
-    }
-    .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+    header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;gap:12px}
+    h1{margin:0;font-size:20px} .tag{font-size:12px;color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 1px 0 rgba(255,255,255,.02),0 8px 40px rgba(0,0,0,.35)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} @media(max-width:900px){.grid{grid-template-columns:1fr}}
     label{display:block;font-weight:600;margin:4px 0 6px}
-    .hl{background:linear-gradient(transparent 60%, rgba(125,211,252,.25) 0);}
-    input,button{
-      width:100%; padding:12px 12px; border-radius:10px; border:1px solid var(--border);
-      background:#0f1320; color:var(--txt); outline:none;
-    }
-    input::placeholder{color:#667085}
-    .row{display:grid;grid-template-columns:repeat(4,1fr); gap:12px}
-    @media (max-width:900px){ .row{grid-template-columns:1fr 1fr} }
-    @media (max-width:560px){ .row{grid-template-columns:1fr} }
-    .btn{
-      background:#0b132d; border:1px solid #1f2a44; font-weight:700; cursor:pointer;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-    }
-    .btn:hover{transform:translateY(-1px); box-shadow:0 10px 30px rgba(0,0,0,.35)}
-    .btn.primary{background:linear-gradient(180deg,#112042,#0b132d); border-color:#223055}
-    .btn.ghost{background:transparent}
-    .muted{color:var(--muted);font-size:13px}
-    .rule{
-      margin-top:10px; padding:10px 12px; border:1px dashed #2a3246; border-radius:10px; background:#0c121f;
-      color:#cfeaff; font-size:13px;
-    }
-    .banner{
-      margin:12px 0 0; padding:12px; border-radius:10px; border:1px solid;
-      display:none;
-    }
-    .banner.ok{display:block; border-color:#234b33; background:var(--ok-bg); color:var(--ok)}
-    .banner.warn{display:block; border-color:#6b1d1d; background:var(--warn-bg); color:var(--warn)}
-    table{width:100%; border-collapse:collapse; margin-top:16px; overflow:auto}
-    thead th{
-      text-align:right; font-size:13px; color:#b7c0d4; font-weight:700; padding:10px;
-      border-bottom:1px solid var(--border); background:#0f1524;
-      position:sticky; top:0; z-index:1;
-    }
-    thead th:first-child, tbody td:first-child{text-align:center}
-    thead th:nth-child(2), tbody td:nth-child(2){text-align:center}
-    tbody td{
-      text-align:right; padding:10px; border-bottom:1px solid #171b28; font-variant-numeric:tabular-nums;
-    }
-    tfoot td{padding:12px 10px; font-weight:700; background:#0f1524; border-top:1px solid var(--border)}
-    .kpi{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
-    .pill{
-      background:#0f1524; border:1px solid var(--border); border-radius:12px; padding:10px 12px; min-width:180px;
-    }
+    input,button{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#0f1320;color:#e9edf5}
+    .btn{cursor:pointer;font-weight:700;background:#0b132d;border:1px solid #1f2a44} .btn:hover{filter:brightness(1.08)}
+    .primary{background:linear-gradient(180deg,#112042,#0b132d);border-color:#223055}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    thead th{position:sticky;top:0;background:#0f1524;border-bottom:1px solid var(--border);padding:10px;font-size:13px;color:#b7c0d4;text-align:right}
+    thead th:first-child,tbody td:first-child{text-align:center} thead th:nth-child(2),tbody td:nth-child(2){text-align:center}
+    tbody td{padding:10px;border-bottom:1px solid #171b28;text-align:right;font-variant-numeric:tabular-nums}
+    tfoot td{padding:12px;border-top:1px solid var(--border);background:#0f1524;font-weight:700}
+    .kpi{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+    .pill{background:#0f1524;border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:180px}
     .pill strong{display:block;font-size:18px}
-    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
-    .small{font-size:12px}
-    .footnote{margin-top:8px;color:#aeb7c8;font-size:12px}
+    .banner{display:none;margin-top:12px;padding:12px;border-radius:10px;border:1px solid}
+    .ok{display:block;border-color:#234b33;background:var(--okbg);color:var(--ok)}
+    .warn{display:block;border-color:#6b1d1d;background:var(--warnbg);color:var(--warn)}
+    .small{font-size:12px;color:#aeb7c8}
   </style>
 </head>
 <body>
@@ -88,9 +38,9 @@
     <header>
       <div>
         <h1>Simulatore rate ENPAP</h1>
-        <div class="tag">Interessi progressivi: <span class="hl">k × 0,375%</span> sul <b>residuo prima della rata</b>. Avviso automatico oltre <b>150 giorni</b>.</div>
+        <div class="tag">Interessi = <b>mesi trascorsi dalla scadenza</b> × <b>tasso mensile</b> sul residuo prima della rata</div>
       </div>
-      <button class="btn ghost small" id="btnReset">Reset</button>
+      <button class="btn" id="btnReset">Reset</button>
     </header>
 
     <section class="card">
@@ -101,30 +51,26 @@
         </div>
         <div>
           <label for="rate">Numero di rate (mesi)</label>
-          <input id="rate" type="number" min="1" max="12" step="1" value="5" />
+          <input id="rate" type="number" min="1" max="12" value="5" />
         </div>
         <div>
           <label for="tasso">Tasso mensile (%)</label>
           <input id="tasso" inputmode="decimal" value="0,375" />
-          <div class="muted small">Di default 0,375%</div>
-        </div>
-        <div>
-          <label for="primaData">Prima scadenza (default 01/11/2025)</label>
-          <input id="primaData" type="date" value="2025-11-01" />
-          <div class="muted small">La prima rata si paga un mese dopo la scadenza originaria</div>
+          <div class="small">Default 0,375%</div>
         </div>
         <div>
           <label for="scadOrig">Scadenza originaria del saldo</label>
           <input id="scadOrig" type="date" value="2025-10-01" />
-          <div class="muted small">Serve per calcolare il limite ENPAP di 150 giorni</div>
+          <div class="small">Il 1° mese (stessa data) = interessi 0%</div>
+        </div>
+        <div>
+          <label for="primaData">Data 1ª rata</label>
+          <input id="primaData" type="date" value="2025-10-01" />
+          <div class="small">Esempi: 01/10 = 0 mesi; 01/11 = 1 mese; 01/12 = 2 mesi…</div>
         </div>
       </div>
 
-      <div class="rule">
-        Regola interessi: 1° mese <b>0,375%</b>, 2° mese <b>0,750%</b>, 3° mese <b>1,125%</b>, ecc. (moltiplicatore <b>k</b> = numero rata).
-      </div>
-
-      <div class="actions">
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn primary" id="btnCalcola">Calcola</button>
         <button class="btn" id="btnCopia">Copia elenco per chat</button>
         <button class="btn" id="btnCSV">Esporta CSV</button>
@@ -134,12 +80,12 @@
       <div id="bannerWARN" class="banner warn"></div>
 
       <div class="kpi" id="kpi" style="display:none">
-        <div class="pill"><div class="muted small">Totale capitale</div><strong id="kCap"></strong></div>
-        <div class="pill"><div class="muted small">Totale interessi</div><strong id="kInt"></strong></div>
-        <div class="pill"><div class="muted small">Totale complessivo</div><strong id="kTot"></strong></div>
+        <div class="pill"><div class="small">Totale capitale</div><strong id="kCap"></strong></div>
+        <div class="pill"><div class="small">Totale interessi</div><strong id="kInt"></strong></div>
+        <div class="pill"><div class="small">Totale complessivo</div><strong id="kTot"></strong></div>
       </div>
 
-      <div id="out" style="display:none;overflow:auto">
+      <div id="out" style="display:none">
         <table id="tbl">
           <thead>
             <tr>
@@ -161,276 +107,169 @@
             </tr>
           </tfoot>
         </table>
-        <div class="footnote">Le quote capitale sono uguali (l’ultima è aggiustata per chiudere i centesimi). Interessi calcolati sul residuo prima della rata.</div>
+        <div class="small">Quote capitale uguali (l’ultima è aggiustata per chiudere i centesimi). Interessi calcolati sul residuo prima della rata.</div>
       </div>
     </section>
   </div>
 
   <script>
-    // --- Utils ---
-    const fmt = new Intl.NumberFormat('it-IT', { minimumFractionDigits:2, maximumFractionDigits:2 });
+    // --- utils ---
+    const fmt = new Intl.NumberFormat('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
     const euro = n => fmt.format(n);
-    function parseEuro(str){
-      if(typeof str !== 'string') return Number(str)||0;
-      const s = str.trim().replace(/\./g,'').replace(',', '.');
-      const n = Number(s);
-      return isNaN(n) ? 0 : n;
+    function parseEuro(s){ if(typeof s!=='string') return Number(s)||0; s=s.replace(/\./g,'').replace(',','.'); const n=Number(s); return isNaN(n)?0:n; }
+    function addMonths(d,m){ const x=new Date(d.getTime()); const day=x.getDate(); x.setMonth(x.getMonth()+m); if(x.getDate()!==day) x.setDate(0); return x; }
+    function addDays(d,days){ const x=new Date(d.getTime()); x.setDate(x.getDate()+days); return x; }
+    function itDate(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+    function round2(n){ return Math.round((n+Number.EPSILON)*100)/100; }
+    // mesi trascorsi (floor) tra scadenza originaria e data rata
+    function monthsElapsed(from,to){
+      let m=(to.getFullYear()-from.getFullYear())*12 + (to.getMonth()-from.getMonth());
+      if(to.getDate()<from.getDate()) m-=1; // se non si è ancora raggiunto il "giorno"
+      return Math.max(0,m);
     }
-    function addMonths(date, months){
-      const d = new Date(date.getTime());
-      const day = d.getDate();
-      d.setMonth(d.getMonth() + months);
-      if (d.getDate() !== day) d.setDate(0);
-      return d;
-    }
-    function addDays(date, days){
-      const d = new Date(date.getTime());
-      d.setDate(d.getDate() + days);
-      return d;
-    }
-    function itDate(d){
-      const day = String(d.getDate()).padStart(2,'0');
-      const mo = String(d.getMonth()+1).padStart(2,'0');
-      const y = d.getFullYear();
-      return `${day}/${mo}/${y}`;
-    }
-    function round2(n){ return Math.round((n + Number.EPSILON) * 100)/100; }
 
-    // --- DOM ---
-    const elImporto = document.getElementById('importo');
-    const elRate = document.getElementById('rate');
-    const elTasso = document.getElementById('tasso');
-    const elPrimaData = document.getElementById('primaData');
-    const elScadOrig = document.getElementById('scadOrig');
+    // --- dom ---
+    const elImporto=document.getElementById('importo');
+    const elRate=document.getElementById('rate');
+    const elTasso=document.getElementById('tasso');
+    const elScadOrig=document.getElementById('scadOrig');
+    const elPrimaData=document.getElementById('primaData');
+    const btnCalcola=document.getElementById('btnCalcola');
+    const btnCopia=document.getElementById('btnCopia');
+    const btnCSV=document.getElementById('btnCSV');
+    const btnReset=document.getElementById('btnReset');
+    const bannerOK=document.getElementById('bannerOK');
+    const bannerWARN=document.getElementById('bannerWARN');
+    const tbody=document.querySelector('#tbl tbody');
+    const tfInt=document.getElementById('tfInt');
+    const tfCap=document.getElementById('tfCap');
+    const tfTot=document.getElementById('tfTot');
+    const kpi=document.getElementById('kpi');
+    const kCap=document.getElementById('kCap');
+    const kInt=document.getElementById('kInt');
+    const kTot=document.getElementById('kTot');
+    const outWrap=document.getElementById('out');
 
-    const btnCalcola = document.getElementById('btnCalcola');
-    const btnCopia = document.getElementById('btnCopia');
-    const btnCSV = document.getElementById('btnCSV');
-    const btnReset = document.getElementById('btnReset');
-
-    const bannerOK = document.getElementById('bannerOK');
-    const bannerWARN = document.getElementById('bannerWARN');
-
-    const outWrap = document.getElementById('out');
-    const tbody = document.querySelector('#tbl tbody');
-    const tfInt = document.getElementById('tfInt');
-    const tfCap = document.getElementById('tfCap');
-    const tfTot = document.getElementById('tfTot');
-    const kpi = document.getElementById('kpi');
-    const kCap = document.getElementById('kCap');
-    const kInt = document.getElementById('kInt');
-    const kTot = document.getElementById('kTot');
-
-    // --- Persistenza ---
+    // stato
     function saveState(){
-      const state = {
-        importo: elImporto.value,
-        rate: elRate.value,
-        tasso: elTasso.value,
-        primaData: elPrimaData.value,
-        scadOrig: elScadOrig.value
-      };
-      localStorage.setItem('enpapSimState_v2', JSON.stringify(state));
+      localStorage.setItem('enpapSimState_v3', JSON.stringify({
+        importo:elImporto.value, rate:elRate.value, tasso:elTasso.value,
+        scadOrig:elScadOrig.value, primaData:elPrimaData.value
+      }));
     }
-    function loadState(){
-      const raw = localStorage.getItem('enpapSimState_v2');
-      if(!raw) return;
-      try{
-        const s = JSON.parse(raw);
-        if(s.importo != null) elImporto.value = s.importo;
-        if(s.rate != null) elRate.value = s.rate;
-        if(s.tasso != null) elTasso.value = s.tasso;
-        if(s.primaData) elPrimaData.value = s.primaData;
-        if(s.scadOrig) elScadOrig.value = s.scadOrig;
-      }catch(e){}
-    }
-    loadState();
+    (function loadState(){
+      const raw=localStorage.getItem('enpapSimState_v3'); if(!raw) return;
+      try{ const s=JSON.parse(raw);
+        if(s.importo!=null) elImporto.value=s.importo;
+        if(s.rate!=null) elRate.value=s.rate;
+        if(s.tasso!=null) elTasso.value=s.tasso;
+        if(s.scadOrig) elScadOrig.value=s.scadOrig;
+        if(s.primaData) elPrimaData.value=s.primaData;
+      }catch{}
+    })();
 
-    // --- Calcolo ---
     function calcola(){
-      const capitale = parseEuro(elImporto.value);
-      const n = Math.max(1, Math.min(120, parseInt(elRate.value || '1',10)));
-      const tassoPerc = parseEuro(elTasso.value); // es. 0,375
-      const tasso = (tassoPerc || 0) / 100;
+      const capitale=parseEuro(elImporto.value);
+      const n=Math.max(1, Math.min(120, parseInt(elRate.value||'1',10)));
+      const tasso=(parseEuro(elTasso.value)||0)/100;
+      const scadOrig=new Date((elScadOrig.value||'2025-10-01')+'T00:00:00');
+      const primaData=new Date((elPrimaData.value||'2025-10-01')+'T00:00:00');
+      const limite150=addDays(scadOrig,150);
 
-      const firstDateStr = elPrimaData.value || '2025-11-01';
-      const firstDate = new Date(firstDateStr + 'T00:00:00');
+      if(!(capitale>0)){ alert('Inserisci un importo valido.'); return; }
 
-      const scadOrigStr = elScadOrig.value || '2025-10-01';
-      const scadOrig = new Date(scadOrigStr + 'T00:00:00');
-      const limite150 = addDays(scadOrig, 150); // data limite inclusa
+      // quote capitale uguali, ultima aggiustata
+      const base=Math.floor((capitale/n)*100)/100;
+      const quote=Array.from({length:n},()=>base);
+      const diff=round2(capitale - round2(base*n));
+      quote[n-1]=round2(quote[n-1]+diff);
 
-      if(capitale <= 0 || !isFinite(capitale)){
-        alert('Inserisci un importo valido.');
-        return;
-      }
-
-      // Quote capitale uguali (aggiusta l’ultima per centesimi)
-      const base = Math.floor((capitale / n) * 100) / 100;
-      const quote = Array.from({length:n}, ()=> base);
-      const sommaBase = round2(base * n);
-      const diff = round2(capitale - sommaBase);
-      quote[n-1] = round2(quote[n-1] + diff);
-
-      let residuo = round2(capitale);
-      const righe = [];
-
-      for(let k=1; k<=n; k++){
-        const interessi = round2(residuo * tasso * k); // k × 0,375% sul residuo prima rata
-        const cap = quote[k-1];
-        const totaleRata = round2(cap + interessi);
-        const data = addMonths(firstDate, k-1);
-
-        righe.push({
-          rata: k,
-          scadenza: data,
-          residuoPrima: residuo,
-          interessi,
-          capitale: cap,
-          totale: totaleRata
-        });
-
+      let residuo=round2(capitale);
+      const righe=[];
+      for(let k=0;k<n;k++){
+        const data = addMonths(primaData,k);
+        const mesi = monthsElapsed(scadOrig, data); // <-- qui: mesi già trascorsi
+        const interessi = round2(residuo * tasso * mesi);
+        const cap = quote[k];
+        const totale = round2(cap + interessi);
+        righe.push({k:k+1, data, residuo, interessi, cap, totale});
         residuo = round2(residuo - cap);
       }
-
       render(righe, limite150);
       saveState();
     }
 
     function render(rows, limite150){
-      tbody.innerHTML = '';
-      let totInt = 0, totCap = 0, totAll = 0;
-
-      for(const r of rows){
-        totInt += r.interessi;
-        totCap += r.capitale;
-        totAll += r.totale;
-
-        const tr = document.createElement('tr');
+      tbody.innerHTML='';
+      let ti=0, tc=0, tt=0;
+      rows.forEach(r=>{
+        ti+=r.interessi; tc+=r.cap; tt+=r.totale;
+        const tr=document.createElement('tr');
         tr.innerHTML = `
-          <td>${r.rata}ª</td>
-          <td>${itDate(r.scadenza)}</td>
-          <td>${euro(r.residuoPrima)}</td>
+          <td>${r.k}ª</td>
+          <td>${itDate(r.data)}</td>
+          <td>${euro(r.residuo)}</td>
           <td>${euro(r.interessi)}</td>
-          <td>${euro(r.capitale)}</td>
-          <td><strong>${euro(r.totale)}</strong></td>
-        `;
+          <td>${euro(r.cap)}</td>
+          <td><strong>${euro(r.totale)}</strong></td>`;
         tbody.appendChild(tr);
-      }
+      });
+      tfInt.textContent=euro(round2(ti));
+      tfCap.textContent=euro(round2(tc));
+      tfTot.textContent=euro(round2(tt));
+      kInt.textContent=tfInt.textContent;
+      kCap.textContent=tfCap.textContent;
+      kTot.textContent=tfTot.textContent;
+      kpi.style.display='flex';
+      outWrap.style.display='block';
 
-      tfInt.textContent = euro(round2(totInt));
-      tfCap.textContent = euro(round2(totCap));
-      tfTot.textContent = euro(round2(totAll));
-
-      kInt.textContent = euro(round2(totInt));
-      kCap.textContent = euro(round2(totCap));
-      kTot.textContent = euro(round2(totAll));
-
-      kpi.style.display = 'flex';
-      outWrap.style.display = 'block';
-
-      // --- Check 150 giorni ---
-      const lastDate = rows.length ? rows[rows.length - 1].scadenza : null;
-      bannerOK.style.display = 'none';
-      bannerWARN.style.display = 'none';
-
-      if(lastDate){
-        const overMs = lastDate.getTime() - limite150.getTime();
-        const limiteStr = itDate(limite150);
-        const lastStr = itDate(lastDate);
-
-        if(overMs > 0){
-          const daysOver = Math.ceil(overMs / (1000*60*60*24));
-          bannerWARN.textContent = `⚠️ Attenzione: l’ultima rata (${lastStr}) supera il limite ENPAP di 150 giorni dalla scadenza originaria (limite: ${limiteStr}). Sfori di ${daysOver} giorno/i.`;
-          bannerWARN.style.display = 'block';
+      // limite 150 giorni
+      bannerOK.style.display='none'; bannerWARN.style.display='none';
+      if(rows.length){
+        const last=rows[rows.length-1].data;
+        const over = last.getTime() - limite150.getTime();
+        const lim = itDate(limite150), lastStr = itDate(last);
+        if(over>0){
+          const days = Math.ceil(over/86400000);
+          bannerWARN.textContent = `⚠️ Attenzione: l’ultima rata (${lastStr}) supera il limite ENPAP di 150 giorni dalla scadenza originaria (limite: ${lim}). Sfori di ${days} giorno/i.`;
+          bannerWARN.style.display='block';
         }else{
-          bannerOK.textContent = `✅ OK: piano entro 150 giorni dalla scadenza originaria (limite: ${limiteStr}). Ultima rata: ${lastStr}.`;
-          bannerOK.style.display = 'block';
+          bannerOK.textContent = `✅ OK: piano entro 150 giorni dalla scadenza originaria (limite: ${lim}). Ultima rata: ${lastStr}.`;
+          bannerOK.style.display='block';
         }
       }
     }
 
-    // --- Copia elenco per chat ---
     function copiaChat(){
-      const rows = Array.from(tbody.querySelectorAll('tr')).map(tr=>{
-        const tds = tr.querySelectorAll('td');
-        return {
-          rata: tds[0].textContent.trim(),
-          data: tds[1].textContent.trim(),
-          tot: tds[5].textContent.replace(/\s/g,'').trim(),
-          int: tds[3].textContent.replace(/\s/g,'').trim()
-        };
+      const rows=[...tbody.querySelectorAll('tr')].map(tr=>{
+        const t=tr.querySelectorAll('td');
+        return `- ${t[0].textContent.trim()} rata: ${t[5].textContent.trim()} (interessi ${t[3].textContent.trim()}) — entro ${t[1].textContent.trim()}`;
       });
-      if(!rows.length){
-        alert('Calcola prima il piano.');
-        return;
-      }
-      const lines = rows.map(r => `- ${r.rata} rata: ${r.tot} (interessi ${r.int}) — entro ${r.data}`);
-      const txt = lines.join('\n');
-      navigator.clipboard.writeText(txt).then(()=>{
-        alert('Elenco copiato negli appunti ✅');
-      },()=> alert('Impossibile copiare. Copia manualmente.'));
+      if(!rows.length){ alert('Calcola prima il piano.'); return; }
+      navigator.clipboard.writeText(rows.join('\n')).then(()=>alert('Elenco copiato ✅'),()=>alert('Copia non riuscita'));
     }
-
-    // --- Export CSV ---
     function exportCSV(){
-      const rows = Array.from(tbody.querySelectorAll('tr')).map(tr=>{
-        const tds = tr.querySelectorAll('td');
-        return Array.from(tds).slice(0,6).map(td=> td.textContent.trim());
-      });
-      if(!rows.length){
-        alert('Calcola prima il piano.');
-        return;
-      }
-      const head = ["Rata","Scadenza","Residuo prima rata (€)","Interessi (€)","Quota capitale (€)","Totale rata (€)"];
-      const all = [head, ...rows];
-      const csv = all.map(r => r.map(cell => `"${cell.replace(/"/g,'""')}"`).join(';')).join('\n');
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'piano-rate-enpap.csv';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const head=['Rata','Scadenza','Residuo prima rata (€)','Interessi (€)','Quota capitale (€)','Totale rata (€)'];
+      const rows=[...tbody.querySelectorAll('tr')].map(tr=>[...tr.querySelectorAll('td')].slice(0,6).map(td=>td.textContent.trim()));
+      if(!rows.length){ alert('Calcola prima il piano.'); return; }
+      const csv=[head,...rows].map(r=>r.map(c=>`"${c.replace(/"/g,'""')}"`).join(';')).join('\n');
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='piano-rate-enpap.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     }
-
-    // --- Reset ---
     function resetAll(){
-      localStorage.removeItem('enpapSimState_v2');
-      document.getElementById('importo').value = '';
-      document.getElementById('rate').value = '5';
-      document.getElementById('tasso').value = '0,375';
-      document.getElementById('primaData').value = '2025-11-01';
-      document.getElementById('scadOrig').value = '2025-10-01';
-
-      bannerOK.style.display = 'none';
-      bannerWARN.style.display = 'none';
-
-      tbody.innerHTML = '';
-      tfInt.textContent = tfCap.textContent = tfTot.textContent = '0,00';
-      kInt.textContent = kCap.textContent = kTot.textContent = '0,00';
-      kpi.style.display = 'none';
-      outWrap.style.display = 'none';
+      localStorage.removeItem('enpapSimState_v3');
+      elImporto.value=''; elRate.value='5'; elTasso.value='0,375'; elScadOrig.value='2025-10-01'; elPrimaData.value='2025-10-01';
+      document.getElementById('bannerOK').style.display='none'; document.getElementById('bannerWARN').style.display='none';
+      tbody.innerHTML=''; document.getElementById('kpi').style.display='none'; document.getElementById('out').style.display='none';
     }
 
-    // --- Eventi ---
-    btnCalcola.addEventListener('click', calcola);
-    btnCopia.addEventListener('click', copiaChat);
-    btnCSV.addEventListener('click', exportCSV);
-    btnReset.addEventListener('click', resetAll);
+    btnCalcola.addEventListener('click',calcola);
+    btnCopia.addEventListener('click',copiaChat);
+    btnCSV.addEventListener('click',exportCSV);
+    btnReset.addEventListener('click',resetAll);
 
-    // Enter per calcolare
-    document.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter'){
-        const tag = e.target.tagName;
-        if(tag === 'INPUT'){
-          e.preventDefault();
-          calcola();
-        }
-      }
-    });
+    // Enter calcola
+    document.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.tagName==='INPUT'){ e.preventDefault(); calcola(); } });
   </script>
 </body>
 </html>
