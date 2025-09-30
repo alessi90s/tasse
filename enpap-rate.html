@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <title>Simulatore Rate ENPAP – Interessi progressivi (k × 0,375%)</title>
+  <title>Simulatore Rate ENPAP – Interessi progressivi (k × 0,375%) + check 150 giorni</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     :root{
@@ -13,12 +13,14 @@
       --accent:#7dd3fc;
       --border:#1e2230;
       --ok:#86efac;
-      --warn:#fde68a;
+      --warn:#fca5a5;
+      --warn-bg:#3b0d0d;
+      --ok-bg:#0f2a19;
     }
     *{box-sizing:border-box}
     body{
       margin:0; background:var(--bg); color:var(--txt);
-      font: 15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     }
     .wrap{max-width:980px;margin:32px auto;padding:0 16px}
     header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;gap:16px}
@@ -30,10 +32,10 @@
       box-shadow:0 1px 0 rgba(255,255,255,.02), 0 8px 40px rgba(0,0,0,.35);
     }
     .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-    @media (max-width:800px){ .grid{grid-template-columns:1fr} }
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
     label{display:block;font-weight:600;margin:4px 0 6px}
     .hl{background:linear-gradient(transparent 60%, rgba(125,211,252,.25) 0);}
-    input,select,button{
+    input,button{
       width:100%; padding:12px 12px; border-radius:10px; border:1px solid var(--border);
       background:#0f1320; color:var(--txt); outline:none;
     }
@@ -49,19 +51,24 @@
     .btn.primary{background:linear-gradient(180deg,#112042,#0b132d); border-color:#223055}
     .btn.ghost{background:transparent}
     .muted{color:var(--muted);font-size:13px}
-    .note{font-size:13px;color:#cfeaff}
     .rule{
       margin-top:10px; padding:10px 12px; border:1px dashed #2a3246; border-radius:10px; background:#0c121f;
       color:#cfeaff; font-size:13px;
     }
+    .banner{
+      margin:12px 0 0; padding:12px; border-radius:10px; border:1px solid;
+      display:none;
+    }
+    .banner.ok{display:block; border-color:#234b33; background:var(--ok-bg); color:var(--ok)}
+    .banner.warn{display:block; border-color:#6b1d1d; background:var(--warn-bg); color:var(--warn)}
     table{width:100%; border-collapse:collapse; margin-top:16px; overflow:auto}
     thead th{
       text-align:right; font-size:13px; color:#b7c0d4; font-weight:700; padding:10px;
       border-bottom:1px solid var(--border); background:#0f1524;
       position:sticky; top:0; z-index:1;
     }
-    thead th:first-child, tbody td:first-child{ text-align:center; }
-    thead th:nth-child(2), tbody td:nth-child(2){ text-align:center; }
+    thead th:first-child, tbody td:first-child{text-align:center}
+    thead th:nth-child(2), tbody td:nth-child(2){text-align:center}
     tbody td{
       text-align:right; padding:10px; border-bottom:1px solid #171b28; font-variant-numeric:tabular-nums;
     }
@@ -72,13 +79,7 @@
     }
     .pill strong{display:block;font-size:18px}
     .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
-    .right{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .sep{height:1px;background:var(--border);margin:16px 0}
-    .switch{display:flex;align-items:center;gap:8px;margin-top:8px}
-    .inline{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
     .small{font-size:12px}
-    .ok{color:var(--ok)} .warn{color:var(--warn)}
-    .center{display:flex;justify-content:center}
     .footnote{margin-top:8px;color:#aeb7c8;font-size:12px}
   </style>
 </head>
@@ -87,11 +88,9 @@
     <header>
       <div>
         <h1>Simulatore rate ENPAP</h1>
-        <div class="tag">Interessi progressivi: <span class="hl">k × 0,375%</span> sul <b>residuo prima della rata</b></div>
+        <div class="tag">Interessi progressivi: <span class="hl">k × 0,375%</span> sul <b>residuo prima della rata</b>. Avviso automatico oltre <b>150 giorni</b>.</div>
       </div>
-      <div class="right">
-        <button class="btn ghost small" id="btnReset">Reset</button>
-      </div>
+      <button class="btn ghost small" id="btnReset">Reset</button>
     </header>
 
     <section class="card">
@@ -110,19 +109,19 @@
           <div class="muted small">Di default 0,375%</div>
         </div>
         <div>
-          <label for="primaData">Prima scadenza</label>
-          <input id="primaData" type="date" />
-          <div class="muted small">Data entro cui si paga la 1ª rata</div>
+          <label for="primaData">Prima scadenza (default 01/11/2025)</label>
+          <input id="primaData" type="date" value="2025-11-01" />
+          <div class="muted small">La prima rata si paga un mese dopo la scadenza originaria</div>
+        </div>
+        <div>
+          <label for="scadOrig">Scadenza originaria del saldo</label>
+          <input id="scadOrig" type="date" value="2025-10-01" />
+          <div class="muted small">Serve per calcolare il limite ENPAP di 150 giorni</div>
         </div>
       </div>
 
-      <div class="switch">
-        <input id="progressivo" type="checkbox" checked />
-        <label for="progressivo" class="small">Applica regola ENPAP: interessi progressivi (<b>k × 0,375%</b>)</label>
-      </div>
-
       <div class="rule">
-        Regola interessi: 1° mese <b>0,375%</b>, 2° mese <b>0,750%</b>, 3° mese <b>1,125%</b>, ecc. (moltiplicatore <b>k</b> in base al numero di rata).
+        Regola interessi: 1° mese <b>0,375%</b>, 2° mese <b>0,750%</b>, 3° mese <b>1,125%</b>, ecc. (moltiplicatore <b>k</b> = numero rata).
       </div>
 
       <div class="actions">
@@ -131,13 +130,14 @@
         <button class="btn" id="btnCSV">Esporta CSV</button>
       </div>
 
+      <div id="bannerOK" class="banner ok"></div>
+      <div id="bannerWARN" class="banner warn"></div>
+
       <div class="kpi" id="kpi" style="display:none">
         <div class="pill"><div class="muted small">Totale capitale</div><strong id="kCap"></strong></div>
         <div class="pill"><div class="muted small">Totale interessi</div><strong id="kInt"></strong></div>
         <div class="pill"><div class="muted small">Totale complessivo</div><strong id="kTot"></strong></div>
       </div>
-
-      <div class="sep"></div>
 
       <div id="out" style="display:none;overflow:auto">
         <table id="tbl">
@@ -167,12 +167,11 @@
   </div>
 
   <script>
-    // --- Utils formattazione & parsing ---
+    // --- Utils ---
     const fmt = new Intl.NumberFormat('it-IT', { minimumFractionDigits:2, maximumFractionDigits:2 });
     const euro = n => fmt.format(n);
     function parseEuro(str){
       if(typeof str !== 'string') return Number(str)||0;
-      // remove dots thousands, replace comma decimal
       const s = str.trim().replace(/\./g,'').replace(',', '.');
       const n = Number(s);
       return isNaN(n) ? 0 : n;
@@ -181,15 +180,13 @@
       const d = new Date(date.getTime());
       const day = d.getDate();
       d.setMonth(d.getMonth() + months);
-      // fix month overflow (e.g., 31 → adjust)
       if (d.getDate() !== day) d.setDate(0);
       return d;
     }
-    function toISODateInput(d){
-      const y = d.getFullYear();
-      const m = String(d.getMonth()+1).padStart(2,'0');
-      const dd = String(d.getDate()).padStart(2,'0');
-      return `${y}-${m}-${dd}`;
+    function addDays(date, days){
+      const d = new Date(date.getTime());
+      d.setDate(d.getDate() + days);
+      return d;
     }
     function itDate(d){
       const day = String(d.getDate()).padStart(2,'0');
@@ -199,17 +196,20 @@
     }
     function round2(n){ return Math.round((n + Number.EPSILON) * 100)/100; }
 
-    // --- Stato/elementi ---
+    // --- DOM ---
     const elImporto = document.getElementById('importo');
     const elRate = document.getElementById('rate');
     const elTasso = document.getElementById('tasso');
     const elPrimaData = document.getElementById('primaData');
-    const elProg = document.getElementById('progressivo');
+    const elScadOrig = document.getElementById('scadOrig');
 
     const btnCalcola = document.getElementById('btnCalcola');
     const btnCopia = document.getElementById('btnCopia');
     const btnCSV = document.getElementById('btnCSV');
     const btnReset = document.getElementById('btnReset');
+
+    const bannerOK = document.getElementById('bannerOK');
+    const bannerWARN = document.getElementById('bannerWARN');
 
     const outWrap = document.getElementById('out');
     const tbody = document.querySelector('#tbl tbody');
@@ -221,26 +221,19 @@
     const kInt = document.getElementById('kInt');
     const kTot = document.getElementById('kTot');
 
-    // --- Default prima scadenza: prossimo 1° del mese (o fra 30 giorni se oggi è fine mese) ---
-    (function initFirstDate(){
-      const today = new Date();
-      const next = new Date(today.getFullYear(), today.getMonth()+1, 1);
-      elPrimaData.value = toISODateInput(next);
-    })();
-
-    // --- Persistenza semplice ---
+    // --- Persistenza ---
     function saveState(){
       const state = {
         importo: elImporto.value,
         rate: elRate.value,
         tasso: elTasso.value,
         primaData: elPrimaData.value,
-        progressivo: elProg.checked
+        scadOrig: elScadOrig.value
       };
-      localStorage.setItem('enpapSimState', JSON.stringify(state));
+      localStorage.setItem('enpapSimState_v2', JSON.stringify(state));
     }
     function loadState(){
-      const raw = localStorage.getItem('enpapSimState');
+      const raw = localStorage.getItem('enpapSimState_v2');
       if(!raw) return;
       try{
         const s = JSON.parse(raw);
@@ -248,7 +241,7 @@
         if(s.rate != null) elRate.value = s.rate;
         if(s.tasso != null) elTasso.value = s.tasso;
         if(s.primaData) elPrimaData.value = s.primaData;
-        if(typeof s.progressivo === 'boolean') elProg.checked = s.progressivo;
+        if(s.scadOrig) elScadOrig.value = s.scadOrig;
       }catch(e){}
     }
     loadState();
@@ -259,36 +252,38 @@
       const n = Math.max(1, Math.min(120, parseInt(elRate.value || '1',10)));
       const tassoPerc = parseEuro(elTasso.value); // es. 0,375
       const tasso = (tassoPerc || 0) / 100;
-      const firstDateStr = elPrimaData.value;
-      const firstDate = firstDateStr ? new Date(firstDateStr + 'T00:00:00') : new Date();
-      const progressivo = elProg.checked;
+
+      const firstDateStr = elPrimaData.value || '2025-11-01';
+      const firstDate = new Date(firstDateStr + 'T00:00:00');
+
+      const scadOrigStr = elScadOrig.value || '2025-10-01';
+      const scadOrig = new Date(scadOrigStr + 'T00:00:00');
+      const limite150 = addDays(scadOrig, 150); // data limite inclusa
 
       if(capitale <= 0 || !isFinite(capitale)){
         alert('Inserisci un importo valido.');
         return;
       }
 
-      // Quote capitale uguali (aggiustiamo l’ultima per chiudere i centesimi)
-      const base = Math.floor((capitale / n) * 100) / 100; // tronco a 2 dec
-      const quote = Array.from({length:n}, (_,i)=> base);
+      // Quote capitale uguali (aggiusta l’ultima per centesimi)
+      const base = Math.floor((capitale / n) * 100) / 100;
+      const quote = Array.from({length:n}, ()=> base);
       const sommaBase = round2(base * n);
       const diff = round2(capitale - sommaBase);
-      // distribuisci la differenza di centesimi sull’ultima rata
       quote[n-1] = round2(quote[n-1] + diff);
 
       let residuo = round2(capitale);
       const righe = [];
 
       for(let k=1; k<=n; k++){
-        const fattore = progressivo ? k : 1; // k × tasso se progressivo
-        const interessi = round2(residuo * tasso * fattore);
+        const interessi = round2(residuo * tasso * k); // k × 0,375% sul residuo prima rata
         const cap = quote[k-1];
         const totaleRata = round2(cap + interessi);
         const data = addMonths(firstDate, k-1);
 
         righe.push({
           rata: k,
-          scadenza: itDate(data),
+          scadenza: data,
           residuoPrima: residuo,
           interessi,
           capitale: cap,
@@ -298,11 +293,11 @@
         residuo = round2(residuo - cap);
       }
 
-      render(righe);
+      render(righe, limite150);
       saveState();
     }
 
-    function render(rows){
+    function render(rows, limite150){
       tbody.innerHTML = '';
       let totInt = 0, totCap = 0, totAll = 0;
 
@@ -314,7 +309,7 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${r.rata}ª</td>
-          <td>${r.scadenza}</td>
+          <td>${itDate(r.scadenza)}</td>
           <td>${euro(r.residuoPrima)}</td>
           <td>${euro(r.interessi)}</td>
           <td>${euro(r.capitale)}</td>
@@ -333,6 +328,26 @@
 
       kpi.style.display = 'flex';
       outWrap.style.display = 'block';
+
+      // --- Check 150 giorni ---
+      const lastDate = rows.length ? rows[rows.length - 1].scadenza : null;
+      bannerOK.style.display = 'none';
+      bannerWARN.style.display = 'none';
+
+      if(lastDate){
+        const overMs = lastDate.getTime() - limite150.getTime();
+        const limiteStr = itDate(limite150);
+        const lastStr = itDate(lastDate);
+
+        if(overMs > 0){
+          const daysOver = Math.ceil(overMs / (1000*60*60*24));
+          bannerWARN.textContent = `⚠️ Attenzione: l’ultima rata (${lastStr}) supera il limite ENPAP di 150 giorni dalla scadenza originaria (limite: ${limiteStr}). Sfori di ${daysOver} giorno/i.`;
+          bannerWARN.style.display = 'block';
+        }else{
+          bannerOK.textContent = `✅ OK: piano entro 150 giorni dalla scadenza originaria (limite: ${limiteStr}). Ultima rata: ${lastStr}.`;
+          bannerOK.style.display = 'block';
+        }
+      }
     }
 
     // --- Copia elenco per chat ---
@@ -342,7 +357,7 @@
         return {
           rata: tds[0].textContent.trim(),
           data: tds[1].textContent.trim(),
-          tot: tds[5].textContent.replace(/\s/g,'').trim(), // già formattato
+          tot: tds[5].textContent.replace(/\s/g,'').trim(),
           int: tds[3].textContent.replace(/\s/g,'').trim()
         };
       });
@@ -383,15 +398,15 @@
 
     // --- Reset ---
     function resetAll(){
-      localStorage.removeItem('enpapSimState');
-      elImporto.value = '';
-      elRate.value = '5';
-      elTasso.value = '0,375';
-      elProg.checked = true;
-      // reset prima scadenza al prossimo 1°
-      const today = new Date();
-      const next = new Date(today.getFullYear(), today.getMonth()+1, 1);
-      elPrimaData.value = toISODateInput(next);
+      localStorage.removeItem('enpapSimState_v2');
+      document.getElementById('importo').value = '';
+      document.getElementById('rate').value = '5';
+      document.getElementById('tasso').value = '0,375';
+      document.getElementById('primaData').value = '2025-11-01';
+      document.getElementById('scadOrig').value = '2025-10-01';
+
+      bannerOK.style.display = 'none';
+      bannerWARN.style.display = 'none';
 
       tbody.innerHTML = '';
       tfInt.textContent = tfCap.textContent = tfTot.textContent = '0,00';
@@ -409,19 +424,11 @@
     // Enter per calcolare
     document.addEventListener('keydown', (e)=>{
       if(e.key === 'Enter'){
-        const target = e.target;
-        if(['INPUT','SELECT'].includes(target.tagName)){
+        const tag = e.target.tagName;
+        if(tag === 'INPUT'){
           e.preventDefault();
           calcola();
         }
-      }
-    });
-
-    // Autocalcolo se già abbiamo stato salvato
-    window.addEventListener('load', ()=>{
-      // auto-calcola se importo presente
-      if(elImporto.value.trim()){
-        calcola();
       }
     });
   </script>
