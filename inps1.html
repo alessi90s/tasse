@@ -235,8 +235,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
           <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input id="dataApertura" type="date" min="2025-01-01" max="2025-12-31" disabled>
             <small class="form-note" id="pivaNote">
-              Se selezioni “Aperta nel 2025”, indica la data: i contributi minimi saranno ricalcolati pro-rata, con
-              <b>prima rata utile a 0 €</b>, rata successiva ridotta e ultime due quanto più possibile piene.
+              Se selezioni “Aperta nel 2025”, indica la data: i contributi minimi saranno ricalcolati pro-rata per trimestre in base ai giorni di attività.
             </small>
           </div>
         </div>
@@ -461,6 +460,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   /* --- Stato --- */
   let coeffFromChips=78;
   let lastState=null,cacheGiugno=0,cacheNov=0,cacheFissiTot=0,cacheFissiQ=[0,0,0,0];
+  let lastInvJobMsg='';
 
   /* Tabs */
   document.addEventListener('click',e=>{
@@ -576,8 +576,9 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     if(!out) return;
     if(isTot){
       out.innerHTML='In questa modalità calcoliamo l’incassato annuo necessario per ottenere il netto complessivo desiderato, considerando <b>minimi + imposta + acconti</b>.';
+      lastInvJobMsg='';
     }else{
-      out.innerHTML='Qui calcoliamo il <b>compenso minimo</b> per un singolo lavoro, sapendo quanto ha già incassato il cliente, così da lasciargli in tasca il netto che hai indicato.';
+      out.innerHTML='Qui calcoliamo il <b>compenso minimo</b> per un singolo lavoro, sapendo quanto hai già incassato, così da lasciarti in tasca il netto che hai indicato.';
     }
   }
 
@@ -677,55 +678,36 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   const ALIQ1={artigiani:0.24, commercianti:0.2448};
   const ALIQ2={artigiani:0.25, commercianti:0.2548};
 
+  // NUOVA LOGICA PRO-RATA PER TRIMESTRE
   function calcFissiProRata(baseAnn, openDate){
-    const dueDates=[
-      new Date('2025-05-16T00:00:00'),
-      new Date('2025-08-20T00:00:00'),
-      new Date('2025-11-17T00:00:00'),
-      new Date('2026-02-16T00:00:00')
+    const yearEnd = new Date('2026-01-01T00:00:00');
+    if(openDate>=yearEnd) return {q:[0,0,0,0],tot:0};
+
+    const qPeriods = [
+      {start:new Date('2025-01-01T00:00:00'), end:new Date('2025-03-31T23:59:59')}, // Q1
+      {start:new Date('2025-04-01T00:00:00'), end:new Date('2025-06-30T23:59:59')}, // Q2
+      {start:new Date('2025-07-01T00:00:00'), end:new Date('2025-09-30T23:59:59')}, // Q3
+      {start:new Date('2025-10-01T00:00:00'), end:new Date('2025-12-31T23:59:59')}  // Q4
     ];
-    const end2025=new Date('2026-01-01T00:00:00');
-    const msDay=24*60*60*1000;
-    let daysRem=Math.max(0,Math.round((end2025-openDate)/msDay));
-    if(daysRem<=0) return {q:[0,0,0,0],tot:0};
-    const fPro=baseAnn*(daysRem/365);
-    let q=[0,0,0,0];
+    const daysYear = 365; // 2025 non è bisestile
+    const msDay = 24*60*60*1000;
+    const q=[0,0,0,0];
+    let tot=0;
 
-    let skipIdx=0;
-    for(let i=0;i<dueDates.length;i++){
-      if(dueDates[i]>=openDate){skipIdx=i;break;}
-    }
-
-    const fullQuota=baseAnn/4;
-    let rem=[];
     for(let i=0;i<4;i++){
-      if(i===skipIdx) continue;
-      if(dueDates[i]>openDate) rem.push(i);
+      const qs=qPeriods[i].start;
+      const qe=qPeriods[i].end;
+      if(openDate>qe) continue; // trimestre interamente prima dell'apertura
+      const start = openDate>qs ? openDate : qs;
+      const end   = qe;
+      if(end<start) continue;
+      const days = Math.round((end-start)/msDay)+1;
+      if(days<=0) continue;
+      const amount = baseAnn*days/daysYear;
+      q[i]=amount;
+      tot+=amount;
     }
-
-    if(rem.length===0){
-      q[skipIdx]=fPro;
-      return {q:q,tot:fPro};
-    }
-
-    const nFull=Math.min(2,rem.length);
-    const fullIdxs=rem.slice(-nFull);
-    let fullSum=0;
-    fullIdxs.forEach(i=>{q[i]=fullQuota;fullSum+=fullQuota;});
-
-    const leftover=rem.slice(0,rem.length-nFull);
-    let remaining=Math.max(0,fPro-fullSum);
-
-    if(leftover.length>0){
-      const adjIdx=leftover[0];
-      q[adjIdx]=remaining;
-    }else if(fullSum>0 && fPro>0){
-      const ratio=fPro/fullSum;
-      fullIdxs.forEach(i=>{q[i]=q[i]*ratio;});
-    }
-
-    const tot=q.reduce((a,b)=>a+b,0);
-    return {q:q,tot:tot};
+    return {q,tot};
   }
 
   function calcVariabile(imponibile, gestione, factor){
@@ -1027,7 +1009,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
     let agevNote='';
     if(s.agevCfg.esonero){
-      agevNote='Hai indicato <b>esenzione per lavoro dipendente</b>: i contributi INPS (minimi e variabili) risultano pari a 0 €, paghi solo l’imposta sostitutiva.';
+      agevNote='Hai indicato <b>esenzione per lavoro dipendente</b>: i contributi INPS (minimi e variabili) risultano pari a 0 €, paghi solo l’imposta sostitutiva e i relativi acconti.';
     }else if(s.agevKey==='rid35'){
       agevNote='Hai attivato la <b>riduzione del 35%</b>: paghi il 65% dei contributi minimi e variabili.';
     }else if(s.agevKey==='rid50'){
@@ -1038,7 +1020,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
     let html='';
 
-    // Premessa
+    // Premessa (senza numerazione)
     html+=wrapSection('Come funziona (in breve)',
       P(`Nel regime forfettario paghi le tasse e i contributi <b>non</b> sul totale che incassi, ma sul tuo incassato moltiplicato per il <b>coefficiente di redditività</b>.`) +
       P(`Nel tuo caso hai incassato <b>${inc}</b> e usi un coefficiente del <b>${s.coeffPerc}%</b>, quindi l’imponibile forfettario è <b>${impForf}</b>.`) +
@@ -1047,8 +1029,10 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     ,'');
 
     if(!simple){
+      let n=1;
+
       // 1. Imponibile
-      html+=wrapSection('1. Imponibile forfettario',
+      html+=wrapSection((n++)+'. Imponibile forfettario',
         P(`Partiamo dall’incassato: <b>${inc}</b>.`) +
         P(`Applichiamo il coefficiente di redditività <b>${s.coeffPerc}%</b>:`) +
         P(`<span class="mono">${inc} × ${s.coeffPerc}% = ${impForf}</span>.`) +
@@ -1058,26 +1042,38 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       // 2. Minimi
       const lblF=['16/05/2025 — Q1','20/08/2025 — Q2','17/11/2025 — Q3','16/02/2026 — Q4'];
       let righe='';
+
       for(let i=0;i<4;i++){
-        righe+=P(`<span class="mono">${lblF[i]} → ${euro(s.fissiQ[i]||0)}</span>`);
+        if((s.fissiQ[i]||0) > 0.5){
+          righe+=P(`<span class="mono">${lblF[i]} → ${euro(s.fissiQ[i])}</span>`);
+        }
       }
 
       let aperturaTesto='';
-      if(s.pivaMode==='pre' || !s.dataApt || s.dataApt<=new Date('2025-01-01T00:00:00')){
+      if(s.agevCfg.esonero){
+        aperturaTesto='Con l’esenzione INPS non hai contributi minimi da versare per il 2025.';
+      }else if(s.pivaMode==='pre' || !s.dataApt || s.dataApt<=new Date('2025-01-01T00:00:00')){
         aperturaTesto='Hai indicato una partita IVA già aperta prima del 2025 (o dal 1° gennaio): i minimi sono distribuiti in 4 rate uguali durante l’anno.';
       }else{
         const d=s.dataApt;
         const dd=d.getDate().toString().padStart(2,'0');
         const mm=(d.getMonth()+1).toString().padStart(2,'0');
-        aperturaTesto=`Hai indicato una partita IVA aperta il <b>${dd}/${mm}/2025</b>: la prima scadenza utile dopo questa data è messa a <b>0 €</b>, la successiva è “aggiustata” pro-rata in base ai giorni di attività e le ultime due rate sono quanto più possibile piene.`;
+        aperturaTesto=`Hai indicato una partita IVA aperta il <b>${dd}/${mm}/2025</b>: i trimestri che cadono interamente prima di questa data non li paghi; il primo trimestre in cui sei aperto è calcolato in <b>proporzione ai giorni dal ${dd}/${mm}</b> a fine trimestre, mentre i trimestri successivi del 2025 sono pieni (se resti aperto tutto l’anno).`;
       }
 
-      html+=wrapSection('2. Contributi fissi (minimi)',
+      let extra2026='';
+      if(!s.agevCfg.esonero && s.pivaMode==='2025' && s.dataApt && s.dataApt>new Date('2025-01-01T00:00:00')){
+        const quotaFutura = euro(minBase * s.agevCfg.factor / 4);
+        extra2026 = P(`Dal <b>2026</b> in poi, salvo cambi di normativa o agevolazioni, avrai 4 rate piene di circa <b>${quotaFutura}</b> ciascuna (maggio, agosto, novembre e febbraio dell’anno successivo).`);
+      }
+
+      html+=wrapSection((n++)+'. Contributi fissi (minimi)',
         P(`Per la gestione <b>${gestLabel}</b> i contributi fissi annui “pieni” (senza agevolazioni) sarebbero <b>${minBaseStr}</b>. Dopo aver applicato la tua agevolazione arriviamo a minimi complessivi di <b>${fissiTot}</b>.`) +
         P(aperturaTesto) +
-        righe +
-        P(`Questi importi hanno <b>scadenze autonome</b> (maggio, agosto, novembre e febbraio) e non rientrano nel “saldo di giugno” né nei nuovi acconti.`),
-      'inps');
+        (righe || (s.agevCfg.esonero ? '' : P('Per il 2025, con i dati inseriti, non risultano trimestri da pagare (caso raro).'))) +
+        P(`Questi importi hanno <b>scadenze autonome</b> (maggio, agosto, novembre e febbraio) e non rientrano nel “saldo di giugno” né nei nuovi acconti.`) +
+        extra2026
+      ,'inps');
 
       // 3. Variabile
       let varIntro=P(`I contributi INPS <b>variabili</b> si applicano solo sulla parte di reddito che supera i <b>18.555 €</b>.`) +
@@ -1096,17 +1092,17 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       varDet+=P(`Totale INPS variabile: <b>${inpsVar}</b>.`);
 
       if(s.agevCfg.esonero){
-        varIntro+=P(`Con l’esenzione per lavoro dipendente, i contributi variabili sono azzerati (INPS = 0 €).`);
+        varIntro+=P(`Con l’esenzione per lavoro dipendente, i contributi variabili sono azzerati (INPS variabile = 0 €).`);
       }
 
-      html+=wrapSection('3. Contributi variabili sul reddito', varIntro+varDet,'inps');
+      html+=wrapSection((n++)+'. Contributi variabili sul reddito', varIntro+varDet,'inps');
 
       // 4. Imposta
       let impTxt='';
       if(s.deducibili>0){
         impTxt+=P(`Dall’imponibile forfettario <b>${impForf}</b> togliamo i <b>contributi deducibili</b> (${ded}):`) +
-                P(`<span class="mono">${impForf} − ${ded} = ${baseImp}</span>.`);
-        impTxt+=P(`<b>Attenzione:</b> i contributi sono deducibili solo se <b>realmente versati</b> nell’anno.`);
+                P(`<span class="mono">${impForf} − ${ded} = ${baseImp}</span>.`) +
+                P(`<b>Attenzione:</b> i contributi sono deducibili solo se <b>realmente versati</b> nell’anno.`);
       }else{
         impTxt+=P(`Non hai indicato contributi deducibili: la base per l’imposta coincide con l’imponibile forfettario, pari a <b>${baseImp}</b>.`);
       }
@@ -1125,7 +1121,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
                P(`<span class="mono">Saldo INPS variabile = ${saldoInps}</span>`) +
                P(`<span class="mono">Saldo totale (solo imposta + INPS variabile) = ${saldoTot}</span>.`);
 
-      html+=wrapSection('4. Imposta sostitutiva e saldi', impTxt,'imp');
+      html+=wrapSection((n++)+'. Imposta sostitutiva e saldi', impTxt,'imp');
 
       // 5. Acconti
       let accTxt='';
@@ -1139,16 +1135,23 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         accTxt+=P(`Eventuali eccedenze di acconti 2024 sono usate prima per ridurre i nuovi acconti; un eventuale residuo rimane come credito da riportare.`);
       }
 
-      html+=wrapSection('5. Nuovi acconti 2025', accTxt,'');
+      html+=wrapSection((n++)+'. Nuovi acconti 2025', accTxt,'');
 
-      // 6. Totale
-      html+=wrapSection('6. Totale anno e incidenza',
+      // 6. Totale anno
+      html+=wrapSection((n++)+'. Totale anno e incidenza',
         P(`Mettendo insieme tutto, il costo complessivo dell’anno è:`) +
         P(`<span class="mono">Minimi ${fissiTot} + saldi (imp.+INPS variabile) ${saldoTot} + acconti ${accTot} = <b>${totAnno}</b></span>.`) +
         P(`In termini percentuali sul tuo incassato <b>${inc}</b>: saldi incidono per circa <b>${perc(s.saldoTotale,s.incassato)}</b>, acconti per <b>${perc(s.accontiTot,s.incassato)}</b> e il totale (minimi inclusi) per circa <b>${perc(s.totaleAnno,s.incassato)}</b>.`),
       '');
 
-      html+=wrapSection('7. Scadenze principali',
+      // 7. Quanto chiedere su questo lavoro (se è stato usato il box)
+      if(lastInvJobMsg){
+        html+=wrapSection((n++)+'. Quanto chiedere per questo lavoro',
+          `<p class="line">${lastInvJobMsg}</p>`,'');
+      }
+
+      // Ultimo: Scadenze
+      html+=wrapSection((n++)+'. Scadenze principali',
         P(`I contributi <b>fissi (minimi)</b> seguono le quattro scadenze INPS (maggio, agosto, novembre, febbraio dell’anno successivo).`) +
         P(`La parte <b>variabile + imposta</b> si concentra invece su:`) +
         P(`<b>Giugno</b>: saldi imposta + INPS variabile (<b>${saldoTot}</b>) + primi acconti → <b>${giu}</b>.`) +
@@ -1176,6 +1179,11 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         P(`Nuovi acconti (imposta + INPS variabile): <b>${accTot}</b>.`) +
         P(`Totale anno (minimi + saldi + acconti): <b>${totAnno}</b>.`),
       '');
+
+      if(lastInvJobMsg){
+        html+=wrapSection('Quanto chiedere per questo lavoro',
+          `<p class="line">${lastInvJobMsg}</p>`,'');
+      }
 
       html+=wrapSection('Scadenze',
         P(`<b>Minimi</b>: Q1, Q2, Q3, Q4 secondo tabella delle scadenze.`) +
@@ -1258,6 +1266,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   /* Inverso: netto annuo totale */
   document.getElementById('btnInverti').addEventListener('click',()=>{
     const target=val('nettoTargetTot');
+    lastInvJobMsg='';
     if(target<=0){setHTML('invOut','Inserisci un netto annuo desiderato valido.');return;}
     const inc=findIncassatoForNet(target);
     const incInput=document.getElementById('incassato');
@@ -1302,22 +1311,34 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     const percFisco=compenso>0?Math.round(extraTasse/compenso*100):0;
 
     const reddito0=s0.imponibileForf;
-    const reddito1=s1.imponibileForf;
     const fissiTot=s1.fissiTot;
+    const agevCfg=s1.agevCfg;
+    const hasEsenzione=agevCfg.esonero;
 
-    let msg=`Per dare al cliente circa <b>${euro(extraNet)}</b> netti in più su questo lavoro, il compenso da chiedere è circa <b>${euro(compenso)}</b> (lordi).<br>`;
-    msg+=`Su questi ${euro(compenso)} lo Stato si prende circa <b>${euro(extraTasse)}</b> (≈ <b>${percFisco||0}%</b>) tra imposta, contributi variabili e acconti.<br>`;
+    let msg=`Per avere circa <b>${euro(extraNet)}</b> netti in base alle tasse che paghi, il compenso da chiedere è di circa <b>${euro(compenso)}</b> (lordi).<br>`;
+
+    if(!hasEsenzione){
+      msg+=`Su questi ${euro(compenso)} dovrai pagare circa <b>${euro(extraTasse)}</b> (≈ <b>${percFisco||0}%</b>) tra imposta, contributi variabili e relativi acconti.<br>`;
+    }else{
+      msg+=`Su questi ${euro(compenso)} pagherai circa <b>${euro(extraTasse)}</b> (≈ <b>${percFisco||0}%</b>) solo di imposta sostitutiva e relativi acconti: non avrai contributi INPS da versare su questo lavoro.<br>`;
+    }
+
     msg+=`Il netto stimato aggiuntivo passa da circa <b>${euro(net0)}</b> a circa <b>${euro(net1)}</b> (extra netto ≈ <b>${euro(netExtra)}</b>).<br>`;
 
-    if(reddito0>=MINIM){
-      msg+=`In questo momento il reddito imponibile del cliente è circa <b>${euro(reddito0)}</b>, quindi è già oltre il minimale di ${euro(MINIM)}: questo lavoro genera soprattutto <b>imposta</b> e <b>contributi variabili/acconti</b>. I contributi fissi annui (${euro(fissiTot)}) restano invariati e li pagherebbe comunque.`;
+    if(hasEsenzione){
+      msg+=`In questo momento il tuo reddito imponibile è circa <b>${euro(reddito0)}</b>. Con l’esenzione INPS per lavoro dipendente, non paghi contributi fissi o variabili: questo lavoro incide solo sull’imposta sostitutiva e sui suoi acconti.`;
     }else{
-      msg+=`Al momento il reddito imponibile del cliente è circa <b>${euro(reddito0)}</b>, ancora sotto il minimale di ${euro(MINIM)}: i contributi fissi INPS (circa <b>${euro(fissiTot)}</b> annui) li paga comunque sull’anno, indipendentemente da questo singolo lavoro.`;
-      if(reddito1>MINIM){
-        msg+=`<br>Con questo lavoro il reddito imponibile supera il minimale, quindi iniziano ad attivarsi anche i <b>contributi variabili</b> sul reddito oltre i 18.555 € (oltre ai minimi).`;
+      if(reddito0>=MINIM){
+        msg+=`In questo momento il tuo reddito imponibile è circa <b>${euro(reddito0)}</b>, quindi è già oltre il minimale di 18.555 €: questo lavoro genera soprattutto imposta e contributi variabili/acconti. I contributi fissi annui (${euro(fissiTot)}) restano invariati e li pagheresti comunque.`;
+      }else{
+        msg+=`In questo momento il tuo reddito imponibile è circa <b>${euro(reddito0)}</b>, ancora sotto il minimale di 18.555 €: i contributi fissi INPS (circa <b>${euro(fissiTot)}</b> annui) li paghi comunque sull’anno, indipendentemente da questo singolo lavoro.`;
+        if(s1.imponibileForf>MINIM){
+          msg+=` Con questo lavoro il reddito imponibile supera il minimale, quindi iniziano ad attivarsi anche i <b>contributi variabili</b> sul reddito oltre i 18.555 € (oltre ai minimi).`;
+        }
       }
     }
 
+    lastInvJobMsg=msg;
     setHTML('invOut',msg);
 
     // aggiorno il simulatore allo scenario "dopo lavoro"
@@ -1397,6 +1418,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       refreshAccMode();
 
       updateInvMode('totale');
+      lastInvJobMsg='';
 
       document.getElementById('ratesAcc').open=true;
       document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').textContent='Vista Dettagliata';
