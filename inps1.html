@@ -78,7 +78,7 @@ details.adv[open] .adv-panel{display:block}
 .bar.theme-4{background:var(--c5)}
 .desc{font-size:12px;color:#6b7280;margin-top:6px}
 
-/* Toggle pill Manuale/Stima */
+/* Toggle pill Manuale/Stima & inverse */
 .pill-toggle{display:flex;justify-content:center;gap:8px;margin:8px 0 14px}
 .pill{height:34px;padding:0 14px;border-radius:9999px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
 .pill.active{background:var(--c2);color:#fff;border-color:var(--c2)}
@@ -298,18 +298,39 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
               </div>
 
               <div class="ibox">
-                <div class="bar theme-4">Calcolo inverso (netto desiderato → incassato)</div>
-                <div class="subgrid" style="align-items:end">
+                <div class="bar theme-4">Calcolo inverso (netto → incassato)</div>
+
+                <div class="pill-toggle" id="invModeToggle" role="tablist" aria-label="Tipo di calcolo inverso">
+                  <button type="button" class="pill active" id="pillInvTotale" aria-pressed="true">Netto annuo totale</button>
+                  <button type="button" class="pill" id="pillInvLavoro" aria-pressed="false">Netto in più su nuovo lavoro</button>
+                </div>
+
+                <div class="subgrid" id="invTotaleBox" style="align-items:end">
                   <div>
-                    <label for="nettoTarget">Netto annuo desiderato (€)</label>
-                    <input id="nettoTarget" type="text" inputmode="decimal" placeholder="es. 20000" value="">
+                    <label for="nettoTargetTot">Netto annuo desiderato (€)</label>
+                    <input id="nettoTargetTot" type="text" inputmode="decimal" placeholder="es. 20000" value="">
                   </div>
                   <div>
                     <button type="button" id="btnInverti" class="btn primary" style="width:100%">Calcola incassato necessario</button>
                   </div>
                 </div>
+
+                <div class="subgrid" id="invLavoroBox" style="align-items:end;display:none;margin-top:4px">
+                  <div>
+                    <label for="incassoAttuale">Incassato già realizzato nell’anno (€)</label>
+                    <input id="incassoAttuale" type="text" inputmode="decimal" placeholder="es. 40000" value="">
+                  </div>
+                  <div>
+                    <label for="nettoLavoro">Netto desiderato da questo lavoro (€)</label>
+                    <input id="nettoLavoro" type="text" inputmode="decimal" placeholder="es. 2000" value="">
+                  </div>
+                  <div>
+                    <button type="button" id="btnInvJob" class="btn primary" style="width:100%">Calcola compenso necessario</button>
+                  </div>
+                </div>
+
                 <div id="invOut" class="desc" style="margin-top:8px"></div>
-                <div class="desc">Il lordo calcolato copre <b>minimi + saldi + acconti</b>.</div>
+                <div class="desc">In entrambe le modalità il simulatore considera <b>minimi + imposta + acconti</b>.</div>
               </div>
 
             </div>
@@ -533,20 +554,39 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   document.getElementById('pillManuale').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillStima').classList.remove('active');refreshAccMode();});
   document.getElementById('pillStima').addEventListener('click',function(){this.classList.add('active');document.getElementById('pillManuale').classList.remove('active');refreshAccMode();});
 
-  /* Vista */
-  const simp=document.getElementById('simpToggle'), viewLabel=document.getElementById('viewLabel');
-  simp.addEventListener('change',()=>{viewLabel.textContent = simp.checked ? 'Vista Semplificata' : 'Vista Dettagliata'; if(document.getElementById('resultsBox').style.display!=='none') buildExplanation();});
+  /* Modalità calcolo inverso */
+  const invTotaleBox=document.getElementById('invTotaleBox');
+  const invLavoroBox=document.getElementById('invLavoroBox');
+  const pillInvTotale=document.getElementById('pillInvTotale');
+  const pillInvLavoro=document.getElementById('pillInvLavoro');
 
-  /* Copy */
-  document.addEventListener('click',async e=>{
-    const btn=e.target.closest('.copy-btn'); if(!btn) return;
-    const box=btn.closest('.section'); const payload=(box.querySelector('.copy-content')||box).innerText.trim();
-    try{await navigator.clipboard.writeText(payload);const t=btn.textContent;btn.textContent='Copiato!';setTimeout(()=>btn.textContent=t,1200);}catch{const t=btn.textContent;btn.textContent='Errore';setTimeout(()=>btn.textContent=t,1200);}
-  });
+  function updateInvMode(mode){
+    const isTot = mode !== 'lavoro';
+    if(invTotaleBox) invTotaleBox.style.display=isTot?'grid':'none';
+    if(invLavoroBox) invLavoroBox.style.display=isTot?'none':'grid';
+    if(pillInvTotale){
+      pillInvTotale.classList.toggle('active',isTot);
+      pillInvTotale.setAttribute('aria-pressed',isTot?'true':'false');
+    }
+    if(pillInvLavoro){
+      pillInvLavoro.classList.toggle('active',!isTot);
+      pillInvLavoro.setAttribute('aria-pressed',!isTot?'true':'false');
+    }
+    const out=document.getElementById('invOut');
+    if(!out) return;
+    if(isTot){
+      out.innerHTML='In questa modalità calcoliamo l’incassato annuo necessario per ottenere il netto complessivo desiderato, considerando <b>minimi + imposta + acconti</b>.';
+    }else{
+      out.innerHTML='Qui calcoliamo il <b>compenso minimo</b> per un singolo lavoro, sapendo quanto ha già incassato il cliente, così da lasciargli in tasca il netto che hai indicato.';
+    }
+  }
 
-  /* AVVISO DEDUCIBILI (input) */
+  if(pillInvTotale) pillInvTotale.addEventListener('click',()=>updateInvMode('totale'));
+  if(pillInvLavoro) pillInvLavoro.addEventListener('click',()=>updateInvMode('lavoro'));
+  updateInvMode('totale');
+
+  /* AVVISO DEDUCIBILI */
   function _parseNumLocal(v){
-    if (typeof parseNum === 'function') return parseNum(v);
     if(v==null) return 0;
     const s = String(v).replace(/\./g,'').replace(',', '.');
     const n = Number(s);
@@ -797,9 +837,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       impRate:params.impRate,
       agevKey:params.agevKey,
       agevCfg,
-      // 👇 FIX: ora esponiamo anche l'imposta calcolata
       imposta,
-      // 👆
       pivaMode:params.pivaMode,
       dataApt:params.dataApt,
       deducibili:params.deducibili||0,
@@ -1000,7 +1038,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
     let html='';
 
-    // Premessa comune
+    // Premessa
     html+=wrapSection('Come funziona (in breve)',
       P(`Nel regime forfettario paghi le tasse e i contributi <b>non</b> sul totale che incassi, ma sul tuo incassato moltiplicato per il <b>coefficiente di redditività</b>.`) +
       P(`Nel tuo caso hai incassato <b>${inc}</b> e usi un coefficiente del <b>${s.coeffPerc}%</b>, quindi l’imponibile forfettario è <b>${impForf}</b>.`) +
@@ -1009,7 +1047,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     ,'');
 
     if(!simple){
-      // Imponibile
+      // 1. Imponibile
       html+=wrapSection('1. Imponibile forfettario',
         P(`Partiamo dall’incassato: <b>${inc}</b>.`) +
         P(`Applichiamo il coefficiente di redditività <b>${s.coeffPerc}%</b>:`) +
@@ -1017,7 +1055,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         P(`Questa è la base su cui si calcolano sia l’imposta sia i contributi INPS variabili.`),
       '');
 
-      // Minimi
+      // 2. Minimi
       const lblF=['16/05/2025 — Q1','20/08/2025 — Q2','17/11/2025 — Q3','16/02/2026 — Q4'];
       let righe='';
       for(let i=0;i<4;i++){
@@ -1041,7 +1079,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
         P(`Questi importi hanno <b>scadenze autonome</b> (maggio, agosto, novembre e febbraio) e non rientrano nel “saldo di giugno” né nei nuovi acconti.`),
       'inps');
 
-      // Variabile
+      // 3. Variabile
       let varIntro=P(`I contributi INPS <b>variabili</b> si applicano solo sulla parte di reddito che supera i <b>18.555 €</b>.`) +
                    P(`Per la gestione <b>${gestLabel}</b> le aliquote 2025 sono:`) +
                    P(`<span class="mono">${a1}%</span> tra <b>18.555 €</b> e <b>55.448 €</b>, e <span class="mono">${a2}%</span> sulla parte oltre <b>55.448 €</b>, sempre dopo aver applicato l’agevolazione.`);
@@ -1063,7 +1101,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
       html+=wrapSection('3. Contributi variabili sul reddito', varIntro+varDet,'inps');
 
-      // Imposta
+      // 4. Imposta
       let impTxt='';
       if(s.deducibili>0){
         impTxt+=P(`Dall’imponibile forfettario <b>${impForf}</b> togliamo i <b>contributi deducibili</b> (${ded}):`) +
@@ -1089,7 +1127,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
       html+=wrapSection('4. Imposta sostitutiva e saldi', impTxt,'imp');
 
-      // Acconti
+      // 5. Acconti
       let accTxt='';
       accTxt+=P(`Dopo aver calcolato il dovuto dell’anno, applichiamo le percentuali di acconto che hai indicato:`) +
               P(`<b>Imposta</b>: ${s.percAccImp}% → acconti totali <b>${accImpTot}</b>.`) +
@@ -1103,7 +1141,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
 
       html+=wrapSection('5. Nuovi acconti 2025', accTxt,'');
 
-      // Totale anno e scadenze
+      // 6. Totale
       html+=wrapSection('6. Totale anno e incidenza',
         P(`Mettendo insieme tutto, il costo complessivo dell’anno è:`) +
         P(`<span class="mono">Minimi ${fissiTot} + saldi (imp.+INPS variabile) ${saldoTot} + acconti ${accTot} = <b>${totAnno}</b></span>.`) +
@@ -1168,7 +1206,7 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     setHTML('rateTotAll',euro(sumTotGiu+cacheNov));
   }
 
-  /* Netto desiderato → incassato */
+  /* Netto desiderato → incassato (totale anno) */
   function netAfterTotale(inc){
     const params=collectParams(inc);
     const s=calcScenario(params);
@@ -1186,6 +1224,30 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     return Math.round(hi);
   }
 
+  /* Netto extra su nuovo lavoro → incasso totale */
+  function findIncassoTotaleForExtraNet(extraNet, incassoAttuale){
+    extraNet=Math.max(0,extraNet||0);
+    incassoAttuale=Math.max(0,incassoAttuale||0);
+    if(extraNet===0) return incassoAttuale;
+
+    const net0=netAfterTotale(incassoAttuale);
+    const targetNet=net0+extraNet;
+
+    let lo=incassoAttuale;
+    let hi=Math.max(incassoAttuale+extraNet*4+5000,incassoAttuale+20000);
+
+    for(let i=0;i<40 && netAfterTotale(hi)<targetNet;i++){
+      hi = incassoAttuale + (hi-incassoAttuale)*1.6;
+    }
+    let best=hi;
+    for(let k=0;k<64;k++){
+      const mid=(lo+hi)/2;
+      const netMid=netAfterTotale(mid);
+      if(netMid>=targetNet){best=mid;hi=mid;}else{lo=mid;}
+    }
+    return Math.round(best);
+  }
+
   /* Stampa */
   document.getElementById('btnPrint').addEventListener('click',()=>{
     const vis=document.getElementById('resultsBox').style.display!=='none';
@@ -1193,15 +1255,75 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
     window.print();
   });
 
-  /* Inverti */
+  /* Inverso: netto annuo totale */
   document.getElementById('btnInverti').addEventListener('click',()=>{
-    const target=val('nettoTarget');
-    if(target<=0){setHTML('invOut','Inserisci un netto desiderato valido.');return;}
+    const target=val('nettoTargetTot');
+    if(target<=0){setHTML('invOut','Inserisci un netto annuo desiderato valido.');return;}
     const inc=findIncassatoForNet(target);
     const incInput=document.getElementById('incassato');
     incInput.value=String(inc);
     [...document.getElementById('incChips').querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
-    setHTML('invOut',`Per avere circa <b>${euro(target)}</b> netti <u>dopo minimi + saldi + acconti</u>, ti servono circa <b>${euro(inc)}</b> di incassato.`);
+    setHTML('invOut',`Per portare il <b>netto complessivo dell’anno</b> intorno a <b>${euro(target)}</b>, ti servono circa <b>${euro(inc)}</b> di incassato complessivo (considerando minimi + imposta + acconti).`);
+    compute();
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  /* Inverso: netto in più su nuovo lavoro */
+  document.getElementById('btnInvJob').addEventListener('click',()=>{
+    const incAtt=val('incassoAttuale');
+    const extraNet=val('nettoLavoro');
+
+    if(extraNet<=0){
+      setHTML('invOut','Inserisci un netto desiderato valido per il nuovo lavoro (es. 2000).');
+      return;
+    }
+    if(incAtt<0){
+      setHTML('invOut','L’incassato attuale non può essere negativo.');
+      return;
+    }
+
+    const incTot=findIncassoTotaleForExtraNet(extraNet,incAtt);
+    const compenso=Math.max(0,incTot-Math.max(0,incAtt));
+
+    // scenari prima / dopo
+    const params0=collectParams(Math.max(0,incAtt));
+    const s0=calcScenario(params0);
+    const params1=collectParams(incTot);
+    const s1=calcScenario(params1);
+
+    const tasse0=s0.totaleAnno;
+    const tasse1=s1.totaleAnno;
+    const extraTasse=Math.max(0,tasse1-tasse0);
+
+    const net0=incAtt-tasse0;
+    const net1=incTot-tasse1;
+    const netExtra=net1-net0;
+
+    const percFisco=compenso>0?Math.round(extraTasse/compenso*100):0;
+
+    const reddito0=s0.imponibileForf;
+    const reddito1=s1.imponibileForf;
+    const fissiTot=s1.fissiTot;
+
+    let msg=`Per dare al cliente circa <b>${euro(extraNet)}</b> netti in più su questo lavoro, il compenso da chiedere è circa <b>${euro(compenso)}</b> (lordi).<br>`;
+    msg+=`Su questi ${euro(compenso)} lo Stato si prende circa <b>${euro(extraTasse)}</b> (≈ <b>${percFisco||0}%</b>) tra imposta, contributi variabili e acconti.<br>`;
+    msg+=`Il netto stimato aggiuntivo passa da circa <b>${euro(net0)}</b> a circa <b>${euro(net1)}</b> (extra netto ≈ <b>${euro(netExtra)}</b>).<br>`;
+
+    if(reddito0>=MINIM){
+      msg+=`In questo momento il reddito imponibile del cliente è circa <b>${euro(reddito0)}</b>, quindi è già oltre il minimale di ${euro(MINIM)}: questo lavoro genera soprattutto <b>imposta</b> e <b>contributi variabili/acconti</b>. I contributi fissi annui (${euro(fissiTot)}) restano invariati e li pagherebbe comunque.`;
+    }else{
+      msg+=`Al momento il reddito imponibile del cliente è circa <b>${euro(reddito0)}</b>, ancora sotto il minimale di ${euro(MINIM)}: i contributi fissi INPS (circa <b>${euro(fissiTot)}</b> annui) li paga comunque sull’anno, indipendentemente da questo singolo lavoro.`;
+      if(reddito1>MINIM){
+        msg+=`<br>Con questo lavoro il reddito imponibile supera il minimale, quindi iniziano ad attivarsi anche i <b>contributi variabili</b> sul reddito oltre i 18.555 € (oltre ai minimi).`;
+      }
+    }
+
+    setHTML('invOut',msg);
+
+    // aggiorno il simulatore allo scenario "dopo lavoro"
+    const incAssatoInput=document.getElementById('incassato');
+    incAssatoInput.value=String(incTot);
+    [...document.getElementById('incChips').querySelectorAll('.chip')].forEach(c=>c.classList.remove('active'));
     compute();
     window.scrollTo({top:0,behavior:'smooth'});
   });
@@ -1212,13 +1334,43 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
   document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('coeffChips').querySelector('.chip[data-coeff="78"]').classList.add('active');
     updateGestioneInfo();
-    ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','percAccImp','percAccInps','nettoTarget']
-      .forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();id==='nettoTarget'?document.getElementById('btnInverti').click():document.getElementById('btnCalc').click();}})});
+
+    // Invio = Calcola (simulatore)
+    ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','coeff2024','percAccImp','percAccInps']
+      .forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el) return;
+        el.addEventListener('keydown',e=>{
+          if(e.key==='Enter'){
+            e.preventDefault();
+            document.getElementById('btnCalc').click();
+          }
+        });
+      });
+
+    // Invio = calcoli inversi
+    [
+      ['nettoTargetTot','btnInverti'],
+      ['incassoAttuale','btnInvJob'],
+      ['nettoLavoro','btnInvJob']
+    ].forEach(pair=>{
+      const [inputId,btnId]=pair;
+      const el=document.getElementById(inputId);
+      const btn=document.getElementById(btnId);
+      if(!el || !btn) return;
+      el.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){
+          e.preventDefault();
+          btn.click();
+        }
+      });
+    });
+
     document.getElementById('deducibili')?.addEventListener('input', updateDeducibiliNotice);
     updateDeducibiliNotice();
 
     document.getElementById('btnReset').addEventListener('click',()=>{
-      ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','nettoTarget'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+      ['incassato','deducibili','accImpPrev','accInpsPrev','incasso2024','nettoTargetTot','incassoAttuale','nettoLavoro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
       document.getElementById('coeffCustom').value='';
       document.querySelectorAll('#coeffChips .chip').forEach(x=>x.classList.remove('active'));
       document.querySelector('#coeffChips .chip[data-coeff="78"]').classList.add('active'); coeffFromChips=78;
@@ -1243,6 +1395,8 @@ details.rates[open]>summary::before{transform:rotate(-135deg)}
       document.getElementById('pillManuale').classList.add('active');
       document.getElementById('pillStima').classList.remove('active');
       refreshAccMode();
+
+      updateInvMode('totale');
 
       document.getElementById('ratesAcc').open=true;
       document.getElementById('simpToggle').checked=false; document.getElementById('viewLabel').textContent='Vista Dettagliata';
