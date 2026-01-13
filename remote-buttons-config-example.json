@@ -28,7 +28,7 @@
   },
   "buttons": [
     { "id": "back", "label": "BACK", "type": "home" },
-    { "id": "fatture", "label": "FATTURE", "type": "goto", "value": "app/archivio-fatture#invoice" },
+    { "id": "fatture", "label": "FATTURE", "type": "goto", "value": "app/fatture-emesse" },
     { "id": "ademp", "label": "ADEMP.", "type": "goto", "value": "app/tasse" },
     { "id": "dichi", "label": "DICHI", "type": "goto", "value": "app/dichiarazione" },
     { "id": "immobili", "label": "IMMOBILI", "type": "goto", "value": "app/immobili" },
