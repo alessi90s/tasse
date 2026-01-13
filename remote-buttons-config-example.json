@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "textCase": "upper",
+  "panel": {
+    "top": 7,
+    "left": 350,
+    "gap": 6
+  },
+  "button": {
+    "height": 36,
+    "paddingX": 10,
+    "radius": 12,
+    "border": "rgba(17, 24, 39, 0.08)",
+    "bg": "rgba(255,255,255,0.92)",
+    "shadow": "0 1px 2px rgba(0,0,0,0.08)",
+    "hoverShadow": "0 1px 0 rgba(0,0,0,0.04)",
+    "darkBg": "rgba(17, 24, 39, 0.78)",
+    "darkBorder": "rgba(255,255,255,0.12)",
+    "darkShadow": "0 6px 16px rgba(0,0,0,0.22)"
+  },
+  "tints": {
+    "back": "107, 114, 128",
+    "fatture": "37, 99, 235",
+    "ademp": "16, 185, 129",
+    "dichi": "124, 58, 237",
+    "immobili": "245, 158, 11",
+    "msg": "236, 72, 153"
+  },
+  "buttons": [
+    { "id": "back", "label": "BACK", "type": "home" },
+    { "id": "fatture", "label": "FATTURE", "type": "goto", "value": "app/archivio-fatture#invoice" },
+    { "id": "ademp", "label": "ADEMP.", "type": "goto", "value": "app/tasse" },
+    { "id": "dichi", "label": "DICHI", "type": "goto", "value": "app/dichiarazione" },
+    { "id": "immobili", "label": "IMMOBILI", "type": "goto", "value": "app/immobili" },
+    { "id": "msg", "label": "MESSAGGI", "type": "path", "value": "/messaggi" }
+  ],
+  "icons": {
+    "back": "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M15 18l-6-6 6-6\"></path><path d=\"M9 12h12\"></path></svg>",
+    "fatture": "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M8 13h8\"></path><path d=\"M8 17h8\"></path><path d=\"M8 9h2\"></path></svg>",
+    "ademp": "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11\"></path><path d=\"M9 11l3 3L22 4\"></path></svg>",
+    "dichi": "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"></path><path d=\"M14 2v6h6\"></path><path d=\"M9 15l2 2 4-4\"></path></svg>",
+    "immobili": "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 10.5L12 3l9 7.5\"></path><path d=\"M5 10v11h14V10\"></path><path d=\"M9 21v-7h6v7\"></path></svg>",
+    "msg": "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z\"></path><path d=\"M22 6l-10 7L2 6\"></path></svg>"
+  }
+}
